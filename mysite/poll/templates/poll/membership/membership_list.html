@@ -1,0 +1,9 @@
+{% extends "poll/header.html" %}
+{% block content %}
+    <h1>Список  персонажей, входящих в группы</h1>
+        <ul>
+        {% for member in membership_list %}
+            <li><a href="/poll/person/{{ member.person.id }}/">{{ member.person }}</a></li>
+        {% endfor %}
+        </ul>
+{% endblock %}

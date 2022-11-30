@@ -1,0 +1,20 @@
+{% extends "poll/header.html" %}
+
+{% block content %}
+
+
+
+<!--Login--> 
+<div class="container py-5">
+  <h1>Login</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ login_form }}
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+  <p >Еще не зарегистрировались? <a href="../register">Регистрация</a>
+  <p >Забыли пароль?<a href="/password_reset">Forgot password?</a></p>
+
+</div>
+
+{% endblock %}

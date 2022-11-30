@@ -1,0 +1,34 @@
+{% extends "poll/header.html" %}
+
+{% block content %}
+  <h1>Персонаж: {{ person_detail.person_name }}</h1>
+
+  <p><strong>Владелец:</strong> <a href="/poll/owner/{{ owner.id }}/"></a>{{ person_detail.owner.owner_name }}</a></p> <!-- owner detail link not yet defined -->
+  <p><strong>Краткое описание:</strong> {{ person_detail.description }}</p>
+  <p><strong>Ссылка:</strong> {{ person_detail.link }}</p>
+  <p><strong>Раса:</strong> {{ person_detail.race_id }}</p>
+  <p><strong>Мeсто возрождения:</strong> {{ person_detail.location_id_birth }}</p>
+  <p><strong>Дата рождения:</strong> {{ person_detail.birth_date }}</p>
+  <p><strong>Мeсто смерти:</strong> {{ person_detail.location_id_death }}</p>
+  <p><strong>Дата смерти:</strong> {{ person_detail.death_date }}</p>
+  <p><strong>Текущий статус:</strong> {{ status_ }}</p>
+  <p><strong>Членство в группе:</strong> {{ group_status }}</p>
+  {% if person_detail.second_person.all.count > 0 %}
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Участники группы</h4>
+    {% for participant in person_detail.second_person.all %}
+    <p> <a href="/poll/person/{{ participant.person.id }}/">{{participant.person.person_name}}</a></p>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p> <a href="{% url 'poll:group-add' person_detail.id %}"> + Добавить в группу?</a></p>
+  {% endif %}
+<p><a href="{% url 'poll:person-update' person_detail.id %}">+ Редактировать Персонаж </a></p>
+<p><a href="{% url 'poll:person-delete' person_detail.pk %}">- Удалить Персонаж</a></p>
+< p > < a  href = "{% url 'poll:membership-add', person_detail.id %}" > + Организовать
+    группу? < / a > < / p >
+< p > < a    href = "{% url 'poll:membership-update' person_detail.id %}" > + Вступить
+    в    группу? < / a > < / p >
+{% endblock %}
+
+

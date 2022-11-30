@@ -1,0 +1,10 @@
+{% extends "poll/header.html" %}
+{% block content %}
+    <h1>Список занятых персонажей</h1>
+    <ul>
+    {% for person in busy_persons_list %}
+        <li>{{ person.person_name }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,12 @@
+<!-- templates/membership/membership_form.html -->
+{% extends "poll/header.html" %}
+{% block content %}
+   {% load bootstrap5 %}
+<h1>Добавление персонажа в группу</h1>
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+{% endblock content %}

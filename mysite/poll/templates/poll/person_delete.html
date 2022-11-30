@@ -1,0 +1,12 @@
+<!-- templates/person/person_delete.html -->
+{% extends "poll/header.html"  %}
+
+{% block content %}
+    <h1>Удаление персонажа</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+      <p>Are you sure you want to delete "{{ person_detail.person_name }}"?</p>
+      <input type="submit" value="Confirm" />
+    </form>
+{% endblock content %}

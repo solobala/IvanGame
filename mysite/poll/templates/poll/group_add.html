@@ -1,0 +1,12 @@
+<!-- templates/person/person_delete.html -->
+{% extends "poll/header.html" %}
+
+{% block content %}
+    <h1>Создание группы</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+          {{form}}
+      <p>{{ person_detail.person_name }}, Вы уверены, что хотите создать собственную группу?</p>
+      <input type="submit" value="Confirm" />
+    </form>
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% extends "poll/header.html" %}
+
+
+{% block content %}
+  <h1>Раса: {{ race_detail.get_race_name_display }}</h1>
+
+  <p><strong>Описание: </strong> {{ race_detail.race_description|safe }}</p>
+  <p><strong>Продолжительность жизни: </strong> {{ race_detail.lifetime }}</p>
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Стартовые очки характеристик: </h4>
+     <ul>
+        {% for key, value in  race_detail.start_points.items %}
+            <li>{{ key }}:{{ value }} </li>
+        {% endfor %}
+     </ul>
+  </div>
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Предельные очки характеристик: </h4>
+     <ul>
+        {% for key, value in  race_detail.finish_points.items %}
+            <li>{{ key }}:{{ value }}</li>
+        {% endfor %}
+     </ul>
+  </div>
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Стартовые очки сопротивлений:  </h4>
+     <ul>
+        {% for key, value in  race_detail.start_resistanses.items %}
+            <li>{{ key }}:{{ value }}</li>
+        {% endfor %}
+     </ul>
+  </div>
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Стартовые очки навыков: </h4>
+     <ul>
+        {% for key, value in  race_detail.start_permissions.items %}
+            <li>{{ key }}:{{ value }}</li>
+        {% endfor %}
+     </ul>
+  </div>
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Снаряжение: </h4>
+     <ul>
+        {% for key, value in  race_detail.equipment.items %}
+            <li>{{ key }}:{{ value }}</li>
+        {% endfor %}
+     </ul>
+  </div>
+
+<p><a href="{% url 'poll:race-update' race_detail.pk %}">+ Изменить данные расы</a></p>
+<p><a href="{% url 'poll:race-delete' race_detail.pk %}">- Удалить расу</a></p>
+<p><a href="{% url 'poll:race-add' %}">+ Добавить расу</a></p>
+<p><a href="{% url 'poll:races-list' %}">^ Вернуться к списку рас</a></p>
+{% endblock %}

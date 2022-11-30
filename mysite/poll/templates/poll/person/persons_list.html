@@ -1,0 +1,13 @@
+{% extends "poll/header.html" %}
+{% block content %}
+    <h1>Список  персонажей</h1>
+        <ul>
+        {% for person in persons_list %}
+            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+        {% endfor %}
+        </ul>
+<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+{% endblock %}
