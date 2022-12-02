@@ -391,7 +391,7 @@ class FractionLocation(models.Model):
     fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
 
     other_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name="other_location")
-    reputation = location_death = models.IntegerField(blank=True, null=True)
+    reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -416,11 +416,11 @@ class FractionFraction(models.Model):
     """
     fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
     other_fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE, related_name="other_fraction")
-    reputation = location_death = models.IntegerField(blank=True, null=True)
+    reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = True
-        db_table = 'fraction_location'
+        db_table = 'fraction_fraction'
         # app_label = 'poll'
 
     def __str__(self):
