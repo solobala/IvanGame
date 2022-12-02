@@ -322,6 +322,160 @@ class Group(models.Model):
             super().save(*args, **kwargs)
 
 
+class Location(models.Model):
+    location_name = models.CharField(max_length=128, blank=True, null=True)
+    location_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'location'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.location_name)
+
+    def get_absolute_url(self):
+
+        return reverse('poll:location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Fraction(models.Model):
+    fraction_name = models.CharField(max_length=128, blank=True, null=True)
+    fraction_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'fraction'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.fraction_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Clan(models.Model):
+    clan_name = models.CharField(max_length=128, blank=True, null=True)
+    clan_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    chief = models.ForeignKey('Person', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'clan'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.fraction_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class FractionLocation(models.Model):
+    """
+    Репутация фракций в чужих локациях
+    other_location - чужая локация
+    reputation - репутация фракции в чужой локации
+    """
+    fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
+
+    other_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name="other_location")
+    reputation = location_death = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'fraction_location'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s, %s, %s" % (self.fraction,  self.other_location)
+
+    def get_absolute_url(self):
+        return reverse('poll:fraction-location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class FractionFraction(models.Model):
+    """
+    fraction -  фракции
+    other_fraction - чужая локация
+    reputation - репутация фракции у чужой фракции
+    """
+    fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
+    other_fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE, related_name="other_fraction")
+    reputation = location_death = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'fraction_location'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s, %s, %s" % (self.fraction, self.location, self.other_fraction)
+
+    def get_absolute_url(self):
+        return reverse('poll:fraction-location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Quest(models.Model):
+    quest_name = models.CharField(max_length=128, blank=True, null=True)
+    quest_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    duration = models.TimeField
+    benefits = models.JSONField
+    requirements = models.JSONField
+
+    class Meta:
+        managed = True
+        db_table = 'quest'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.quest_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:quest-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Party(models.Model):
+    party_name = models.CharField(max_length=128, blank=True, null=True)
+    party_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    quest = models.ForeignKey('Quest', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'party'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.party_name, self.quest)
+
+    def get_absolute_url(self):
+        return reverse('poll:party-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
 class Membership(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -347,4 +501,5 @@ class Membership(models.Model):
 
 
 class Bar(models.Model):
-    """записи очков силы персонажа в моменты времени"""
+    """ слепок состояния персонажа в моменты времени"""
+

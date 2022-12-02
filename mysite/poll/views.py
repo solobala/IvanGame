@@ -465,8 +465,8 @@ class GroupCreateView(JsonableResponseMixin, CreateView):
     """
     Создание новой группы
     """
-    queryset = Group.objects.set_related('group')
-    fields = ['group_name', 'members', 'person', 'inviter', 'invite_reason']
+    model = Group
+    fields = ['group_name', 'members']
 
     def form_valid(self, form):
         """
