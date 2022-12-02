@@ -345,7 +345,7 @@ class Location(models.Model):
 class Fraction(models.Model):
     fraction_name = models.CharField(max_length=128, blank=True, null=True)
     fraction_description = models.TextField(verbose_name='Описание', blank=True, null=True)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+
 
     class Meta:
         managed = True
@@ -385,11 +385,12 @@ class Clan(models.Model):
 class FractionLocation(models.Model):
     """
     Репутация фракций в чужих локациях
+    location = своя локация
     other_location - чужая локация
     reputation - репутация фракции в чужой локации
     """
     fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
-
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
     other_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name="other_location")
     reputation = models.IntegerField(blank=True, null=True)
 
