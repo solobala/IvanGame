@@ -209,7 +209,7 @@ BOOTSTRAP5 = {
     'success_css_class': 'is-valid',
 
     # Renderers (only set these if you have studied the source and understand the inner workings)
-    'formset_renderers':{
+    'formset_renderers': {
         'default': 'bootstrap5.renderers.FormsetRenderer',
     },
     'form_renderers': {
@@ -221,4 +221,4 @@ BOOTSTRAP5 = {
     },
 }
 
-CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+# CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
