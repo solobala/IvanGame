@@ -68,13 +68,14 @@ class Owner(models.Model):
     class Meta:
         managed = True
         db_table = 'owner'
+        verbose_name = "Owner"
+        verbose_name_plural = "Owners"
         # app_label = 'poll'
 
 
 class Race(models.Model):
     """
     Класс Раса  Персонажа (Person).
-
   `race_name` varchar(45) NOT NULL COMMENT 'Наименование расы персонажа',
   `race_description` varchar(200) DEFAULT NULL COMMENT 'Описание возможностей расы персонажа',
   `start_points` json DEFAULT NULL COMMENT 'стартовые  значение очков стамины, маны, интелекта, силы, ловкости, веры, удачи, харизмы и рассудка в формате JSON',
@@ -83,7 +84,6 @@ class Race(models.Model):
   `start_permissions` json DEFAULT NULL COMMENT 'стартовые значение разрешений на воздействие водой, огнем, ветром и т.д',
   equipment json снаряжение json DEFAULT NULL COMMENT 'Стартовые значения количества слотов для экипировки',
   PRIMARY KEY (`race_id`)
-
     """
 
     class Races(models.TextChoices):
@@ -218,6 +218,8 @@ class Race(models.Model):
         managed = True
         db_table = 'race'
         ordering = ['race_name']
+        verbose_name = "Race"
+        verbose_name_plural = "Races"
         # app_label = 'poll'
 
 
@@ -270,6 +272,8 @@ class Person(models.Model):
     class Meta:
         managed = True
         db_table = 'person'
+        verbose_name = "Person"
+        verbose_name_plural = "Persons"
         # app_label = 'poll'
 
 
@@ -329,7 +333,9 @@ class Location(models.Model):
     class Meta:
         managed = True
         db_table = 'location'
-        # app_label = 'poll'
+        verbose_name = "Location"
+        verbose_name_plural = "Locations"
+        ordering = ['location_name']
 
     def __str__(self):
         return "%s" % (self.location_name)
@@ -350,6 +356,8 @@ class Fraction(models.Model):
     class Meta:
         managed = True
         db_table = 'fraction'
+        verbose_name = "Fraction"
+        verbose_name_plural = "Fractions"
         # app_label = 'poll'
 
     def __str__(self):
@@ -370,6 +378,8 @@ class Clan(models.Model):
     class Meta:
         managed = True
         db_table = 'clan'
+        verbose_name = "Clan"
+        verbose_name_plural = "Clans"
         # app_label = 'poll'
 
     def __str__(self):
@@ -382,28 +392,29 @@ class Clan(models.Model):
         super().save(*args, **kwargs)
 
 
-class FractionLocation(models.Model):
+class LocationFraction(models.Model):
     """
     Репутация фракций в чужих локациях
-    location = своя локация
-    other_location - чужая локация
+
+    location - чужая локация
     reputation - репутация фракции в чужой локации
     """
-    fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
+
     location = models.ForeignKey('Location', on_delete=models.CASCADE)
-    other_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name="other_location")
+    fraction = models.ForeignKey('Fraction', on_delete=models.CASCADE)
     reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = True
-        db_table = 'fraction_location'
+        db_table = 'location_fraction'
+
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s, %s" % (self.fraction,  self.other_location)
+        return "%s, %s, %s" % (self.fraction,  self.location)
 
     def get_absolute_url(self):
-        return reverse('poll:fraction-location-detail', kwargs={'pk': self.pk})
+        return reverse('poll:location-fraction-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -425,10 +436,10 @@ class FractionFraction(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s, %s" % (self.fraction, self.location, self.other_fraction)
+        return "%s, %s" % (self.fraction,  self.other_fraction)
 
     def get_absolute_url(self):
-        return reverse('poll:fraction-location-detail', kwargs={'pk': self.pk})
+        return reverse('poll:fraction-fraction-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -497,6 +508,8 @@ class Quest(models.Model):
     class Meta:
         managed = True
         db_table = 'quest'
+        verbose_name = "Quest"
+        verbose_name_plural = "Quests"
         # app_label = 'poll'
 
     def __str__(self):
@@ -517,6 +530,8 @@ class Party(models.Model):
     class Meta:
         managed = True
         db_table = 'party'
+        verbose_name = "Party"
+        verbose_name_plural = "Parties"
         # app_label = 'poll'
 
     def __str__(self):
