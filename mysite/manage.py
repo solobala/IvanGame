@@ -3,7 +3,7 @@
 import os
 import sys
 
-sys.path.append('/mysite/poll')
+sys.path.append('/mysite/poll/')
 
 def main():
     """Run administrative tasks."""

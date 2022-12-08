@@ -44,7 +44,7 @@ class Owner(models.Model):
         return "%s" % (self.owner_name)
 
     def get_absolute_url(self):
-        #  return reverse('poll:owner_detail', args=[str(self.id)])
+        # return reverse('poll:owner_detail', args=[str(self.id)])
         return reverse('poll:owner-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
@@ -291,9 +291,9 @@ class Group(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        # return self.group_name, self_members
-        self.group_name = self.members.through.objects.filter(
-            group__id=self.id)[0].inviter.person_name
+
+
+        self.group_name = self.members.through.objects.filter(group__id=self.id)[0].inviter.person_name
         try:
             if self.members.count() >= 1:
                 for member in self.members.through.objects.filter(group__id=self.id):

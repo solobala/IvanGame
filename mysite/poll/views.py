@@ -16,9 +16,16 @@ from rest_framework import viewsets
 from .models import Owner, Person, Group, Membership, Race
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, ModelFormMixin
 from .forms import NewUserForm
 from django.http import JsonResponse
+from django.forms.models import inlineformset_factory
+from django.urls import reverse
+from django.forms import ModelForm
+
+PersonFormset = inlineformset_factory(
+    Owner, Person, fields=('person_name',)
+)
 
 
 class JsonableResponseMixin:
@@ -156,48 +163,115 @@ class OwnerCreateView(JsonableResponseMixin, CreateView):
     model = Owner
     fields = ['owner_name', 'owner_description', 'link']
 
+    def get_context_data(self, **kwargs):
+        # we need to overwrite get_context_data
+        # to make sure that our formset is rendered
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data["persons"] = PersonFormset(self.request.POST)
+        else:
+            data["persons"] = PersonFormset()
+        return data
+
     def form_valid(self, form):
-        """
-        Сведения о том, кем был создан игрок
-        :param form:
-        :return:
-        """
-        form.instance.created_by = self.request.user
+        context = self.get_context_data()
+        persons = context["persons"]
+        self.object = form.save()
+        if persons.is_valid():
+            persons.instance = self.object
+            persons.save()
         return super().form_valid(form)
 
-    def add_owner(owner_name, owner_description, link):
-        """
-        Добавление нового игрока в список
-        :param owner_name:
-        :param owner_description:
-        :param link:
-        :return:
-        """
-        try:
-            Owner.objects.get(owner_name=owner_name)
-            response = 'Игрок %s уже существует'
-        except ObjectDoesNotExist:
-            b = Owner(owner_name=owner_name, owner_description=owner_description, link=link)
-            b.save()
-            response = 'Игрок %s добавлен'
-        finally:
-            return HttpResponse(response)
+    def get_success_url(self):
+        return reverse("owners-list")
+    # def form_valid(self, form):
+    #     """
+    #     Сведения о том, кем был создан игрок
+    #     :param form:
+    #     :return:
+    #     """
+    #     form.instance.created_by = self.request.user
+    #     return super().form_valid(form)
+
+    # def add_owner(owner_name, owner_description, link):
+    #     """
+    #     Добавление нового игрока в список
+    #     :param owner_name:
+    #     :param owner_description:
+    #     :param link:
+    #     :return:
+    #     """
+    #     try:
+    #         Owner.objects.get(owner_name=owner_name)
+    #         response = 'Игрок %s уже существует'
+    #     except ObjectDoesNotExist:
+    #         b = Owner(owner_name=owner_name, owner_description=owner_description, link=link)
+    #         b.save()
+    #         response = 'Игрок %s добавлен'
+    #     finally:
+    #         return HttpResponse(response)
 
 
 class OwnerUpdateView(UpdateView):
     """
     Редактирование данных игрока
     """
-    model = Owner
+    # model = Owner
+    queryset = Owner.objects.all()
     fields = ['owner_name', 'owner_description', 'link']
     template_name_suffix = '_update'
 
+    # def get_context_data(self, **kwargs):
+    #     # we need to overwrite get_context_data
+    #     # to make sure that our formset is rendered.
+    #     # the difference with CreateView is that
+    #     # on this view we pass instance argument
+    #     # to the formset because we already have
+    #     # the instance created
+    #     data = super().get_context_data(**kwargs)
+    #     if self.request.POST:
+    #         data["persons"] = PersonFormset(self.request.POST, instance=self.object)
+    #     else:
+    #         data["persons"] = PersonFormset(instance=self.object)
+    #     return data
+
+    # def manage_books(request, owner_id):
+    #     owner = Owner.objects.get(pk=owner_id)
+    #     PersonInlineFormSet = inlineformset_factory(Owner, Personk, fields=('person_name',))
+    #     if request.method == "POST":
+    #         formset = PersonInlineFormSet(request.POST, request.FILES, instance=owner)
+    #         if formset.is_valid():
+    #             formset.save()
+    #             # Do something. Should generally end with a redirect. For example:
+    #             return HttpResponseRedirect(owner.get_absolute_url())
+    #     else:
+    #         formset = PersonInlineFormSet(instance=owner)
+    #     return render(request, 'manage_books.html', {'formset': formset})
+
+    # def form_valid(self, form):
+    #     context = self.get_context_data()
+    #     persons = context["persons"]
+    #     self.object = form.save()
+    #     if persons.is_valid():
+    #         persons.instance = self.object
+    #         persons.save()
+    #     form.instance.updated_by = self.request.user
+    #     return super().form_valid(form)
+
+    def get_success_url(self):
+        # return reverse("poll:owners-list")
+        # return reverse("poll:owner-detail")
+        return reverse_lazy(
+            "poll:owner-detail", kwargs={"pk": self.object.pk}
+         )
     def form_valid(self, form):
         """
         Сведения о том, кем был изменен игрок
         :param form:
         :return:
         """
+        # ModelFormMixin.success_url = "127.0.0.1:8000/poll/owner/5/owner-detail.html"
+
         form.instance.updated_by = self.request.user
         return super().form_valid(form)
 
@@ -218,13 +292,14 @@ class OwnerDeleteView(DeleteView):
         return context
 
 
-class OwnerDetailView(DetailView):
+class OwnerDetailView(JsonableResponseMixin,DetailView):
     """
     Просмотр детальной информации по игроку
     """
     template_name = 'poll/owner/owner_detail.html'
     context_object_name = 'owner_detail'
-    queryset = Owner.objects.all()
+    model = Owner
+    # queryset = Owner.objects.all()
 
     # def get_queryset(request, self):
     #     """
@@ -243,6 +318,13 @@ class OwnerDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
         return context
+
+    # def get_success_url(self):
+    #     # return reverse("owners-list")
+    #     return reverse_lazy(
+    #         "/poll/owner/owner-detail",
+    #         kwargs={"pk": self.object.pk}
+    #     )
     #
     # def get_queryset(self):
     #     return self.object.person_set.all()
@@ -316,7 +398,7 @@ class PersonCreateView(JsonableResponseMixin, CreateView):
 
 
 
-class PersonUpdateView(UpdateView):
+class PersonUpdateView(JsonableResponseMixin,UpdateView):
     """
     Редактирование персонажа
     """
@@ -334,6 +416,7 @@ class PersonUpdateView(UpdateView):
         :return:
                 """
         form.instance.updated_by = self.request.user
+
         return super().form_valid(form)
 
 
@@ -408,7 +491,7 @@ class PersonDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['status_'] = ['Занят' if context['person_detail'].status == 1 else 'Заморозка' if context['person_detail'].status == 2 else 'Свободен'][0]
+        context['status_'] = ['Свободен' if context['person_detail'].status == 1 else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
         #person_groups = Person.objects.get(id=context['person_detail'].pk).group_set.all()
 
         # Person может быть inviter, участник группы или никто
@@ -443,13 +526,16 @@ class GroupDetailView(DetailView):
 
     queryset = Group.objects.all()
 
-
-def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    members = self.members.through.objects.filter(group__id=self.id)
-    context['members'] = members
-    context['inviter_person'] = members[0].inviter
-    return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        members = kwargs['object'].members.through.objects.filter(group__id=self.object.pk)
+        # members = self.members.through.objects.filter(group__id=self.id)
+        context['members'] = members
+        try:
+            context['inviter_person'] = members[0].inviter
+        except:
+            context['inviter_person'] = "В группу никто не приглашен"
+        return context
 
 
 class GroupsListView(ListView):
@@ -465,7 +551,9 @@ class GroupCreateView(JsonableResponseMixin, CreateView):
     """
     Создание новой группы
     """
-    model = Group
+    # model = Group
+    context_object_name = 'Group'
+    queryset = Group.objects.filter()
     fields = ['group_name', 'members']
 
     def form_valid(self, form):
@@ -614,7 +702,7 @@ class RaceCreateView(JsonableResponseMixin, CreateView):
         return super().form_valid(form)
 
 
-class RaceUpdateView(UpdateView):
+class RaceUpdateView(JsonableResponseMixin,UpdateView):
     """
     Редактирование Расы
     """
