@@ -7,21 +7,28 @@ from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.core.exceptions import ObjectDoesNotExist
+#  from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
-from .models import Owner, Person, Group, Membership, Race
+from .models import Owner, Person, Group, Membership, Race, PersonBar
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, ModelFormMixin
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import NewUserForm
 from django.http import JsonResponse
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
-from django.forms import ModelForm
+# from django.forms import ModelForm
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from django.http import Http404
+# from rest_framework import mixins
+from rest_framework import generics
 
 PersonFormset = inlineformset_factory(
     Owner, Person, fields=('person_name',)
@@ -80,7 +87,9 @@ def register_request(request):
         else:
             messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
+    # return render(request=request, template_name="poll/register.html", context={"register_form": form})
     return render(request=request, template_name="poll/register.html", context={"register_form": form})
+
 
 
 def login_request(request):
@@ -100,6 +109,7 @@ def login_request(request):
             messages.error(request, "Invalid username or password.")
     form = AuthenticationForm()
     return render(request=request, template_name="poll/login.html", context={"login_form": form})
+    #  return render(request=request, template_name="poll/login.html", context={"login_form": form})
 
 
 def logout_request(request):
@@ -117,7 +127,8 @@ def password_reset_request(request):
             if associated_users.exists():
                 for user in associated_users:
                     subject = "Password Reset Requested"
-                    email_template_name = "poll/password/password_reset_email.txt"
+                    #email_template_name = "poll/password/password_reset_email.txt"
+                    email_template_name = "accounts/password/password_reset_email.txt"
                     c = {
                         "email": user.email,
                         'domain': '127.0.0.1:8000',
@@ -134,7 +145,8 @@ def password_reset_request(request):
                         return HttpResponse('Invalid header found.')
                     return redirect("/password_reset/done/")
     password_reset_form = PasswordResetForm()
-    return render(request=request, template_name="poll/password/password_reset.html",
+    #return render(request=request, template_name="poll/password/password_reset.html",
+    return render(request=request, template_name="accounts/password/password_reset.html",
                   context={"password_reset_form": password_reset_form})
 
 
@@ -156,12 +168,14 @@ def index(request):
     )
 
 
-class OwnerCreateView(JsonableResponseMixin, CreateView):
+class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequiredMixin, CreateView):
     """
     Добавление нового игрока
+    Должно зависеть от того, под каким логином зашли
     """
     model = Owner
     fields = ['owner_name', 'owner_description', 'link']
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         # we need to overwrite get_context_data
@@ -174,13 +188,19 @@ class OwnerCreateView(JsonableResponseMixin, CreateView):
         return data
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        persons = context["persons"]
-        self.object = form.save()
-        if persons.is_valid():
-            persons.instance = self.object
-            persons.save()
-        return super().form_valid(form)
+        form.instance.created_by = self.request.user
+        owner_amount = Owner.objects.filter(created_by=self.request.user).count()
+        if owner_amount == 0:  # реальный игрок еще не создал Owner
+            context = self.get_context_data()
+            persons = context["persons"]
+            self.object = form.save()
+
+            if persons.is_valid():
+                persons.instance = self.object
+                persons.save()
+            return super().form_valid(form)
+        else:  # У игрока уже есть Owner, нового создавать нельзя
+            return reverse("Forbidden")
 
     def get_success_url(self):
         return reverse("owners-list")
@@ -212,14 +232,16 @@ class OwnerCreateView(JsonableResponseMixin, CreateView):
     #         return HttpResponse(response)
 
 
-class OwnerUpdateView(UpdateView):
+class OwnerUpdateView(LoginRequiredMixin,
+                      PermissionRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование данных игрока
     """
-    # model = Owner
-    queryset = Owner.objects.all()
+    model = Owner
+    # queryset = Owner.objects.all()
     fields = ['owner_name', 'owner_description', 'link']
     template_name_suffix = '_update'
+    login_url = 'poll:login'
 
     # def get_context_data(self, **kwargs):
     #     # we need to overwrite get_context_data
@@ -237,7 +259,7 @@ class OwnerUpdateView(UpdateView):
 
     # def manage_books(request, owner_id):
     #     owner = Owner.objects.get(pk=owner_id)
-    #     PersonInlineFormSet = inlineformset_factory(Owner, Personk, fields=('person_name',))
+    #     PersonInlineFormSet = inlineformset_factory(Owner, Person, fields=('person_name',))
     #     if request.method == "POST":
     #         formset = PersonInlineFormSet(request.POST, request.FILES, instance=owner)
     #         if formset.is_valid():
@@ -258,12 +280,12 @@ class OwnerUpdateView(UpdateView):
     #     form.instance.updated_by = self.request.user
     #     return super().form_valid(form)
 
-    def get_success_url(self):
-        # return reverse("poll:owners-list")
-        # return reverse("poll:owner-detail")
-        return reverse_lazy(
-            "poll:owner-detail", kwargs={"pk": self.object.pk}
-         )
+    # def get_success_url(self):
+    #     # return reverse("poll:owners-list")
+    #     # return reverse("poll:owner-detail")
+    #     return reverse_lazy(
+    #         "poll:owner-detail", kwargs={"pk": self.object.pk}
+    #      )
     def form_valid(self, form):
         """
         Сведения о том, кем был изменен игрок
@@ -276,7 +298,7 @@ class OwnerUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class OwnerDeleteView(DeleteView):
+class OwnerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Удаление игрока
     """
@@ -285,6 +307,7 @@ class OwnerDeleteView(DeleteView):
     success_url = reverse_lazy('poll:owners-list')
     context_object_name = 'owner_detail'
     queryset = Owner.objects.all()
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -292,14 +315,17 @@ class OwnerDeleteView(DeleteView):
         return context
 
 
-class OwnerDetailView(JsonableResponseMixin,DetailView):
+class OwnerDetailView(LoginRequiredMixin,
+                      PermissionRequiredMixin, JsonableResponseMixin, DetailView):
     """
     Просмотр детальной информации по игроку
     """
     template_name = 'poll/owner/owner_detail.html'
     context_object_name = 'owner_detail'
-    model = Owner
-    # queryset = Owner.objects.all()
+    # model = Owner
+    queryset = Owner.objects.all()
+    login_url = 'poll:login'
+    permission_required = 'poll.special_status'  # new
 
     # def get_queryset(request, self):
     #     """
@@ -330,23 +356,36 @@ class OwnerDetailView(JsonableResponseMixin,DetailView):
     #     return self.object.person_set.all()
 
 
-class OwnersListView(ListView):
+class OwnersListView(LoginRequiredMixin, ListView):
     """
     Просмотр полного списка игроков
     """
     template_name = 'poll/owner/owners_list.html'
     context_object_name = 'owners_list'
     queryset = Owner.objects.all()
+    login_url = 'poll:login'
 
 
-class OwnersFreeListView(ListView):
+class OwnerList(generics.ListCreateAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    login_url = 'poll:login'
+
+
+class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    login_url = 'poll:login'
+
+
+class OwnersFreeListView(LoginRequiredMixin, ListView):
     """
-    Просмотр  списка свободных игроков
+    Просмотр списка свободных игроков
     """
     template_name = 'poll/free_owner/free_owners_list.html'
     context_object_name = 'free_owners_list'
     queryset = Owner.objects.filter(person__status=1).distinct('owner_name')
-
+    login_url = 'poll:login'
 
 
 # class OwnerByPerson(DetailView):
@@ -376,15 +415,14 @@ class OwnersFreeListView(ListView):
 #         context['owner'] = self.owner
 #         return context
 
-
-class PersonCreateView(JsonableResponseMixin, CreateView):
+class PersonCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Добавление нового персонажа
     """
     model = Person
     fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
               'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
-
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -393,21 +431,23 @@ class PersonCreateView(JsonableResponseMixin, CreateView):
         :return:
                 """
         form.instance.created_by = self.request.user
+        owner = get_object_or_404(Owner, id=self.kwargs.get('pk'))
+        person = form.save(commit=False)
+        person.owner = owner
+        form.instance.owner = owner
+        person.save()
         return super().form_valid(form)
 
 
-
-
-class PersonUpdateView(JsonableResponseMixin,UpdateView):
+class PersonUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование персонажа
     """
     model = Person
-
     fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
               'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
-
     template_name_suffix = '_update'
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -420,7 +460,7 @@ class PersonUpdateView(JsonableResponseMixin,UpdateView):
         return super().form_valid(form)
 
 
-class PersonDeleteView(DeleteView):
+class PersonDeleteView(LoginRequiredMixin, DeleteView):
     """
     Удаление персонажа
     """
@@ -429,6 +469,7 @@ class PersonDeleteView(DeleteView):
     success_url = reverse_lazy('poll:persons-list')
     context_object_name = 'person_detail'
     queryset = Person.objects.all()
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -436,8 +477,7 @@ class PersonDeleteView(DeleteView):
         return context
 
 
-
-class PersonsFreeListView(ListView):
+class PersonsFreeListView(LoginRequiredMixin, ListView):
     """
     Просмотр  списка свободных персонажей
     """
@@ -445,86 +485,88 @@ class PersonsFreeListView(ListView):
 
     context_object_name = 'free_persons_list'
     queryset = Person.objects.filter(status=1)
+    login_url = 'poll:login'
 
 
-class PersonsBusyListView(ListView):
+class PersonsBusyListView(LoginRequiredMixin, ListView):
     """
     Просмотр  списка занятых персонажей
     """
     template_name = 'poll/busy_person/busy_persons_list.html'
     context_object_name = 'busy_persons_list'
     queryset = Person.objects.filter(status=0)
+    login_url = 'poll:login'
 
 
-class PersonsFreezListView(ListView):
+class PersonsFreezListView(LoginRequiredMixin, ListView):
     """
     Просмотр  списка заморозки персонажей
     """
     template_name = 'poll/freez_person/freez_persons_list.html'
     context_object_name = 'freez_persons_list'
     queryset = Person.objects.filter(status=2)
+    login_url = 'poll:login'
 
 
-class PersonsListView(ListView):
+class PersonsListView(LoginRequiredMixin, ListView):
     """
-    Занятые персонажи: status= 0
-    Свободные персонажи: status = 1
-    Заморозка : status = 2
-    :param status:
-    :return:
+    Список Персонажей
     """
     template_name = 'poll/person/persons_list.html'
     context_object_name = 'persons_list'
     queryset = Person.objects.all()
+    login_url = 'poll:login'
 
 
-class PersonDetailView(DetailView):
+class PersonDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр информации по персонажу
     """
     template_name = 'poll/person/person_detail.html'
     context_object_name = 'person_detail'
-    queryset = Person.objects.all()
-
-
-    # model = Person
+    # queryset = Person.objects.all()
+    model = Person
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['status_'] = ['Свободен' if context['person_detail'].status == 1 else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
-        #person_groups = Person.objects.get(id=context['person_detail'].pk).group_set.all()
+        context['status_'] = ['Свободен' if context['person_detail'].status == 1
+                              else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
+        person_group = Person.objects.get(id=context['person_detail'].pk).group_set.all() #Это Queryset - список групп из 1 группы
+        amount = person_group.count()  # это к-во групп с нашим персонажем - или 0, или 1
+        members = Membership.objects.filter(inviter=Person.objects.get(id=context['person_detail'].pk))  # Membership с участием нашего Person
+        amount1 = members.count()
 
         # Person может быть inviter, участник группы или никто
-
+        # Если amount=0 и amount1>1 - наш person - это inviter
         # Если не inviter, но участник группы - >= 1 (число людей в группе), иначе 0
-        if Membership.objects.filter(person=Person.objects.get(id=context['person_detail'].pk).id).count() > 0:
+        if amount >= 1:
             context['group_status'] = 'в группе'
-            person_groups = Membership.objects.filter(
-                person=Person.objects.get(id=context['person_detail'].pk).id)
-            context['inviter_person'] = person_groups[0].inviter
-            context['participants'] = person_groups
+            context['inviter_person'] = Membership.objects.filter(group_id=person_group[0].id)[0].inviter
+            context['participants'] = person_group[0].members.all()  # Queryset список Person - членов гРуппы, без inviter
+
             # Если не inviter или не состоит в группе - получится 0
-        elif Membership.objects.filter(inviter=Person.objects.get(id=context['person_detail'].pk).id).count() == 0:
+        elif amount == 0 and amount1 == 0:
             context['group_status'] = 'не в группе'
+            # это inviter
         else:
-            # Если inviter - >=1 ( число людей в группе
             context['group_status'] = 'в группе'
-            person_groups = Membership.objects.filter(
-                inviter=Person.objects.get(id=context['person_detail'].pk).id)
-            context['inviter_person'] = person_groups[0].inviter
-            context['participants'] = person_groups
-            #contex['group_status'] = 'в группе'
+            participants =[]
+            for member in members:
+                participants.append(member.person)
+            context['inviter_person'] = members[0].inviter
+            context['participants'] = participants
         return context
 
 
-class GroupDetailView(DetailView):
+class GroupDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр информации по конкретной группе
     """
     template_name = 'poll/group/group_detail.html'
     context_object_name = 'group_detail'
-
-    queryset = Group.objects.all()
+    model = Group
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -538,23 +580,30 @@ class GroupDetailView(DetailView):
         return context
 
 
-class GroupsListView(ListView):
+class GroupsListView(LoginRequiredMixin, ListView):
     """
     Просмотр списка групп Персонажей
     """
     template_name = 'poll/group/groups_list.html'
     context_object_name = 'groups_list'
-    queryset = Group.objects.all()
+    model = Group
+    login_url = 'poll:login'
 
 
-class GroupCreateView(JsonableResponseMixin, CreateView):
+class GroupCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Создание новой группы
     """
-    # model = Group
+    model = Group
     context_object_name = 'Group'
-    queryset = Group.objects.filter()
     fields = ['group_name', 'members']
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+    #     members = self.object.members.through.objects.filter(group__id=self.object.pk)
+        return context
 
     def form_valid(self, form):
         """
@@ -563,17 +612,25 @@ class GroupCreateView(JsonableResponseMixin, CreateView):
         :return:
         """
         form.instance.created_by = self.request.user
+        inviter = get_object_or_404(Person, id=self.kwargs.get('pk'))
+        group = form.save(commit=False)
+        members = group.members.all()
+        for member in members:
+            member.through.membership.inviter = inviter
+
+        form.instance.group = group
+        group.save()
         return super().form_valid(form)
 
 
-class GroupUpdateView(UpdateView):
+class GroupUpdateView(LoginRequiredMixin, UpdateView):
     """
     Редактирование группы
     """
     model = Group
-
     fields = ['group_name', 'members']
     template_name_suffix = '_update'
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -585,15 +642,15 @@ class GroupUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class GroupDeleteView(DeleteView):
+class GroupDeleteView(LoginRequiredMixin, DeleteView):
     """
     Удаление группы
     """
-    # model = Group
+    model = Group
     template_name_suffix = '_delete'
     success_url = reverse_lazy('poll:groups-list')
     context_object_name = 'group_detail'
-    queryset = Group.objects.all()
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -601,32 +658,33 @@ class GroupDeleteView(DeleteView):
         return context
 
 
-class MembershipListView(ListView):
+class MembershipListView(LoginRequiredMixin, ListView):
     """
     Просмотр списка связей
     """
+    model = Membership
     template_name = 'poll/membership/members_list.html'
     context_object_name = 'members_list'
-    queryset = Membership.objects.all()
+    login_url = 'poll:login'
 
 
-class MembershipDetailView(DetailView):
+class MembershipDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр информации по конкретному виду связи
     """
     template_name = 'poll/membership/membership_detail.html'
     context_object_name = 'membership_detail'
-    queryset = Membership.objects.all()
-    #  model = Membership
+    model = Membership
+    login_url = 'poll:login'
 
 
-class MembershipCreateView(JsonableResponseMixin, CreateView):
+class MembershipCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Создание новой связи
     """
     model = Membership
     fields = ['group', 'person', 'inviter', 'invite_reason']
-
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -638,14 +696,14 @@ class MembershipCreateView(JsonableResponseMixin, CreateView):
         return super().form_valid(form)
 
 
-class MembershipUpdateView(UpdateView):
+class MembershipUpdateView(LoginRequiredMixin, UpdateView):
     """
     Редактирование группы
     """
     model = Membership
-
     fields = ['group', 'person', 'inviter', 'invite_reason']
     template_name_suffix = '_update'
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -657,15 +715,15 @@ class MembershipUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class MembershipDeleteView(DeleteView):
+class MembershipDeleteView(LoginRequiredMixin, DeleteView):
     """
     Удаление связи
     """
-    # model = Membership
+    model = Membership
     template_name_suffix = '_delete'
     success_url = reverse_lazy('poll:membership-list')
     context_object_name = 'membership_detail'
-    queryset = Membership.objects.all()
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -675,22 +733,24 @@ class MembershipDeleteView(DeleteView):
         return context
 
 
-class RacesListView(ListView):
+class RacesListView(LoginRequiredMixin, ListView):
     """
     Просмотр полного списка Рас
     """
     template_name = 'poll/race/races_list.html'
     context_object_name = 'races_list'
-    queryset = Race.objects.all()
+    model = Race
+    login_url = 'poll:login'
 
 
-class RaceCreateView(JsonableResponseMixin, CreateView):
+class RaceCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Создание новой Расы
     """
     model = Race
     fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
               'start_resistanses', 'start_permissions', 'equipment']
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -702,7 +762,7 @@ class RaceCreateView(JsonableResponseMixin, CreateView):
         return super().form_valid(form)
 
 
-class RaceUpdateView(JsonableResponseMixin,UpdateView):
+class RaceUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование Расы
     """
@@ -711,6 +771,7 @@ class RaceUpdateView(JsonableResponseMixin,UpdateView):
     fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
               'start_resistanses', 'start_permissions', 'equipment']
     template_name_suffix = '_update'
+    login_url = 'poll:login'
 
     def form_valid(self, form):
         """
@@ -722,15 +783,15 @@ class RaceUpdateView(JsonableResponseMixin,UpdateView):
         return super().form_valid(form)
 
 
-class RaceDeleteView(DeleteView):
+class RaceDeleteView(LoginRequiredMixin, DeleteView):
     """
     Удаление Расы
     """
-    # model = Race
+    model = Race
     template_name_suffix = '_delete'
     success_url = reverse_lazy('poll:race-list')
     context_object_name = 'race_detail'
-    queryset = Race.objects.all()
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -738,13 +799,14 @@ class RaceDeleteView(DeleteView):
         return context
 
 
-class RaceDetailView(DetailView):
+class RaceDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр детальной информации по расе
     """
     template_name = 'poll/race/race_detail.html'
     context_object_name = 'race_detail'
-    queryset = Race.objects.all()
+    model = Race
+    login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -762,34 +824,43 @@ class RaceDetailView(DetailView):
 
         return context
 
+
+class PersonBarDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр среза информации по персонажу
+    """
+    template_name = 'poll/bar/bar_detail.html'
+    context_object_name = 'bar_detail'
+    model = PersonBar
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
 #  REST API
 
 
-class OwnerViewSet(viewsets.ModelViewSet):
-    # model = Owner
-    queryset = Owner.objects.all()
+class OwnerViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Owner
     serializer_class = OwnerSerializer
 
 
-class PersonViewSet(viewsets.ModelViewSet):
-    # model = Person
-    queryset = Person.objects.all()
+class PersonViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Person
     serializer_class = PersonSerializer
 
 
-class GroupViewSet(viewsets.ModelViewSet):
-    # model = Group
-    queryset = Group.objects.all()
+class GroupViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Group
     serializer_class = GroupSerializer
 
 
-class MembershipViewSet(viewsets.ModelViewSet):
-    # model = Membership
-    queryset = Membership.objects.all()
+class MembershipViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Membership
     serializer_class = MembershipSerializer
 
 
-class RaceViewSet(viewsets.ModelViewSet):
-    # model = Race
-    queryset = Race.objects.all()
+class RaceViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Race
     serializer_class = RaceSerializer

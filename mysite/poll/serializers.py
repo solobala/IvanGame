@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Owner, Person, Group, Membership, Race
+from .models import  Owner, Person, Group, Membership, Race
 
 
 class OwnerSerializer(serializers.ModelSerializer):
@@ -24,6 +24,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = "__all__"
+
 
 class RaceSerializer(serializers.ModelSerializer):
     class Meta:

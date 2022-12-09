@@ -191,9 +191,10 @@
             </tbody>
         </table>
   </div>
-
+{% if user.username == 'gameadmin' %}
 <p><a href="{% url 'poll:race-update' race_detail.pk %}">+ Изменить данные расы</a></p>
 <p><a href="{% url 'poll:race-delete' race_detail.pk %}">- Удалить расу</a></p>
+{% endif %}
 <p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
 <p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
 <p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>

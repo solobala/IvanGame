@@ -1,0 +1,107 @@
+{% extends "poll/header.html" %}
+
+{% block content %}
+  <h1>Персонаж: {{ person_detail.person_name }}</h1>
+     <table class="editorDemoTable">
+            <tbody>
+            <tr>
+                <td><strong> Владелец: </strong></td>
+                <td><strong><a href="/poll/owner/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></strong></td>
+            </tr>
+                <td><strong>Краткое описание:</strong></td>
+                <td> {{ person_detail.description }}</td>
+            <tr>
+                <td><strong>Ссылка:</strong> </td>
+                <td>{{ person_detail.link }}</td>
+            </tr>
+            </tr>
+                <td><strong>Биография:</strong></td>
+                <td> {{ person_detail.biography }}</td>
+            <tr>
+            </tr>
+                <td><strong>Характер:</strong></td>
+                <td> {{ person_detail.character }}</td>
+            <tr>
+            </tr>
+                <td><strong>Интересы:</strong></td>
+                <td> {{ person_detail.interests }}</td>
+            <tr>
+            </tr>
+                <td><strong>Фобии:</strong></td>
+                <td> {{ person_detail.phobias }}</td>
+            <tr>
+             <tr>
+                 <td><strong>Раса:</strong></td>
+                 <td>{{ person_detail.race }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Мeсто возрождения:</strong></td>
+                 <td>{{ person_detail.location_id_birth }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Дата рождения:</strong></td>
+                 <td>{{ person_detail.birth_date }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Мeсто смерти:</strong></td>
+                 <td>{{ person_detail.location_id_death }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Дата смерти:</strong></td>
+                 <td>{{ person_detail.death_date }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Текущий статус:</strong> </td>
+                 <td>{{ status_ }}</td>
+             </tr>
+             <tr>
+                 <td><strong>Членство в группе:</strong></td>
+                 <td>{{ group_status }}</td>
+             </tr>
+                {% if group_status == 'в группе' %}
+             <tr>
+                <td><strong> Организатор группы :     </strong></td>
+                <td><a href="/poll/person/{{inviter_person.id }}/"> {{inviter_person.person_name}}</a></td>
+             </tr>
+             <tr>
+                <td><strong>Участники группы: </strong></td>
+                <td>
+                    {% for participant in participants %}
+                        <ul>
+                        <li><a href="/poll/person/{{ participant.person.id }}/"> {{ participant.person.person_name }}</a></li>
+                        </ul>
+                    {% endfor %}
+                </td>
+             </tr>
+            <tr>
+
+            <td>
+                {% if inviter_person.person_name == person_detail.person_name %}
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Пригласить в группу?</a></p>
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Удалить из группы?</a></p>
+                {% else %}
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Выйти из группы?</a></p>
+                {% endif %}
+
+            {% elif person_detail.created_by.username == user.username %}
+<p> <a  href = "{% url 'poll:group-add' person_detail.id %}" > + Организовать  группу? </a> </p>
+<p> <a  href = "{% url 'poll:membership-update' person_detail.id %}" > + Вступить  в    группу? </a> </p>
+             {% endif %}
+                </td>
+                <td></td>
+             </tr>
+            </tbody>
+     </table>
+
+
+{% if person_detail.created_by.username == user.username %}
+<p><a href="{% url 'poll:person-update' person_detail.id %}">+ Редактировать Персонаж </a></p>
+<p><a href="{% url 'poll:person-delete' person_detail.pk %}">- Удалить Персонаж</a></p>
+{% endif %}
+<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+{% endblock %}
+
+

@@ -1,0 +1,7 @@
+django
+django-allauth
+psycopg2
+django-cors-headers
+djangorestframework
+django-js-asset
+django-ckeditor

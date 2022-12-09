@@ -31,7 +31,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('poll.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-   #  path('accounts/', include('allauth.urls')),
+    # path('poll/', include('django.contrib.auth.urls')),
+    # path('poll/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),
 
     path('password_reset/done/',
          auth_views.PasswordResetDoneView.as_view(template_name='poll/password/password_reset_done.html'),

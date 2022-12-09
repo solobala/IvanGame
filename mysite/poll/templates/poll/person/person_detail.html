@@ -35,6 +35,18 @@
                  <td>{{ person_detail.race }}</td>
              </tr>
              <tr>
+                 <td><strong>Слабости и особенности:</strong></td>
+                 <td>{{ person_detail.race }}</td>
+             </tr>
+            <tr>
+                 <td><strong>Основная характеристика:</strong></td>
+                 <td>{{ person_detail.race }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Основное умение:</strong></td>
+                 <td>{{ person_detail.race }}</td>
+            </tr>
+             <tr>
                  <td><strong>Мeсто возрождения:</strong></td>
                  <td>{{ person_detail.location_id_birth }}</td>
              </tr>
@@ -54,7 +66,43 @@
                  <td><strong>Текущий статус:</strong> </td>
                  <td>{{ status_ }}</td>
              </tr>
+            <tr>
+                 <td><strong>Здоровье:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Ментальное здоровье:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Выносливость:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Мана:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Голод:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Интоксикация:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
              <tr>
+                 <tr>
+                 <td><strong>Переносимый вес:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Среднее сопротивление к физическому урону:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
+            <tr>
+                 <td><strong>Среднее сопротивление к магическому урону:</strong> </td>
+                 <td>{{ status_ }}</td>
+            </tr>
                  <td><strong>Членство в группе:</strong></td>
                  <td>{{ group_status }}</td>
              </tr>
@@ -68,7 +116,7 @@
                 <td>
                     {% for participant in participants %}
                         <ul>
-                        <li><a href="/poll/person/{{ participant.person.id }}/"> {{ participant.person.person_name }}</a></li>
+                        <li><a href="/poll/person/{{ participant.id }}/"> {{ participant.person_name }}</a></li>
                         </ul>
                     {% endfor %}
                 </td>
@@ -77,18 +125,15 @@
 
             <td>
                 {% if inviter_person.person_name == person_detail.person_name %}
-                <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Пригласить в группу?</a></p>
-                <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Удалить из группы?</a></p>
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Пригласить в группу?</a></p>
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Удалить из группы?</a></p>
                 {% else %}
-                <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Выйти из группы?</a></p>
+                    <p> <a href="{% url 'poll:group-delete' person_detail.id %}"> + Выйти из группы?</a></p>
                 {% endif %}
 
-            {% else %}
-<p> <a  href = "{% url 'poll:group-add' person_detail.id %}" > + Организовать
-    группу? </a> </p>
-<p> <a  href = "{% url 'poll:membership-update' person_detail.id %}" > + Вступить
-    в    группу? </a> </p>
-
+            {% elif person_detail.created_by.username == user.username %}
+<p> <a  href = "{% url 'poll:group-add' person_detail.id %}" > + Организовать  группу? </a> </p>
+<p> <a  href = "{% url 'poll:membership-update' person_detail.id %}" > + Вступить  в    группу? </a> </p>
              {% endif %}
                 </td>
                 <td></td>
@@ -97,9 +142,10 @@
      </table>
 
 
-
+{% if person_detail.created_by.username == user.username %}
 <p><a href="{% url 'poll:person-update' person_detail.id %}">+ Редактировать Персонаж </a></p>
 <p><a href="{% url 'poll:person-delete' person_detail.pk %}">- Удалить Персонаж</a></p>
+{% endif %}
 <p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
 <p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
 <p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>

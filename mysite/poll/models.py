@@ -39,8 +39,7 @@ class Owner(models.Model):
 
     def __str__(self):
         # return self
-
-        #return "%s, %s, %s, %s" % (self.owner_name, self.owner_description, self.link, self.owner_status)
+          #return "%s, %s, %s, %s" % (self.owner_name, self.owner_description, self.link, self.owner_status)
         return "%s" % (self.owner_name)
 
     def get_absolute_url(self):
@@ -48,7 +47,7 @@ class Owner(models.Model):
         return reverse('poll:owner-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
-        # возвращает объект Owner с добавленным owmer_status
+        # возвращает объект Owner с добавленным owner_status
 
         try:
             if self.filter(person__status=1).count() == 0:
@@ -237,7 +236,7 @@ class Person(models.Model):
         }
 
     person_name = models.CharField(max_length=45)
-    owner = models.ForeignKey('Owner', on_delete=models.CASCADE)
+    owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True )
     link = models.CharField(max_length=30, blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     character = models.TextField(blank=True, null=True)
@@ -274,6 +273,9 @@ class Person(models.Model):
         db_table = 'person'
         verbose_name = "Person"
         verbose_name_plural = "Persons"
+        permissions = [
+            ('special_status', 'Can list all persons'),
+        ]
         # app_label = 'poll'
 
 
@@ -291,8 +293,6 @@ class Group(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-
-
         self.group_name = self.members.through.objects.filter(group__id=self.id)[0].inviter.person_name
         try:
             if self.members.count() >= 1:
@@ -568,6 +568,28 @@ class Membership(models.Model):
         return reverse('poll:membership', kwargs={'pk': self.pk})
 
 
-class Bar(models.Model):
+class PersonBar(models.Model):
     """ слепок состояния персонажа в моменты времени"""
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
+    race = models.ForeignKey('Race', on_delete=models.CASCADE, blank=True, null=True)
+    summary_points = models.JSONField(verbose_name='Суммарные очки характеристик', blank=True, null=True)
+    summary_permissions = models.JSONField(verbose_name='Суммарные очки умений', blank=True, null=True)
+    summary_resistances = models.JSONField(verbose_name='Суммарные очки сопротивлений', blank=True, null=True)
+    summary_equipment = models.JSONField(verbose_name='Суммарные слоты экипировки', blank=True, null=True)
+    unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
+    unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
+
+    def __str__(self):
+       return "%s" % (self.get_person_name_display())
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('poll:personbar-detail', kwargs={'pk': self.pk})
+
+    class Meta:
+        managed = True
+        db_table = 'personbar'
+
 
