@@ -22,6 +22,7 @@ from .forms import NewUserForm
 from django.http import JsonResponse
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
+from django.db.models.functions import Power, Round
 # from django.forms import ModelForm
 # from rest_framework.views import APIView
 # from rest_framework.response import Response
@@ -91,7 +92,6 @@ def register_request(request):
     return render(request=request, template_name="poll/register.html", context={"register_form": form})
 
 
-
 def login_request(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -127,7 +127,7 @@ def password_reset_request(request):
             if associated_users.exists():
                 for user in associated_users:
                     subject = "Password Reset Requested"
-                    #email_template_name = "poll/password/password_reset_email.txt"
+                    # email_template_name = "poll/password/password_reset_email.txt"
                     email_template_name = "accounts/password/password_reset_email.txt"
                     c = {
                         "email": user.email,
@@ -145,7 +145,7 @@ def password_reset_request(request):
                         return HttpResponse('Invalid header found.')
                     return redirect("/password_reset/done/")
     password_reset_form = PasswordResetForm()
-    #return render(request=request, template_name="poll/password/password_reset.html",
+    # return render(request=request, template_name="poll/password/password_reset.html",
     return render(request=request, template_name="accounts/password/password_reset.html",
                   context={"password_reset_form": password_reset_form})
 
@@ -532,9 +532,11 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['status_'] = ['Свободен' if context['person_detail'].status == 1
                               else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
-        person_group = Person.objects.get(id=context['person_detail'].pk).group_set.all() #Это Queryset - список групп из 1 группы
+        person_group = Person.objects.get(
+            id=context['person_detail'].pk).group_set.all()  # Это Queryset - список групп из 1 группы
         amount = person_group.count()  # это к-во групп с нашим персонажем - или 0, или 1
-        members = Membership.objects.filter(inviter=Person.objects.get(id=context['person_detail'].pk))  # Membership с участием нашего Person
+        members = Membership.objects.filter(
+            inviter=Person.objects.get(id=context['person_detail'].pk))  # Membership с участием нашего Person
         amount1 = members.count()
 
         # Person может быть inviter, участник группы или никто
@@ -543,7 +545,8 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         if amount >= 1:
             context['group_status'] = 'в группе'
             context['inviter_person'] = Membership.objects.filter(group_id=person_group[0].id)[0].inviter
-            context['participants'] = person_group[0].members.all()  # Queryset список Person - членов гРуппы, без inviter
+            context['participants'] = person_group[
+                0].members.all()  # Queryset список Person - членов гРуппы, без inviter
 
             # Если не inviter или не состоит в группе - получится 0
         elif amount == 0 and amount1 == 0:
@@ -551,11 +554,32 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
             # это inviter
         else:
             context['group_status'] = 'в группе'
-            participants =[]
+            participants = []
             for member in members:
                 participants.append(member.person)
             context['inviter_person'] = members[0].inviter
             context['participants'] = participants
+        info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
+        points = info.summary_points
+        permissions = info.summary_permissions
+        resistances = info.summary_resistances
+        equipment = info.summary_equipment
+        context['summary_points'] = points
+        context['summary_permissions'] = permissions
+        context['summary_resistances'] = resistances
+        context['summary_equipment'] = equipment
+        context['unallocated_points'] = info.unallocated_points
+        context['unallocated_permissions'] = info.unallocated_permissions
+        health = round(25 * (points['SP_START'] * 0.2
+                             + points['IP_START'] * 0.2
+                             + points['PP_START'] * 0.5
+                             + points['AP_START'] * 0.4
+                             + points['BP_START'] * 0.4
+                             + (permissions['Bleed_access_start'] * 0.1
+                                + permissions['Nature_access_start'] * 0.1
+                                + permissions['Mental_access_start'] * 0.1)) ** 1.5, 0)
+        context['health'] = health
+
         return context
 
 
@@ -602,7 +626,7 @@ class GroupCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-    #     members = self.object.members.through.objects.filter(group__id=self.object.pk)
+        #     members = self.object.members.through.objects.filter(group__id=self.object.pk)
         return context
 
     def form_valid(self, form):
@@ -851,6 +875,7 @@ class PersonBarDetailView(LoginRequiredMixin, DetailView):
         for item in context['person_bar_detail'].unallocated_permissions:
             context[item[0]] = item
         return context
+
 
 #  REST API
 

@@ -88,7 +88,7 @@ ROOT_URLCONF = "mysite.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
- #       "DIRS": [],
+        #  "DIRS": [],
         "DIRS":  [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -115,6 +115,8 @@ DATABASES = {
         'USER': 'gameadmin',
         'PASSWORD': 'Trubnik1967',
         'HOST': 'db.phlwfizcuzvxpjpitfyq.supabase.co',
+        # 'USER': 'postgres',
+        # 'PASSWORD': '2305623056',
         'PORT': '5432',
     }
 }

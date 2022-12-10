@@ -580,7 +580,7 @@ class PersonBar(models.Model):
     unallocated_permissions = models.IntegerField(verbose_name='Нераспределенные очки умений', default=0)
 
     def __str__(self):
-       return "%s" % (self.get_person_name_display())
+       return "%s" % (self.person.person_name)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
