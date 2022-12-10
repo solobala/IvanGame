@@ -279,6 +279,28 @@ class Person(models.Model):
         # app_label = 'poll'
 
 
+class Location(models.Model):
+    location_name = models.CharField(max_length=128, blank=True, null=True)
+    location_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'location'
+        verbose_name = "Location"
+        verbose_name_plural = "Locations"
+        ordering = ['location_name']
+
+    def __str__(self):
+        return "%s" % (self.location_name)
+
+    def get_absolute_url(self):
+
+        return reverse('poll:location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
 class Group(models.Model):
     group_name = models.CharField(max_length=128, default='group')
     members = models.ManyToManyField(
@@ -326,48 +348,29 @@ class Group(models.Model):
             super().save(*args, **kwargs)
 
 
-class Location(models.Model):
-    location_name = models.CharField(max_length=128, blank=True, null=True)
-    location_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+class Membership(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    inviter = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+        related_name="membership_invites",
+    )
+    invite_reason = models.CharField(max_length=64)
 
     class Meta:
         managed = True
-        db_table = 'location'
-        verbose_name = "Location"
-        verbose_name_plural = "Locations"
-        ordering = ['location_name']
-
-    def __str__(self):
-        return "%s" % (self.location_name)
-
-    def get_absolute_url(self):
-
-        return reverse('poll:location-detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-
-class Fraction(models.Model):
-    fraction_name = models.CharField(max_length=128, blank=True, null=True)
-    fraction_description = models.TextField(verbose_name='Описание', blank=True, null=True)
-
-
-    class Meta:
-        managed = True
-        db_table = 'fraction'
-        verbose_name = "Fraction"
-        verbose_name_plural = "Fractions"
+        db_table = 'membership'
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.fraction_name)
+        return "%s, %s" % (self.inviter, self.person)
+        # return "%s, %s,  %s,  %s," % (self.group, self.person, self.inviter, self.invite_reason)
 
     def get_absolute_url(self):
-        return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
+        #  return reverse('poll:person_detail', args=[str(self.id)])
+        return reverse('poll:membership', kwargs={'pk': self.pk})
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
 
 
 class Clan(models.Model):
@@ -392,6 +395,74 @@ class Clan(models.Model):
         super().save(*args, **kwargs)
 
 
+class Fraction(models.Model):
+    fraction_name = models.CharField(max_length=128, blank=True, null=True)
+    fraction_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+
+    class Meta:
+        # managed = True
+        db_table = 'fraction'
+        verbose_name = "Fraction"
+        verbose_name_plural = "Fractions"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.fraction_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Quest(models.Model):
+    quest_name = models.CharField(max_length=128, blank=True, null=True)
+    quest_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    duration = models.TimeField
+    benefits = models.JSONField
+    requirements = models.JSONField
+
+    class Meta:
+        managed = True
+        db_table = 'quest'
+        verbose_name = "Quest"
+        verbose_name_plural = "Quests"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.quest_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:quest-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Party(models.Model):
+    party_name = models.CharField(max_length=128, blank=True, null=True)
+    party_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    quest = models.ForeignKey('Quest', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'party'
+        verbose_name = "Party"
+        verbose_name_plural = "Parties"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.party_name, self.quest)
+
+    def get_absolute_url(self):
+        return reverse('poll:party-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
 class LocationFraction(models.Model):
     """
     Репутация фракций в чужих локациях
@@ -405,7 +476,7 @@ class LocationFraction(models.Model):
     reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = True
+        # managed = True
         db_table = 'location_fraction'
 
         # app_label = 'poll'
@@ -431,7 +502,7 @@ class FractionFraction(models.Model):
     reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = True
+        # managed = True
         db_table = 'fraction_fraction'
         # app_label = 'poll'
 
@@ -497,77 +568,6 @@ class PersonLocation(models.Model):
         super().save(*args, **kwargs)
 
 
-class Quest(models.Model):
-    quest_name = models.CharField(max_length=128, blank=True, null=True)
-    quest_description = models.TextField(verbose_name='Описание', blank=True, null=True)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE)
-    duration = models.TimeField
-    benefits = models.JSONField
-    requirements = models.JSONField
-
-    class Meta:
-        managed = True
-        db_table = 'quest'
-        verbose_name = "Quest"
-        verbose_name_plural = "Quests"
-        # app_label = 'poll'
-
-    def __str__(self):
-        return "%s" % (self.quest_name)
-
-    def get_absolute_url(self):
-        return reverse('poll:quest-detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-
-class Party(models.Model):
-    party_name = models.CharField(max_length=128, blank=True, null=True)
-    party_description = models.TextField(verbose_name='Описание', blank=True, null=True)
-    quest = models.ForeignKey('Quest', on_delete=models.CASCADE)
-
-    class Meta:
-        managed = True
-        db_table = 'party'
-        verbose_name = "Party"
-        verbose_name_plural = "Parties"
-        # app_label = 'poll'
-
-    def __str__(self):
-        return "%s" % (self.party_name, self.quest)
-
-    def get_absolute_url(self):
-        return reverse('poll:party-detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-
-class Membership(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    inviter = models.ForeignKey(
-        Person,
-        on_delete=models.CASCADE,
-        related_name="membership_invites",
-    )
-    invite_reason = models.CharField(max_length=64)
-
-    class Meta:
-        managed = True
-        db_table = 'membership'
-        # app_label = 'poll'
-
-    def __str__(self):
-        return "%s, %s" % (self.inviter, self.person)
-        # return "%s, %s,  %s,  %s," % (self.group, self.person, self.inviter, self.invite_reason)
-
-    def get_absolute_url(self):
-        #  return reverse('poll:person_detail', args=[str(self.id)])
-        return reverse('poll:membership', kwargs={'pk': self.pk})
-
-
 class PersonBar(models.Model):
     """ слепок состояния персонажа в моменты времени"""
     person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
@@ -577,7 +577,7 @@ class PersonBar(models.Model):
     summary_resistances = models.JSONField(verbose_name='Суммарные очки сопротивлений', blank=True, null=True)
     summary_equipment = models.JSONField(verbose_name='Суммарные слоты экипировки', blank=True, null=True)
     unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
-    unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
+    unallocated_permissions = models.IntegerField(verbose_name='Нераспределенные очки умений', default=0)
 
     def __str__(self):
        return "%s" % (self.get_person_name_display())
@@ -586,10 +586,10 @@ class PersonBar(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('poll:personbar-detail', kwargs={'pk': self.pk})
+        return reverse('poll:person-bar-detail', kwargs={'pk': self.pk})
 
     class Meta:
         managed = True
-        db_table = 'personbar'
+        db_table = 'person_bar'
 
 

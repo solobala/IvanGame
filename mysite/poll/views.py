@@ -829,13 +829,27 @@ class PersonBarDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр среза информации по персонажу
     """
-    template_name = 'poll/bar/bar_detail.html'
-    context_object_name = 'bar_detail'
+    template_name = 'poll/person_bar/person_bar_detail.html'
+    context_object_name = 'person_bar_detail'
     model = PersonBar
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['race'] = context['person_bar_detail'].race
+        context['person'] = context['person_bar_detail'].person
+        for item in context['person_bar_detail'].summary_points:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_permissions:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_resistances:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_equipment:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].unallocated_points:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].unallocated_permissions:
+            context[item[0]] = item
         return context
 
 #  REST API
