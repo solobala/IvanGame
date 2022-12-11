@@ -172,7 +172,25 @@
         {% for key, value in summary_points.items %}
         <tr>
             <td>
-               {{ key}}
+                {% if key == 'SP_START' %}
+                Стамина
+                {% elif key == 'MP_START' %}
+                Колдовство
+                {% elif key == 'IP_START' %}
+                Интеллект
+                {% elif key == 'PP_START' %}
+                Сила
+                {% elif key == 'AP_START' %}
+                Ловкость
+                {% elif key == 'FP_START' %}
+                Вера
+                {% elif key == 'LP_START' %}
+                Удача
+                {% elif key == 'CP_START' %}
+                Харизма
+                {% elif key == 'BP_START' %}
+                Рассудок
+                {% endif %}
             </td>
             <td>{{ value }}</td>
         </tr>
@@ -187,7 +205,27 @@
         {% for key, value in summary_resistances.items %}
         <tr>
             <td>
-                {{key }}
+                {% if key == "fire_res_start" %}
+                Огонь
+                {% elif key == "water_res_start" %}
+                Вода
+                {% elif key == "wind_res_start"%}
+                Воздух
+                {% elif key == "dirt_res_start" %}
+                Земля
+                {% elif key == "lightning_res_start" %}
+                Молнии
+                {% elif key == "holy_res_start" %}
+                Свет
+                {% elif key == "curse_res_start"%}
+                Тьма
+                {% elif key == "crush_res_start" %}
+                Дробление
+                {% elif key == "cut_res_start" %}
+                Порезы
+                {% elif key == "stab_res_start" %}
+                Протыкание
+                {% endif %}
             </td>
             <td>{{ value }}</td>
         </tr>
@@ -202,7 +240,43 @@
         {% for key, value in summary_permissions.items %}
         <tr>
             <td>
-              {{ key }}
+                {% if key == "Fire_access_start" %}
+                Пирокинектика
+                {% elif key == "Water_access_start" %}
+                Гидрософистика
+                {% elif key == "Wind_access_start" %}
+                Аэрософистика
+                {% elif key == "Dirt_access_start" %}
+                Геомантия
+                {% elif key == "Lightning_access_start" %}
+                Киловактика
+                {% elif key == "Holy_access_start" %}
+                Элафристика
+                {% elif key == "Curse_access_start" %}
+                Катифристика
+                {% elif key == "Bleed_access_start" %}
+                Гематомантия
+                {% elif key == "Nature_access_start" %}
+                Ботаника
+                {% elif key == "Mental_access_start" %}
+                Псифистика
+                {% elif key == "Twohanded_access_start" %}
+                Владение навыками Двуручного оружия
+                {% elif key == "Polearm_access_start" %}
+                Владение навыками Древкового оружия
+                {% elif key == "Onehanded_access_start" %}
+                Владение навыками Одноручного оружия
+                {% elif key == "Stabbing_access_start"%}
+                Владение навыками Колющего оружия
+                {% elif key == "Cutting_access_start" %}
+                Владение навыками Режущего оружия
+                {% elif key == "Crushing_access_start" %}
+                Владение навыками Дробящего оружия
+                {% elif key == "Small_arms_access_start" %}
+                Владение навыками Стрелкового оружия
+                {% elif key == "Shields_access_start" %}
+                Владение навыками Стрелкового оружия
+                {% endif %}
             </td>
             <td>{{ value }}</td>
         </tr>

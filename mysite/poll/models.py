@@ -372,7 +372,6 @@ class Membership(models.Model):
         return reverse('poll:membership', kwargs={'pk': self.pk})
 
 
-
 class Clan(models.Model):
     clan_name = models.CharField(max_length=128, blank=True, null=True)
     clan_description = models.TextField(verbose_name='Описание', blank=True, null=True)

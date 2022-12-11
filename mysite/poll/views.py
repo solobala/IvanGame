@@ -559,10 +559,66 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                 participants.append(member.person)
             context['inviter_person'] = members[0].inviter
             context['participants'] = participants
+        dict_points = {
+            "SP_START": "Стамина",
+            "MP_START": "Колдовство",
+            "IP_START": 'Интеллект',
+            "PP_START": 'Сила',
+            "AP_START": 'Ловкость',
+            "FP_START": 'Вера',
+            "LP_START": 'Удача',
+            "CP_START": 'Харизма',
+            "BP_START": 'Рассудок'
+        }
+        dict_permissions = {
+            "Fire_access_start": 'Пирокинектика',
+            "Water_access_start": 'Гидрософистика',
+            "Wind_access_start": 'Аэрософистика',
+            "Dirt_access_start": 'Геомантия',
+            "Lightning_access_start": 'Киловактика',
+            "Holy_access_start": 'Элафристика',
+            "Curse_access_start": 'Катифристика',
+            "Bleed_access_start": 'Гематомантия',
+            "Nature_access_start": 'Ботаника',
+            "Mental_access_start": 'Псифистика',
+            "Twohanded_access_start": 'Владение навыками Двуручного оружия',
+            "Polearm_access_start": 'Владение навыками Древкового оружия',
+            "Onehanded_access_start": 'Владение навыками Одноручного оружия',
+            "Stabbing_access_start": 'Владение навыками Колющего оружия',
+            "Cutting_access_start": 'Владение навыками Режущего оружия',
+            "Crushing_access_start": 'Владение навыками Дробящего оружия',
+            "Small_arms_access_start": 'Владение навыками Стрелкового оружия',
+            "Shields_access_start": 'Владение навыками Щитов'
+        }
+        dict_resistances = {
+            "fire_res_start": 'Устойчивость к огню',
+            "water_res_start": 'Устойчивость к воде',
+            "wind_res_start": 'Устойчивость к воздуху',
+            "dirt_res_start": 'Устойчивость к земле',
+            "lightning_res_start": 'Устойчивость к молниям',
+            "holy_res_start": 'Устойчивость к свету',
+            "curse_res_start": 'Устойчивость ко тьме',
+            "crush_res_start": 'Устойчивость к дроблению',
+            "cut_res_start": 'Устойчивость к порезам',
+            "stab_res_start": 'Устойчивость к протыканию'
+        }
         info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
-        points = info.summary_points
-        permissions = info.summary_permissions
-        resistances = info.summary_resistances
+
+        #points = info.summary_points
+        points = dict()
+        for key, value in info.summary_points.items():
+            points[dict_points.get(key)] = value
+
+        #permissions = info.summary_permissions
+        permissions = dict()
+        for key, value in info.summary_permissions.items():
+            permissions[dict_permissions.get(key)] = value
+
+        #resistances = info.summary_resistances
+        resistances = dict()
+        for key, value in info.summary_resistances.items():
+            resistances[dict_resistances.get(key)] = value
+
         equipment = info.summary_equipment
         context['summary_points'] = points
         context['summary_permissions'] = permissions
@@ -570,16 +626,75 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context['summary_equipment'] = equipment
         context['unallocated_points'] = info.unallocated_points
         context['unallocated_permissions'] = info.unallocated_permissions
-        health = round(25 * (points['SP_START'] * 0.2
-                             + points['IP_START'] * 0.2
-                             + points['PP_START'] * 0.5
-                             + points['AP_START'] * 0.4
-                             + points['BP_START'] * 0.4
-                             + (permissions['Bleed_access_start'] * 0.1
-                                + permissions['Nature_access_start'] * 0.1
-                                + permissions['Mental_access_start'] * 0.1)) ** 1.5, 0)
+
+        health = round(25 * (points['Стамина'] * 0.2
+                             + points['Интеллект'] * 0.2
+                             + points['Сила'] * 0.5
+                             + points['Ловкость'] * 0.4
+                             + points['Рассудок'] * 0.4
+                             + (permissions['Гематомантия'] * 0.1
+                                + permissions['Ботаника'] * 0.1
+                                + permissions['Псифистика'] * 0.1)) ** 1.5, 0)
         context['health'] = health
 
+        mental_health = round(10 * (points['Интеллект'] * 0.4
+                                    + points['Вера'] * 0.3
+                                    + points['Рассудок'] * 0.5
+                                    + (permissions['Псифистика'] * 0.1
+                                       - abs(permissions['Элафристика']
+                                             - permissions['Катифристика']) * 0.1)) ** 1.2, 0)
+        context['mental_health'] = mental_health
+
+        endurance = round(15 * (points['Стамина'] * 0.5
+                                + points['Колдовство'] * 0.4
+                                + points['Сила'] * 0.2
+                                + points['Ловкость'] * 0.4
+                                + (permissions['Гематомантия'] * 0.1
+                                   )) ** 1.2, 0)
+        context['endurance'] = endurance
+
+        mana = round(15 * (points['Колдовство'] * 0.5
+                           + points['Интеллект'] * 0.4
+                           + points['Вера'] * 0.2
+                           + permissions['Псифистика'] * 0.1
+                           + abs(permissions['Элафристика']
+                                 - permissions['Катифристика'])) ** 1.2, 0)
+        context['mana'] = mana
+
+        hungry = round(5 * (points['Сила'] * 0.3
+                            + points['Ловкость'] * 0.3
+                            + points['Стамина'] * 0.3
+                            ) ** 1.05, 0)
+        context['hungry'] = hungry
+
+        intoxication = round(5 * (points['Сила'] * 0.7
+                                  + points['Ловкость'] * 0.1
+                                  + points['Стамина'] * 0.1
+                                  + permissions['Гематомантия'] * 0.1
+                                  ) ** 1.05, 0)
+        context['intoxication'] = intoxication
+
+        load_capacity = round(5 * (points['Стамина'] * 0.4
+                                   + points['Сила'] * 0.5
+                                   + points['Ловкость'] * 0.2
+                                   ) ** 1.05, 0)
+        context['load_capacity'] = load_capacity
+
+
+        context['main_points'] = dict_points.get(max(points, key=points.get))
+        context['main_permission'] = dict_permissions.get(max(permissions, key=permissions.get))
+        context['avg_magic_resistance'] = round((resistances.get('Устойчивость к огню') +
+                                         resistances.get('Устойчивость к воде') +
+                                         resistances.get('Устойчивость к воздуху') +
+                                         resistances.get('Устойчивость к земле') +
+                                         resistances.get('Устойчивость к молниям') +
+                                         resistances.get('Устойчивость к свету') +
+                                         resistances.get('Устойчивость ко тьме')
+                                         )/7, 0)
+        context['avg_physic_resistance'] = round((resistances.get('Устойчивость к дроблению') +
+                                                 resistances.get('Устойчивость к порезам') +
+                                                 resistances.get('Устойчивость к протыканию')
+                                                 ) / 3, 0)
         return context
 
 
