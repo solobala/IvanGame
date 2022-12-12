@@ -1,5 +1,3 @@
-import json
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -39,8 +37,8 @@ class Owner(models.Model):
 
     def __str__(self):
         # return self
-          #return "%s, %s, %s, %s" % (self.owner_name, self.owner_description, self.link, self.owner_status)
-        return "%s" % (self.owner_name)
+        # return "%s, %s, %s, %s" % (self.owner_name, self.owner_description, self.link, self.owner_status)
+        return "%s" % self.owner_name
 
     def get_absolute_url(self):
         # return reverse('poll:owner_detail', args=[str(self.id)])
@@ -62,7 +60,7 @@ class Owner(models.Model):
     @property
     def full_name(self):
         """Возвращает имя игрока"""
-        return "%s" % (self.owner_name)
+        return "%s" % self.owner_name
 
     class Meta:
         managed = True
@@ -77,10 +75,12 @@ class Race(models.Model):
     Класс Раса  Персонажа (Person).
   `race_name` varchar(45) NOT NULL COMMENT 'Наименование расы персонажа',
   `race_description` varchar(200) DEFAULT NULL COMMENT 'Описание возможностей расы персонажа',
-  `start_points` json DEFAULT NULL COMMENT 'стартовые  значение очков стамины, маны, интелекта, силы, ловкости, веры, удачи, харизмы и рассудка в формате JSON',
-  `finish_points` json DEFAULT NULL COMMENT 'финишные значение очков стамины, маны, интелекта, силы, ловкости, веры, удачи, харизмы и рассудка в формате JSON',
-  `start_resistanses` json DEFAULT NULL COMMENT 'стартовые значение устойчивости к воздействию водой, огнем, ветром и т.д',
-  `start_permissions` json DEFAULT NULL COMMENT 'стартовые значение разрешений на воздействие водой, огнем, ветром и т.д',
+  `start_points` json DEFAULT NULL COMMENT 'стартовые  значение очков стамины, маны, интелекта, силы, ловкости, веры,
+  удачи, харизмы и рассудка в формате JSON',
+  `finish_points` json DEFAULT NULL COMMENT 'финишные значение очков стамины, маны, интелекта, силы, ловкости, веры,
+  удачи, харизмы и рассудка в формате JSON',
+  `start_resistanses` json DEFAULT NULL COMMENT 'стартовые значение устойчивости к воздействию водой, огнем, ветром ,
+  `start_permissions` json DEFAULT NULL COMMENT 'стартовые значение разрешений на воздействие водой, огнем, ветром ',
   equipment json снаряжение json DEFAULT NULL COMMENT 'Стартовые значения количества слотов для экипировки',
   PRIMARY KEY (`race_id`)
     """
@@ -111,7 +111,7 @@ class Race(models.Model):
         ORK = '22', 'Орк'
 
     def is_upperclass(self):
-        return self.race in {
+        return self.race_name in {
             self.Races.ELF,
             self.Races.ANGEL,
             self.Races.PHOENIX,
@@ -148,10 +148,6 @@ class Race(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-
-        # return "%s, %s, %s, %s, %s, %s, %s, %s" % (
-        #     self.get_race_name_display(), self.race_description, self.lifetime, self.start_points,
-        #     self.finish_points, self.start_resistanses, self.start_permissions, self.equipment)
         return "%s" % (
             self.get_race_name_display())
 
@@ -191,9 +187,12 @@ class Race(models.Model):
         #         "Onehanded_access_start", "Stabbing_access_start", "Cutting_access_start", "Crushing_access_start",
         #         "Small_arms_access_start", "Shields_access_start"]
         # labels = 'Пирокинектика, Гидрософистика, Аэрософистика, Геомантия, Киловактика, Элафристика, Катифристика,\
-        #        Гематомантия, Ботаника, Психистика, Владение навыками Двуручного оружия, Владение навыками Древкового оружия,\
-        #        Владение навыками Одноручного оружия, Владение навыками Колющего оружия, Владение навыками Режущего оружия,\
-        #        Владение навыками Дробящего оружия, Владение навыками Стрелкового оружия, Владение навыками Стрелкового оружия'
+        #        Гематомантия, Ботаника, Психистика, Владение навыками Двуручного оружия, Владение навыками
+        #        Древкового оружия,\
+        #        Владение навыками Одноручного оружия, Владение навыками Колющего оружия, Владение навыками
+        #        Режущего оружия,\
+        #        Владение навыками Дробящего оружия, Владение навыками Стрелкового оружия, Владение навыками
+        #        Стрелкового оружия'
         # my_dict = dict(zip(keys, labels.split(', ')))
         # for key in keys:
         #     stp[my_dict.get(key)] = json.loads(self.start_permissions).get(key)
@@ -211,7 +210,6 @@ class Race(models.Model):
     def get_absolute_url(self):
         #  return reverse('poll:owner_detail', args=[str(self.id)])
         return reverse('poll:race-detail', kwargs={'pk': self.pk})
-
 
     class Meta:
         managed = True
@@ -236,7 +234,7 @@ class Person(models.Model):
         }
 
     person_name = models.CharField(max_length=45)
-    owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True )
+    owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True)
     link = models.CharField(max_length=30, blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     character = models.TextField(blank=True, null=True)
@@ -266,7 +264,7 @@ class Person(models.Model):
     @property
     def full_name(self):
         """Возвращает имя Персонажа"""
-        return "%s" % (self.person_name)
+        return "%s" % self.person_name
 
     class Meta:
         managed = True
@@ -291,10 +289,9 @@ class Location(models.Model):
         ordering = ['location_name']
 
     def __str__(self):
-        return "%s" % (self.location_name)
+        return "%s" % self.location_name
 
     def get_absolute_url(self):
-
         return reverse('poll:location-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
@@ -324,7 +321,7 @@ class Group(models.Model):
         except:
             pass
         finally:
-            return "%s" % (self.group_name)
+            return "%s" % self.group_name
 
     def get_absolute_url(self):
         #  return reverse('poll:person_detail', args=[str(self.id)])
@@ -332,10 +329,13 @@ class Group(models.Model):
 
     def save(self, *args, **kwargs):
         # возвращает объект Group с измененным group_name
-        # mo.Group.objects.get(id=7).members.through.objects.filter(group__id=7) - возщвращает набор membership из пар inviter-person
+        # mo.Group.objects.get(id=7).members.through.objects.filter(group__id=7) - возщвращает
+        # набор membership из пар inviter-person
         # Можно получить список группы либо по person, либо по inviter либо по названию группы
-        # ПОиск участников группы по  invitor -  mo.Group.objects.get(id=2).members.through.objects.filter(person_id=mo.Person.objects.get(person_name='Лилит Игнис').id)
-        # ПОиск участников группы по  person -  mo.Group.objects.get(id=2).members.through.objects.filter(inviter_id=mo.Person.objects.get(person_name='Люцифер Вераз').id)
+        # ПОиск участников группы по  invitor -  mo.Group.objects.get(id=2).members.through.objects.
+        # filter(person_id=mo.Person.objects.get(person_name='Лилит Игнис').id)
+        # ПОиск участников группы по  person -  mo.Group.objects.get(id=2).members.through.objects.
+        # filter(inviter_id=mo.Person.objects.get(person_name='Люцифер Вераз').id)
         try:
             if self.members.count() >= 1:
                 self.group_name = self.members.through.objects.filter(
@@ -385,10 +385,10 @@ class Clan(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.fraction_name)
+        return "%s" % self.clan_name
 
     def get_absolute_url(self):
-        return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
+        return reverse('poll:clan-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -406,7 +406,7 @@ class Fraction(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.fraction_name)
+        return "%s" % self.fraction_name
 
     def get_absolute_url(self):
         return reverse('poll:fraction-detail', kwargs={'pk': self.pk})
@@ -431,7 +431,7 @@ class Quest(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.quest_name)
+        return "%s" % self.quest_name
 
     def get_absolute_url(self):
         return reverse('poll:quest-detail', kwargs={'pk': self.pk})
@@ -453,7 +453,7 @@ class Party(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.party_name, self.quest)
+        return "%s, %s" % (self.party_name, self.quest)
 
     def get_absolute_url(self):
         return reverse('poll:party-detail', kwargs={'pk': self.pk})
@@ -481,7 +481,7 @@ class LocationFraction(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s, %s" % (self.fraction,  self.location)
+        return "%s, %s" % (self.fraction, self.location)
 
     def get_absolute_url(self):
         return reverse('poll:location-fraction-detail', kwargs={'pk': self.pk})
@@ -506,7 +506,7 @@ class FractionFraction(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s" % (self.fraction,  self.other_fraction)
+        return "%s, %s" % (self.fraction, self.other_fraction)
 
     def get_absolute_url(self):
         return reverse('poll:fraction-fraction-detail', kwargs={'pk': self.pk})
@@ -531,7 +531,7 @@ class PersonFraction(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s, %s" % (self.person, self.fraction)
+        return "%s, %s" % (self.person, self.fraction)
 
     def get_absolute_url(self):
         return reverse('poll:person-fraction-detail', kwargs={'pk': self.pk})
@@ -558,7 +558,7 @@ class PersonLocation(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s, %s" % (self.person, self.location)
+        return "%s, %s" % (self.person, self.location)
 
     def get_absolute_url(self):
         return reverse('poll:person-location-detail', kwargs={'pk': self.pk})
@@ -579,7 +579,7 @@ class PersonBar(models.Model):
     unallocated_permissions = models.IntegerField(verbose_name='Нераспределенные очки умений', default=0)
 
     def __str__(self):
-       return "%s" % (self.person.person_name)
+        return "%s" % self.person.person_name
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -592,3 +592,74 @@ class PersonBar(models.Model):
         db_table = 'person_bar'
 
 
+class Action(models.Model):
+    action_name = models.CharField(max_length=128, blank=True, null=True)
+    action_alias = models.CharField(max_length=128, blank=True, null=True)
+    action_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+
+    action_points = models.JSONField(verbose_name='Характеристики',
+                                     default=dict)
+    SP = models.IntegerField(verbose_name="Стамина", default=0)
+    MP = models.IntegerField(verbose_name="Колдовство", default=0)
+    IP = models.IntegerField(verbose_name="Интеллект", default=0)
+    PP = models.IntegerField(verbose_name="Сила", default=0)
+    AP = models.IntegerField(verbose_name="Ловкость", default=0)
+    FP = models.IntegerField(verbose_name="Вера", default=0)
+    LP = models.IntegerField(verbose_name="Удача", default=0)
+    CP = models.IntegerField(verbose_name="Харизма", default=0)
+    BP = models.IntegerField(verbose_name="Рассудок", default=0)
+    action_resistanses = models.JSONField(verbose_name='Сопротивляемость', default=dict)
+    fire_res = models.IntegerField(verbose_name="Сопротивляемость огню", default=0)
+    water_res = models.IntegerField(verbose_name="Сопротивляемость воде", default=0)
+    wind_res = models.IntegerField(verbose_name="Сопротивляемость ветру", default=0)
+    dirt_res = models.IntegerField(verbose_name="Сопротивляемость земле", default=0)
+    lightning_rest = models.IntegerField(verbose_name="Сопротивляемость молниям", default=0)
+    holy_res = models.IntegerField(verbose_name="Сопротивляемость свету", default=0)
+    curse_res = models.IntegerField(verbose_name="Сопротивляемость тьме", default=0)
+    crush_res = models.IntegerField(verbose_name="Сопротивляемость дроблению", default=0)
+    cut_res = models.IntegerField(verbose_name="Сопротивляемость порезам", default=0)
+    stab_res = models.IntegerField(verbose_name="Сопротивляемость протыканию", default=0)
+
+    action_permissions = models.JSONField(verbose_name='Умения',
+                                          default=dict)
+    Fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
+    Water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
+    Wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
+    Dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
+    Lightning_accesst = models.IntegerField(verbose_name="Киловактика", default=0)
+    Holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
+    Curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
+    Bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
+    Nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
+    Mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
+    Twohanded_access = models.IntegerField(verbose_name="Владение навыками Двуручного оружия", default=0)
+    Polearm_acces = models.IntegerField(verbose_name="Владение навыками Древкового оружия", default=0)
+    Onehanded_access = models.IntegerField(verbose_name="Владение навыками Одноручного оружия", default=0)
+    Stabbing_accesst = models.IntegerField(verbose_name="Владение навыками Колющего оружия", default=0)
+    Cutting_access = models.IntegerField(verbose_name="Владение навыками Режущего оружия", default=0)
+    Crushing_access = models.IntegerField(verbose_name="Владение навыками Дробящего оружия", default=0)
+    Small_arms_acces = models.IntegerField(verbose_name="Владение навыками Стрелкового оружия", default=0)
+    Shields_access = models.IntegerField(verbose_name="Владение навыками Щитов", default=0)
+
+    action_equipment = models.JSONField(verbose_name='Снаряжение', default=dict)
+    helmet_status = models.IntegerField(verbose_name='Шлем', default=0)
+    chest_status = models.IntegerField(verbose_name='Нагрудник', default=0)
+    shoes_status = models.IntegerField(verbose_name='Сапоги', default=0)
+    gloves_status = models.IntegerField(verbose_name='Наручи', default=0)
+    item_status = models.IntegerField(verbose_name='Прочее', default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'action'
+        verbose_name = "Action"
+        verbose_name_plural = "Actions"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s, %s" % (self.action_name, self.action_alias)
+
+    def get_absolute_url(self):
+        return reverse('poll:action-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)

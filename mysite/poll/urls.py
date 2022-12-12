@@ -2,13 +2,13 @@
 from django.urls import path, include
 from . import views
 from .views import OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView, OwnersListView, \
-    OwnersFreeListView, RaceDeleteView, RaceDetailView, RacesListView, PersonBarDetailView
+    OwnersFreeListView, RaceDeleteView, RaceDetailView, RacesListView, PersonBarDetailView, ActionDetailView, \
+    ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView
 from .views import PersonsFreeListView, PersonDetailView, PersonCreateView, PersonUpdateView, PersonDeleteView, RaceCreateView
 from .views import PersonsListView,  PersonsBusyListView, PersonsFreezListView
 from .views import MembershipListView, MembershipDeleteView, MembershipCreateView, MembershipUpdateView, MembershipDetailView
 from .views import GroupsListView, GroupCreateView, GroupUpdateView, GroupDeleteView, GroupDetailView
 from .views import RaceCreateView, RaceUpdateView, RaceDeleteView
-
 
 
 from rest_framework import routers
@@ -72,6 +72,12 @@ urlpatterns = [
     path('poll/person/<int:pk>/group-add/', GroupCreateView.as_view(), name='group-add'),  # создание  группы
     path('poll/person/<int:pk>/membership-update/', MembershipUpdateView.as_view(), name='membership-update'), # добавление в группы
     path('poll/person/<int:pk>/membership/', MembershipListView.as_view(), name='membership-list'),  # просмотр участников группы персонажа
+
+    path('poll/action/<int:pk>/', ActionDetailView.as_view(), name='action-detail'),  # просмотр карточки действия
+    path('poll/action/<int:pk>/update', ActionUpdateView.as_view(), name='action-update'),  # обновление действия
+    path('poll/action/<int:pk>/delete', ActionDeleteView.as_view(), name='action-delete'),  # удаление действия
+    path('poll/action/add/', ActionCreateView.as_view(), name='action-add'),  # new action
+    path('poll/action/', ActionsListView.as_view(), name='actions-list'),  # просмотр списка действий
 
     path('poll/race/', RacesListView.as_view(), name='races-list'),  # список Рас
     path('poll/race/<int:pk>/', RaceDetailView.as_view(), name='race-detail'),  # просмотр карточки расы

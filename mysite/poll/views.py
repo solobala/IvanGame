@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout  # add this
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
@@ -14,15 +15,15 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
-from .models import Owner, Person, Group, Membership, Race, PersonBar
+from .models import Owner, Person, Group, Membership, Race, PersonBar, Action
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import NewUserForm
+from .forms import NewUserForm, ActionForm
 from django.http import JsonResponse
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
-from django.db.models.functions import Power, Round
+
 # from django.forms import ModelForm
 # from rest_framework.views import APIView
 # from rest_framework.response import Response
@@ -30,6 +31,7 @@ from django.db.models.functions import Power, Round
 # from django.http import Http404
 # from rest_framework import mixins
 from rest_framework import generics
+from . import slovar
 
 PersonFormset = inlineformset_factory(
     Owner, Person, fields=('person_name',)
@@ -61,19 +63,6 @@ class JsonableResponseMixin:
                 'pk': self.object.pk,
             }
             return JsonResponse(data)
-
-
-# Это просто для примера
-# class RegisterFormView(FormView):
-#     template_name = 'contact.html'
-#     form_class = RegisterForm
-#     # success_url = '/thanks/'
-#
-#     def form_valid(self, form):
-#         # This method is called when valid form data has been POSTed.
-#         # It should return an HttpResponse.
-#         form.send_email()
-#         return super().form_valid(form)
 
 
 def register_request(request):
@@ -188,12 +177,13 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
         return data
 
     def form_valid(self, form):
+
         form.instance.created_by = self.request.user
+        # self.object = form.save()
         owner_amount = Owner.objects.filter(created_by=self.request.user).count()
         if owner_amount == 0:  # реальный игрок еще не создал Owner
             context = self.get_context_data()
             persons = context["persons"]
-            self.object = form.save()
 
             if persons.is_valid():
                 persons.instance = self.object
@@ -559,67 +549,25 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                 participants.append(member.person)
             context['inviter_person'] = members[0].inviter
             context['participants'] = participants
-        dict_points = {
-            "SP_START": "Стамина",
-            "MP_START": "Колдовство",
-            "IP_START": 'Интеллект',
-            "PP_START": 'Сила',
-            "AP_START": 'Ловкость',
-            "FP_START": 'Вера',
-            "LP_START": 'Удача',
-            "CP_START": 'Харизма',
-            "BP_START": 'Рассудок'
-        }
-        dict_permissions = {
-            "Fire_access_start": 'Пирокинектика',
-            "Water_access_start": 'Гидрософистика',
-            "Wind_access_start": 'Аэрософистика',
-            "Dirt_access_start": 'Геомантия',
-            "Lightning_access_start": 'Киловактика',
-            "Holy_access_start": 'Элафристика',
-            "Curse_access_start": 'Катифристика',
-            "Bleed_access_start": 'Гематомантия',
-            "Nature_access_start": 'Ботаника',
-            "Mental_access_start": 'Псифистика',
-            "Twohanded_access_start": 'Владение навыками Двуручного оружия',
-            "Polearm_access_start": 'Владение навыками Древкового оружия',
-            "Onehanded_access_start": 'Владение навыками Одноручного оружия',
-            "Stabbing_access_start": 'Владение навыками Колющего оружия',
-            "Cutting_access_start": 'Владение навыками Режущего оружия',
-            "Crushing_access_start": 'Владение навыками Дробящего оружия',
-            "Small_arms_access_start": 'Владение навыками Стрелкового оружия',
-            "Shields_access_start": 'Владение навыками Щитов'
-        }
-        dict_resistances = {
-            "fire_res_start": 'Устойчивость к огню',
-            "water_res_start": 'Устойчивость к воде',
-            "wind_res_start": 'Устойчивость к воздуху',
-            "dirt_res_start": 'Устойчивость к земле',
-            "lightning_res_start": 'Устойчивость к молниям',
-            "holy_res_start": 'Устойчивость к свету',
-            "curse_res_start": 'Устойчивость ко тьме',
-            "crush_res_start": 'Устойчивость к дроблению',
-            "cut_res_start": 'Устойчивость к порезам',
-            "stab_res_start": 'Устойчивость к протыканию'
-        }
+
         info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
 
-        #points = info.summary_points
         points = dict()
         for key, value in info.summary_points.items():
-            points[dict_points.get(key)] = value
+            points[slovar.dict_points_start.get(key)] = value
 
-        #permissions = info.summary_permissions
         permissions = dict()
         for key, value in info.summary_permissions.items():
-            permissions[dict_permissions.get(key)] = value
+            permissions[slovar.dict_permissions_start.get(key)] = value
 
-        #resistances = info.summary_resistances
         resistances = dict()
         for key, value in info.summary_resistances.items():
-            resistances[dict_resistances.get(key)] = value
+            resistances[slovar.dict_resistances_start.get(key)] = value
 
-        equipment = info.summary_equipment
+        equipment = dict()
+        for key, value in info.summary_equipment.items():
+            equipment[slovar.dict_equipment_start.get(key)] = value
+
         context['summary_points'] = points
         context['summary_permissions'] = permissions
         context['summary_resistances'] = resistances
@@ -680,21 +628,22 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                                    ) ** 1.05, 0)
         context['load_capacity'] = load_capacity
 
-
-        context['main_points'] = dict_points.get(max(points, key=points.get))
-        context['main_permission'] = dict_permissions.get(max(permissions, key=permissions.get))
+        # context['main_points'] = slovar.dict_points_start.get(max(points, key=points.get))
+        # context['main_permission'] = slovar.dict_permissions_start.get(max(permissions, key=permissions.get))
+        context['main_points'] = max(points, key=points.get)
+        context['main_permission'] = max(permissions, key=permissions.get)
         context['avg_magic_resistance'] = round((resistances.get('Устойчивость к огню') +
-                                         resistances.get('Устойчивость к воде') +
-                                         resistances.get('Устойчивость к воздуху') +
-                                         resistances.get('Устойчивость к земле') +
-                                         resistances.get('Устойчивость к молниям') +
-                                         resistances.get('Устойчивость к свету') +
-                                         resistances.get('Устойчивость ко тьме')
-                                         )/7, 0)
+                                                 resistances.get('Устойчивость к воде') +
+                                                 resistances.get('Устойчивость к воздуху') +
+                                                 resistances.get('Устойчивость к земле') +
+                                                 resistances.get('Устойчивость к молниям') +
+                                                 resistances.get('Устойчивость к свету') +
+                                                 resistances.get('Устойчивость ко тьме')
+                                                 ) / 7, 0)
         context['avg_physic_resistance'] = round((resistances.get('Устойчивость к дроблению') +
-                                                 resistances.get('Устойчивость к порезам') +
-                                                 resistances.get('Устойчивость к протыканию')
-                                                 ) / 3, 0)
+                                                  resistances.get('Устойчивость к порезам') +
+                                                  resistances.get('Устойчивость к протыканию')
+                                                  ) / 3, 0)
         return context
 
 
@@ -949,18 +898,31 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        start_points = dict()
+        for key, value in context['race_detail'].start_points.items():
+            start_points[slovar.dict_points_start.get(key)] = value
 
-        for item in context['race_detail'].finish_points:
-            context[item[0]] = item
-        for item in context['race_detail'].finish_points:
-            context[item[0]] = item
-        for item in context['race_detail'].start_resistanses:
-            context[item[0]] = item
-        for item in context['race_detail'].start_permissions:
-            context[item[0]] = item
-        for item in context['race_detail'].equipment:
-            context[item[0]] = item
+        finish_points = dict()
+        for key, value in context['race_detail'].finish_points.items():
+            finish_points[slovar.dict_points_max.get(key)] = value
 
+        start_permissions = dict()
+        for key, value in context['race_detail'].start_permissions.items():
+            start_permissions[slovar.dict_permissions_start.get(key)] = value
+
+        start_resistances = dict()
+        for key, value in context['race_detail'].start_resistanses.items():
+            start_resistances[slovar.dict_resistances_start.get(key)] = value
+
+        equipment = dict()
+        for key, value in context['race_detail'].equipment.items():
+            equipment[slovar.dict_equipment_start.get(key)] = value
+
+        context['start_points'] = start_points
+        context['finish_points'] = finish_points
+        context['start_permissions'] = start_permissions
+        context['start_resistances'] = start_resistances
+        context['equipment'] = equipment
         return context
 
 
@@ -990,6 +952,191 @@ class PersonBarDetailView(LoginRequiredMixin, DetailView):
         for item in context['person_bar_detail'].unallocated_permissions:
             context[item[0]] = item
         return context
+
+
+class ActionDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по команде
+    """
+    template_name = 'poll/action/action_detail.html'
+    context_object_name = 'action_detail'
+    queryset = Action.objects.all()
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in context['action_detail'].action_points.items():
+            action_points[slovar.dict_points.get(key)] = value
+        context['action_points'] = action_points
+
+        for key, value in context['action_detail'].action_permissions.items():
+            action_permissions[slovar.dict_permissions.get(key)] = value
+        context['action_permissions'] = action_permissions
+
+        for key, value in context['action_detail'].action_resistanses.items():
+            action_resistanses[slovar.dict_resistances.get(key)] = value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in context['action_detail'].action_equipment.items():
+            action_equipment[slovar.dict_equipment.get(key)] = value
+        context['action_equipment'] = action_equipment
+        return context
+
+
+class ActionsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Действий
+    """
+    template_name = 'poll/action/actions_list.html'
+    context_object_name = 'actions_list'
+    model = Action
+    login_url = 'poll:login'
+
+
+class ActionDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Действия
+    """
+    model = Action
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:actions-list')
+    context_object_name = 'raction_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ActionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Действия
+    """
+    # model = Action
+    form_class = ActionForm
+    context_object_name = 'action_update'
+    queryset = Action.objects.all()
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+    # fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
+    #           'action_resistanses', 'action_equipment']
+    #
+    # for key, value in slovar.dict_points.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_permissions.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_resistances.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_equipment.items():
+    #     fields.append(value)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in context['action_detail'].action_points.items():
+            action_points[slovar.dict_points.get(key)] = value
+        context['action_points'] = action_points
+
+        for key, value in context['action_detail'].action_permissions.items():
+            action_permissions[slovar.dict_permissions.get(key)] = value
+        context['action_permissions'] = action_permissions
+
+        for key, value in context['action_detail'].action_resistanses.items():
+            action_resistanses[slovar.dict_resistances.get(key)] = value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in context['action_detail'].action_equipment.items():
+            action_equipment[slovar.dict_equipment.get(key)] = value
+        context['action_equipment'] = action_equipment
+
+        return context
+
+    def get_success_url(self):
+        return reverse('action_update', kwargs={'pk': self.object.id})
+
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+        # form.instance.action_equipment = self.action_equipment
+        # form.instance.action_resistanses = self.action_resistanses
+        # form.instance.action_permissions = self.action_permissions
+        # form.instance.action_points = self.action_points
+        form.instance.updated_by = self.request.user
+
+        return super().form_valid(form)
+
+
+class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Действия
+    """
+    context_object_name = 'action_add'
+    queryset = Action.objects.all()
+
+    login_url = 'poll:login'
+    fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
+              'action_resistanses', 'action_equipment']
+
+    for key, value in slovar.dict_points.items():
+        fields.append(value)
+    for key, value in slovar.dict_permissions.items():
+        fields.append(value)
+    for key, value in slovar.dict_resistances.items():
+        fields.append(value)
+    for key, value in slovar.dict_equipment.items():
+        fields.append(value)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in slovar.dict_points.items():
+            action_points[key] = context.action_points.get(value).value
+        context['action_points'] = action_points
+
+        for key, value in slovar.dict_permissions.items():
+            action_permissions[key] = context.action_permissions.get(value).value
+        context['action_permissions'] = action_permissions
+
+        for key, value in slovar.dict_resistances.items():
+            action_resistanses[key] = context.action_resistanses.get(value).value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in slovar.dict_equipment.items():
+            action_equipment[key] = context.action_equipment.get(value).value
+        context['action_equipment'] = action_equipment
+
+        return context
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        # form.instance.action_equipment = self.action_equipment
+        # form.instance.action_resistanses = self.action_resistanses
+        # form.instance.action_permissions = self.action_permissions
+        # form.instance.action_points = self.action_points
+        # form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 
 #  REST API

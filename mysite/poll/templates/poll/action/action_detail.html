@@ -1,0 +1,71 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h1>Действие: {{ action_detail.action_name }}</h1>
+  <p><strong>Алиас: </strong> {{ action_detail.action_alias }}</p>
+  <p><strong>Описание: </strong> {{ action_detail.action_description|safe }}</p>
+  <p><strong>Характеристики: </strong> {{ action_detail.action_points }}</p>
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Очки характеристик: </h4>
+        <table class="editorDemoTable">
+            <tbody>
+            {% for key, value in  action_points.items %}
+                <tr>
+                    <td>{{ key }}  </td>
+                    <td>{{ value }} </td>
+                </tr>
+             {% endfor %}
+            </tbody>
+        </table>
+  </div>
+
+ <p><strong>Сопротивляемость: </strong> {{ action_detail.action_resistanses }}</p>
+  <div style="margin-left:20px;margin-top:20px">
+    <h4> Очки сопротивлений:  </h4>
+        <table class="editorDemoTable">
+            <tbody>
+            {% for key, value in  action_resistanses.items %}
+                <tr>
+                    <td>{{ key }} </td>
+                    <td>{{ value }} </td>
+                </tr>
+             {% endfor %}
+            </tbody>
+        </table>
+  </div>
+ <p><strong>Умения: </strong> {{ action_detail.action_permissions }}</p>
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Очки навыков: </h4>
+         <table class="editorDemoTable">
+            <tbody>
+            {% for key, value in  action_permissions.items %}
+                <tr>
+                    <td>{{ key }} </td>
+                    <td>{{ value }} </td>
+                </tr>
+             {% endfor %}
+            </tbody>
+        </table>
+  </div>
+ <p><strong>Снаряжение: </strong> {{ action_detail.action_equipment }}</p>
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Слоты под: </h4>
+        <table class="editorDemoTable">
+            <tbody>
+            {% for key, value in  action_equipment.items %}
+                <tr>
+                    <td>{{ key }} </td>
+                    <td>{{ value }} </td>
+                </tr>
+             {% endfor %}
+            </tbody>
+        </table>
+  </div>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:action-update' action_detail.pk %}">+ Изменить Действие</a></p>
+<p><a href="{% url 'poll:action-delete' action_detail.pk %}">- Удалить Действие</a></p>
+{% endif %}
+<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+{% endblock %}
