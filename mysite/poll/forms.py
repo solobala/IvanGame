@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Action
+
 from . import slovar
 
 
@@ -27,87 +28,110 @@ class NewUserForm(UserCreationForm):
 
 
 # https://colinkingswood.github.io/Model-Form-Customisation/
-class ActionForm(forms.ModelForm):
+class ActionUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(ActionForm, self).__init__(*args, **kwargs)
-        # user = kwargs.pop('user')
-        # self.logged_user = user
+        super(ActionUpdateForm, self).__init__(*args, **kwargs)
 
         self.fields['action_name'].widget = forms.TextInput()
         self.fields['action_alias'].widget = forms.TextInput()
-        self.fields['action_description'].widget = forms.TextInput()
-        self.fields['action_points'].widget = forms.TextInput()
-        self.fields['Стамина'].widget = forms.NumberInput()
-        self.fields['Колдовство'].widget = forms.NumberInput()
-        self.fields['Интеллект'].widget = forms.NumberInput()
-        self.fields['Сила'].widget = forms.NumberInput()
-        self.fields['Ловкость'].widget = forms.NumberInput()
-        self.fields['Вера'].widget = forms.NumberInput()
-        self.fields['Удача'].widget = forms.NumberInput()
-        self.fields['Харизма'].widget = forms.NumberInput()
-        self.fields['Рассудок'].widget = forms.NumberInput()
+        self.fields['action_description'].widget = forms.Textarea()
 
-        self.fields['Пирокинектика'].widget = forms.TextInput()
-        self.fields['Гидрософистика'].widget = forms.NumberInput()
-        self.fields['Аэрософистика'].widget = forms.NumberInput()
-        self.fields['Геомантия'].widget = forms.NumberInput()
-        self.fields['Киловактика'].widget = forms.NumberInput()
-        self.fields['Элафристика'].widget = forms.NumberInput()
-        self.fields['Катифристика'].widget = forms.NumberInput()
-        self.fields['Гематомантия'].widget = forms.NumberInput()
-        self.fields['Ботаника'].widget = forms.NumberInput()
-        self.fields['Псифистика'].widget = forms.NumberInput()
-        self.fields['Владение навыками Древкового оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Одноручного оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Колющего оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Режущего оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Дробящего оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Стрелкового оружия'].widget = forms.NumberInput()
-        self.fields['Владение навыками Щитов'].widget = forms.NumberInput()
+        self.fields['SP'].widget = forms.NumberInput()
+        self.fields['MP'].widget = forms.NumberInput()
+        self.fields['IP'].widget = forms.NumberInput()
+        self.fields['PP'].widget = forms.NumberInput()
+        self.fields['AP'].widget = forms.NumberInput()
+        self.fields['FP'].widget = forms.NumberInput()
+        self.fields['LP'].widget = forms.NumberInput()
+        self.fields['CP'].widget = forms.NumberInput()
+        self.fields['BP'].widget = forms.NumberInput()
 
-        self.fields['action_resistanses'].widget = forms.TextInput()
-        self.fields['Устойчивость к огню'].widget = forms.NumberInput()
-        self.fields['Устойчивость к воде'].widget = forms.NumberInput()
-        self.fields['Устойчивость к воздуху'].widget = forms.NumberInput()
-        self.fields['Устойчивость к земле'].widget = forms.NumberInput()
-        self.fields['Устойчивость к молниям'].widget = forms.NumberInput()
-        self.fields['Устойчивость к свету'].widget = forms.NumberInput()
-        self.fields['Устойчивость ко тьме'].widget = forms.NumberInput()
-        self.fields['Устойчивость к дроблению'].widget = forms.NumberInput()
-        self.fields['Устойчивость к порезам'].widget = forms.NumberInput()
-        self.fields['Устойчивость к протыканию'].widget = forms.NumberInput()
+        self.fields['Fire_access'].widget = forms.NumberInput()
+        self.fields['Water_access'].widget = forms.NumberInput()
+        self.fields['Wind_access'].widget = forms.NumberInput()
+        self.fields['Dirt_access'].widget = forms.NumberInput()
+        self.fields['Lightning_access'].widget = forms.NumberInput()
+        self.fields['Holy_access'].widget = forms.NumberInput()
+        self.fields['Curse_access'].widget = forms.NumberInput()
+        self.fields['Bleed_access'].widget = forms.NumberInput()
+        self.fields['Nature_access'].widget = forms.NumberInput()
+        self.fields['Mental_access'].widget = forms.NumberInput()
+        self.fields['Twohanded_access'].widget = forms.NumberInput()
+        self.fields['Polearm_access'].widget = forms.NumberInput()
+        self.fields['Onehanded_access'].widget = forms.NumberInput()
+        self.fields['Stabbing_access'].widget = forms.NumberInput()
+        self.fields['Cutting_access'].widget = forms.NumberInput()
+        self.fields['Crushing_access'].widget = forms.NumberInput()
+        self.fields['Small_arms_access'].widget = forms.NumberInput()
+        self.fields['Shields_access'].widget = forms.NumberInput()
 
-        self.fields['action_equipment'].widget = forms.TextInput()
-        self.fields['Шлем'].widget = forms.NumberInput()
-        self.fields['Нагрудник'].widget = forms.NumberInput()
-        self.fields['Сапоги'].widget = forms.NumberInput()
-        self.fields['Наручи'].widget = forms.NumberInput()
-        self.fields['Прочее'].widget = forms.NumberInput()
+        self.fields['fire_res'].widget = forms.NumberInput()
+        self.fields['water_res'].widget = forms.NumberInput()
+        self.fields['wind_res'].widget = forms.NumberInput()
+        self.fields['dirt_res'].widget = forms.NumberInput()
+        self.fields['lightning_res'].widget = forms.NumberInput()
+        self.fields['holy_res'].widget = forms.NumberInput()
+        self.fields['curse_res'].widget = forms.NumberInput()
+        self.fields['crush_res'].widget = forms.NumberInput()
+        self.fields['cut_res'].widget = forms.NumberInput()
+        self.fields['stab_res'].widget = forms.NumberInput()
+
+        self.fields['helmet_status'].widget = forms.NumberInput()
+        self.fields['chest_status'].widget = forms.NumberInput()
+        self.fields['shoes_status'].widget = forms.NumberInput()
+        self.fields['gloves_status'].widget = forms.NumberInput()
+        self.fields['item_status'].widget = forms.NumberInput()
+
+        self.fields['action_points'].widget = forms.Textarea()
+        self.fields['action_permissions'].widget = forms.Textarea()
+        self.fields['action_resistances'].widget = forms.Textarea()
+        self.fields['action_equipment'].widget = forms.Textarea()
 
     class Meta:
         model = Action
-        fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
-                  'action_resistanses', 'action_equipment']
 
-        for key, value in slovar.dict_points.items():
-            fields.append(value)
-        for key, value in slovar.dict_permissions.items():
-            fields.append(value)
-        for key, value in slovar.dict_resistances.items():
-            fields.append(value)
-        for key, value in slovar.dict_equipment.items():
-            fields.append(value)
+        fields = ['action_name', 'action_alias', 'action_description']
+        for key in slovar.dict_points.keys():
+            fields.append(key)
+        fields.append('action_points')
 
-    # def get_form_kwargs(self):
-    #     kwargs = {'user': self.request.user, }
-    #     return kwargs
+        for key in slovar.dict_resistances.keys():
+            fields.append(key)
+        fields.append('action_resistances')
+
+        for key in slovar.dict_permissions.keys():
+            fields.append(key)
+        fields.append('action_permissions')
+
+        for key in slovar.dict_equipment.keys():
+            fields.append(key)
+        fields.append('action_equipment')
 
     def clean(self):
         cleaned_data = super().clean()
+
         self.cleaned_data.update({'action_name': cleaned_data.get('action_name'),
                                   'action_alias': cleaned_data.get('action_alias'),
-                                  'action_description': cleaned_data.get('action_description'),
-                                  'action_points':  cleaned_data.get('action_points'),
-                                  'action_permissions':  cleaned_data.get('action_permissions'),
-                                  'action_resistanses': cleaned_data.get('action_resistanses'),
-                                  'action_equipment': cleaned_data.get('action_equipment')})
+                                  'action_description': cleaned_data.get('action_description')})
+
+        action_points = dict()
+        for key in slovar.dict_points.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_points[key] = self.cleaned_data[key]
+        self.cleaned_data.update({'action_points': action_points})
+        action_permissions = dict()
+        for key in slovar.dict_permissions.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_permissions[key] = self.cleaned_data[key]
+        self.cleaned_data["action_permissions"] = action_permissions
+        action_resistances = dict()
+        for key in slovar.dict_resistances.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_resistances[key] = self.cleaned_data[key]
+        self.cleaned_data["action_resistances"] = action_resistances
+        action_equipment = dict()
+        for key in slovar.dict_equipment.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_equipment[key] = self.cleaned_data[key]
+        self.cleaned_data.update({"action_equipment": action_equipment})
+        return self.cleaned_data

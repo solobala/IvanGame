@@ -1,324 +1,1167 @@
-from django.shortcuts import render
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
+import json
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import login, authenticate, logout  # add this
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
+from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.db.models.query_utils import Q
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+#  from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
-from django.template import loader
-from rest_framework import generics
+from rest_framework import viewsets
+from .models import Owner, Person, Group, Membership, Race, PersonBar, Action
+from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .forms import NewUserForm, ActionForm
+from django.http import JsonResponse
+from django.forms.models import inlineformset_factory
+from django.urls import reverse
 
-from .models import Owner, Person, RelationType, PersonToPersonAction
-from .serializers import OwnerSerializer, PersonSerializer, RelationTypeSerializer, PersonToPersonActionSerializer
+# from django.forms import ModelForm
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from django.http import Http404
+# from rest_framework import mixins
+from rest_framework import generics
+from . import slovar
+
+PersonFormset = inlineformset_factory(
+    Owner, Person, fields=('person_name',)
+)
+
+
+class JsonableResponseMixin:
+    """
+    Mixin to add JSON support to a form.
+    Must be used with an object-based FormView (e.g. CreateView)
+    """
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.accepts('text/html'):
+            return response
+        else:
+            return JsonResponse(form.errors, status=400)
+
+    def form_valid(self, form):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).
+        response = super().form_valid(form)
+        if self.request.accepts('text/html'):
+            return response
+        else:
+            data = {
+                'pk': self.object.pk,
+            }
+            return JsonResponse(data)
+
+
+def register_request(request):
+    if request.method == "POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            # login(request, user)
+            messages.success(request, "Registration successful.")
+            return redirect("poll:index")
+        else:
+            messages.error(request, "Unsuccessful registration. Invalid information.")
+    form = NewUserForm()
+    # return render(request=request, template_name="poll/register.html", context={"register_form": form})
+    return render(request=request, template_name="poll/register.html", context={"register_form": form})
+
+
+def login_request(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+                return redirect("poll:index")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="poll/login.html", context={"login_form": form})
+    #  return render(request=request, template_name="poll/login.html", context={"login_form": form})
+
+
+def logout_request(request):
+    logout(request)
+    messages.info(request, "You have successfully logged out.")
+    return redirect("poll:index")
+
+
+def password_reset_request(request):
+    if request.method == "POST":
+        password_reset_form = PasswordResetForm(request.POST)
+        if password_reset_form.is_valid():
+            data = password_reset_form.cleaned_data['email']
+            associated_users = User.objects.filter(Q(email=data))
+            if associated_users.exists():
+                for user in associated_users:
+                    subject = "Password Reset Requested"
+                    # email_template_name = "poll/password/password_reset_email.txt"
+                    email_template_name = "accounts/password/password_reset_email.txt"
+                    c = {
+                        "email": user.email,
+                        'domain': '127.0.0.1:8000',
+                        'site_name': 'Website',
+                        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                        "user": user,
+                        'token': default_token_generator.make_token(user),
+                        'protocol': 'http',
+                    }
+                    email = render_to_string(email_template_name, c)
+                    try:
+                        send_mail(subject, email, 'admin@example.com', [user.email], fail_silently=False)
+                    except BadHeaderError:
+                        return HttpResponse('Invalid header found.')
+                    return redirect("/password_reset/done/")
+    password_reset_form = PasswordResetForm()
+    # return render(request=request, template_name="poll/password/password_reset.html",
+    return render(request=request, template_name="accounts/password/password_reset.html",
+                  context={"password_reset_form": password_reset_form})
 
 
 def index(request):
-    # Это должна быть стартовая страница с картинками,
-    # ссылкой на регистрацию в игре, формой для входа зарегистрированных
-    context = {'game': "Ivan's Game, Hello"}
-    return render(request, 'poll/index.html', context)
-
-
-def get_owners_list(request):
     """
-    Общий список игроков
-    :return:
+    Функция отображения для домашней страницы сайта.
     """
-    # response = "Список игроков %s."
-    # template = loader.get_template('poll/owners_list.html')
-    owners_list = Owner.objects.all()
-    context = {
-        'owners_list': owners_list,
-    }
-    return render(request, 'poll/owners_list.html', context)
-    # return HttpResponse(template.render(context, request))
-    # output = ', '.join([q.owner_name for q in owners_list])
-    # return HttpResponse(response % output)
+    # Генерация "количеств" некоторых главных объектов
+    num_owners = Owner.objects.all().count()
+    num_persons = Person.objects.all().count()
+    # Доступные игроки и персонажи
+    num_owners_available = Owner.objects.filter(person__status=1).distinct('owner_name').count()
+    num_persons_available = Person.objects.filter(status=1).count()  # Метод 'all()' применён по умолчанию.
+    return render(
+        request,
+        'poll/index.html',
+        context={'num_owners': num_owners, 'num_persons': num_persons,
+                 'num_owners_available': num_owners_available, 'num_persons_available': num_persons_available},
+    )
 
 
-def get_persons_list(request):
+class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequiredMixin, CreateView):
     """
-    Общий список персонажей в виде строки через ,
-    :return:
+    Добавление нового игрока
+    Должно зависеть от того, под каким логином зашли
     """
-    # response = "Список персонажей %s."
-    persons_list = Person.objects.all()
-    context = {
-        'persons_list': persons_list,
-    }
-    return render(request, 'poll/persons_list.html', context)
-    # output = ', '.join([q.person_name for q in persons_list])
-    # return HttpResponse(response % output)
+    model = Owner
+    fields = ['owner_name', 'owner_description', 'link']
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        # we need to overwrite get_context_data
+        # to make sure that our formset is rendered
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data["persons"] = PersonFormset(self.request.POST)
+        else:
+            data["persons"] = PersonFormset()
+        return data
+
+    def form_valid(self, form):
+
+        form.instance.created_by = self.request.user
+        # self.object = form.save()
+        owner_amount = Owner.objects.filter(created_by=self.request.user).count()
+        if owner_amount == 0:  # реальный игрок еще не создал Owner
+            context = self.get_context_data()
+            persons = context["persons"]
+
+            if persons.is_valid():
+                persons.instance = self.object
+                persons.save()
+            return super().form_valid(form)
+        else:  # У игрока уже есть Owner, нового создавать нельзя
+            return reverse("Forbidden")
+
+    def get_success_url(self):
+        return reverse("owners-list")
+    # def form_valid(self, form):
+    #     """
+    #     Сведения о том, кем был создан игрок
+    #     :param form:
+    #     :return:
+    #     """
+    #     form.instance.created_by = self.request.user
+    #     return super().form_valid(form)
+
+    # def add_owner(owner_name, owner_description, link):
+    #     """
+    #     Добавление нового игрока в список
+    #     :param owner_name:
+    #     :param owner_description:
+    #     :param link:
+    #     :return:
+    #     """
+    #     try:
+    #         Owner.objects.get(owner_name=owner_name)
+    #         response = 'Игрок %s уже существует'
+    #     except ObjectDoesNotExist:
+    #         b = Owner(owner_name=owner_name, owner_description=owner_description, link=link)
+    #         b.save()
+    #         response = 'Игрок %s добавлен'
+    #     finally:
+    #         return HttpResponse(response)
 
 
-def find_persons_by_owner(request, owner_name):
+class OwnerUpdateView(LoginRequiredMixin,
+                      PermissionRequiredMixin, JsonableResponseMixin, UpdateView):
     """
-    Список персонажей игрока owner_name в виде строки через ,
-    :param request:
-    :param owner_name:
-    :return:
+    Редактирование данных игрока
     """
-    try:
-        selected_owner = Owner.objects.get(owner_name=owner_name)
-        # selected_owner = Owner.objects.get(owner_name__icontains=owner_name) # выдает похожих, но если >1 - ошибка
-        persons_by_owner_list = selected_owner.person_set.all()
-        context = {
-            'persons_by_owner_list': persons_by_owner_list,
-        }
+    model = Owner
+    # queryset = Owner.objects.all()
+    fields = ['owner_name', 'owner_description', 'link']
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
 
-        # output = ', '.join([q.person_name for q in persons_by_owner_list])
-        # response = "Персонажи игрока %s."
-    except ObjectDoesNotExist:
-        raise Http404("Игрок %s не найден")
-    finally:
-        # return HttpResponse(response % output)
-        return render(request, 'poll/persons_by_owner_list.html', context)
+    # def get_context_data(self, **kwargs):
+    #     # we need to overwrite get_context_data
+    #     # to make sure that our formset is rendered.
+    #     # the difference with CreateView is that
+    #     # on this view we pass instance argument
+    #     # to the formset because we already have
+    #     # the instance created
+    #     data = super().get_context_data(**kwargs)
+    #     if self.request.POST:
+    #         data["persons"] = PersonFormset(self.request.POST, instance=self.object)
+    #     else:
+    #         data["persons"] = PersonFormset(instance=self.object)
+    #     return data
 
-def find_owner_by_person(request, person_name):
+    # def manage_books(request, owner_id):
+    #     owner = Owner.objects.get(pk=owner_id)
+    #     PersonInlineFormSet = inlineformset_factory(Owner, Person, fields=('person_name',))
+    #     if request.method == "POST":
+    #         formset = PersonInlineFormSet(request.POST, request.FILES, instance=owner)
+    #         if formset.is_valid():
+    #             formset.save()
+    #             # Do something. Should generally end with a redirect. For example:
+    #             return HttpResponseRedirect(owner.get_absolute_url())
+    #     else:
+    #         formset = PersonInlineFormSet(instance=owner)
+    #     return render(request, 'manage_books.html', {'formset': formset})
+
+    # def form_valid(self, form):
+    #     context = self.get_context_data()
+    #     persons = context["persons"]
+    #     self.object = form.save()
+    #     if persons.is_valid():
+    #         persons.instance = self.object
+    #         persons.save()
+    #     form.instance.updated_by = self.request.user
+    #     return super().form_valid(form)
+
+    # def get_success_url(self):
+    #     # return reverse("poll:owners-list")
+    #     # return reverse("poll:owner-detail")
+    #     return reverse_lazy(
+    #         "poll:owner-detail", kwargs={"pk": self.object.pk}
+    #      )
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен игрок
+        :param form:
+        :return:
+        """
+        # ModelFormMixin.success_url = "127.0.0.1:8000/poll/owner/5/owner-detail.html"
+
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class OwnerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
-    Игрок ищется по person_name персонажа
-    :param request:
-    :param person_name:
-    :return:
+    Удаление игрока
     """
-    try:
-        selected_person = Person.objects.get(person_name=person_name)
-        owner_name = selected_person.owner.owner_name
-        response = "Владелец персонажа %s."
-    except ObjectDoesNotExist:
-        raise Http404("Персонаж %s не найден")
-    finally:
-        return HttpResponse(response % owner_name)
+    #  model = Owner
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:owners-list')
+    context_object_name = 'owner_detail'
+    queryset = Owner.objects.all()
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['owner_name'] = context['owner_detail'].owner_name
+        return context
 
 
-def get_all_participants(request, person_name):
+class OwnerDetailView(LoginRequiredMixin,
+                      PermissionRequiredMixin, JsonableResponseMixin, DetailView):
     """
-    Список всех участников группы, в которой состоит
-    персонаж person_name
-    :param request:
-    :param person_name:
-    :return:
+    Просмотр детальной информации по игроку
     """
-    try:
-        selected_person = Person.objects.get(person_name=person_name)
-        persons_by_group_list = PersonToPersonAction.objects.filter(person_id=selected_person.id)
-        output = ', '.join([q.other_person.person_name for q in persons_by_group_list])
-        response = "Участники группы %s."
-    except ObjectDoesNotExist:
-        raise Http404("Персонаж %s не найден")
-    finally:
-        return HttpResponse(response % output)
+    template_name = 'poll/owner/owner_detail.html'
+    context_object_name = 'owner_detail'
+    # model = Owner
+    queryset = Owner.objects.all()
+    login_url = 'poll:login'
+    permission_required = 'poll.special_status'  # new
+
+    # def get_queryset(request, self):
+    #     """
+    #     Просмотр детальной информации по владельцу указанного персонажа
+    #     """
+    #     selected_person = get_object_or_404(Person, person_name=self.kwargs['person_name'])
+    #     context = {'owner_detail': selected_person.owner}
+    #     return render(request, 'poll/owner/owner_detail.html', context)
+    #
+    # def get(self, request, *args, **kwargs):
+    #     self.object = self.get_object(queryset=Owner.objects.all())
+    #     return super().get(request, *args, **kwargs)
+    #
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
+        return context
+
+    # def get_success_url(self):
+    #     # return reverse("owners-list")
+    #     return reverse_lazy(
+    #         "/poll/owner/owner-detail",
+    #         kwargs={"pk": self.object.pk}
+    #     )
+    #
+    # def get_queryset(self):
+    #     return self.object.person_set.all()
 
 
-def get_selected_persons_list(status_id):
+class OwnersListView(LoginRequiredMixin, ListView):
     """
-    Занятые персонажи: status_id = 0
-    Свободные персонажи: status_id = 1
-    Заморозка : status_id = 2
-    :param status_id:
-    :return:
+    Просмотр полного списка игроков
     """
-    response = "Список выбранных персонажей %s."
-    persons_list = Person.objects.filter(status_id=status_id)
-    output = ', '.join([q.person_name for q in persons_list])
-    return HttpResponse(response % output)
+    template_name = 'poll/owner/owners_list.html'
+    context_object_name = 'owners_list'
+    queryset = Owner.objects.all()
+    login_url = 'poll:login'
 
 
-def get_free_owner_list():
+class OwnerList(generics.ListCreateAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    login_url = 'poll:login'
+
+
+class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    login_url = 'poll:login'
+
+
+class OwnersFreeListView(LoginRequiredMixin, ListView):
     """
-    Список свободных игроков
-    определяется по наличию свободного персонажа
-    со статусом status_id = 1
-    :return:
+    Просмотр списка свободных игроков
     """
-    response = "Список свободных игроков %s."
-    free_persons_list = Person.objects.filter(status_id=1)
-    output = ', '.join(set([q.owner.owner_name for q in free_persons_list]))
-    return HttpResponse(response % output)
+    template_name = 'poll/free_owner/free_owners_list.html'
+    context_object_name = 'free_owners_list'
+    queryset = Owner.objects.filter(person__status=1).distinct('owner_name')
+    login_url = 'poll:login'
 
 
-def add_owner_to_list(owner_name, owner_description, link):
+# class OwnerByPerson(DetailView):
+#     """
+#        Просмотр детальной информации по игроку, найденному по персонажу
+#        """
+#     template_name = 'poll/owner/owner_detail.html'
+#     context_object_name = 'owner_detail'
+#     queryset = Owner.objects.get()
+
+
+# class OwnerPersonListView(ListView):
+#     """
+#     Просмотр  списка персонажей игрока
+#     """
+#     template_name = 'poll/person/persons_by_owner.html'
+#     context_object_name = 'persons_by_owner'
+#
+#     def get_queryset(self):
+#         self.owner = get_object_or_404(Owner, owner_name=self.kwargs['owner'])
+#         return Person.objects.filter(owner=self.owner)
+#
+#     def get_context_data(self, **kwargs):
+#         # Call the base implementation first to get a context
+#         context = super().get_context_data(**kwargs)
+#         # Add in the publisher
+#         context['owner'] = self.owner
+#         return context
+
+class PersonCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
-    Добавление нового игрока в список
-    :param owner_name:
-    :param owner_description:
-    :param link:
-    :return:
+    Добавление нового персонажа
     """
-    try:
-        Owner.objects.get(owner_name=owner_name)
-        response = 'Игрок %s уже существует'
-    except ObjectDoesNotExist:
-        b = Owner(owner_name=owner_name, owner_description=owner_description, link=link)
-        b.save()
-        response = 'Игрок %s добавлен'
-    finally:
-        return HttpResponse(response)
+    model = Person
+    fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
+              'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан персонаж
+        :param form:
+        :return:
+                """
+        form.instance.created_by = self.request.user
+        owner = get_object_or_404(Owner, id=self.kwargs.get('pk'))
+        person = form.save(commit=False)
+        person.owner = owner
+        form.instance.owner = owner
+        person.save()
+        return super().form_valid(form)
 
 
-def delete_owner_from_list(owner_name):
+class PersonUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
-    Удаление игрока и всех его персонажей из списка
-    :param owner_name:
-    :return:
+    Редактирование персонажа
     """
-    try:
-        owner = Owner.objects.get(owner_name=owner_name)
-        owner.delete()
-        response = 'Игрок  %s удален'
-    except ObjectDoesNotExist:
-        response = 'Игрок %s не найден'
-    finally:
-        return HttpResponse(response)
+    model = Person
+    fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
+              'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен персонаж
+        :param form:
+        :return:
+                """
+        form.instance.updated_by = self.request.user
+
+        return super().form_valid(form)
 
 
-def add_person_to_list(owner_name, person_name, link, person_description, race_id, location_id_birth, birth_date,
-                       status_id):
-    """
-    Добавление персонажа в список
-    :param owner_name:
-    :param person_name:
-    :param link:
-    :param person_description:
-    :param race_id:
-    :param location_id_birth:
-    :param birth_date:
-    :param status_id:
-    :return:
-    """
-    try:
-        owner = Owner.objects.get(owner_name=owner_name)  #  проверяем, если ли такой игрок
-
-        try:  # проверяем, нет ли уже такого персонажа у кого-либо
-            person = Person.objects.get(person_name=person_name)
-            response = 'Игрок c таким ником уже существует'
-
-        except ObjectDoesNotExist:
-            person = Person(person_name=person_name, link=link, person_description=person_description, race_id=race_id,
-                            location_id_birth=location_id_birth, birth_date=birth_date, status_id=status_id)
-            person.owner = owner
-            person.save()
-            response = 'Персонаж добавлен'
-
-    except ObjectDoesNotExist:
-        response = 'Игрок не найден'
-
-    finally:
-        return HttpResponse(response)
-
-
-def delete_person_from_list(person_name):
+class PersonDeleteView(LoginRequiredMixin, DeleteView):
     """
     Удаление персонажа
-    :param person_name:
-    :return:
     """
-    try:  # проверяем, есть ли персонаж в общем списке
-        person = Person.objects.get(person_name=person_name)
-        person.delete()
-        response = 'Игрок %s удален'
+    # model = Person
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:persons-list')
+    context_object_name = 'person_detail'
+    queryset = Person.objects.all()
+    login_url = 'poll:login'
 
-    except ObjectDoesNotExist:
-        response = 'Игрок %s отсутствует в списке'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['person_name'] = context['person_detail'].person_name
+        return context
 
-    finally:
-        return HttpResponse(response)
 
-
-def add_person_to_group(who_added, whom_added):
+class PersonsFreeListView(LoginRequiredMixin, ListView):
     """
-    Добавление персонажа в группу
-    :param who_added: персонаж, которого следует добавить  вгруппу
-    :param whom_added: персонаж, по которому определяется группа
-    :return:
+    Просмотр  списка свободных персонажей
     """
-    try:  # проверяем, есть ли добавляемый персонаж в общем списке персонажей
-        person_who = Person.objects.get(person_name=who_added)
+    template_name = 'poll/free_person/free_persons_list.html'
 
-        try:  # проверяем, есть ли другой участник в списке
-            person_whom = Person.objects.get(person_name=whom_added)
-        except ObjectDoesNotExist:
-            responce = 'Персонаж, в группу к которому добавляем учатника, не найден'
-        finally:
-            pass
-
-    except ObjectDoesNotExist:
-        responce = 'Персонаж - участник группы не найден'
-
-    finally:
-        try:  # проверяем, не состоят ли они уже в группе
-            action = PersonToPersonAction.objects.get(person__in=[person_who, person_whom],
-                                                      other_person__in=[person_who, person_whom])
-            response = "Данные персонажи  уже являются участниками группы"
-
-        except ObjectDoesNotExist: # данные персонажи не состоят в одной группе
-
-            #  добавляем персонажей person_who и person_whom в группы друг к другу
-            new_action_who = PersonToPersonAction(person=person_who.id, relation_type_id=1, other_person=person_whom.id)
-            new_action_whom = PersonToPersonAction(person=person_whom.id, relation_type_id=1,
-                                                   other_person=person_who.id)
-
-            # добавляем person_who к другим участникам группы person_whom и наоборот
-            other_participants_list = PersonToPersonAction.objects.filter(person=person_whom.id)
-
-            for participant in other_participants_list:
-
-                new_action_who = PersonToPersonAction(person=person_who.id, relation_type_id=1,
-                                                      other_person=participant.id)
-                new_action_whom = PersonToPersonAction(person=participant.id, relation_type_id=1,
-                                                       other_person=person_who.id)
-            response = 'Персонаж %s добавлен в группу к персонажу %s'
-
-        finally:
-            pass
-    return HttpResponse(response)
+    context_object_name = 'free_persons_list'
+    queryset = Person.objects.filter(status=1)
+    login_url = 'poll:login'
 
 
-def delete_person_from_group(person_name):
+class PersonsBusyListView(LoginRequiredMixin, ListView):
     """
-    Удаление персонажа из группы
-    :param person_name:
-    :return:
+    Просмотр  списка занятых персонажей
     """
-    try:  # проверяем, есть ли персонаж в общем списке
-        person = Person.objects.get(person_name=person_name)
-
-          # проверяем, состоит ли персонаж в группе
-        actions = PersonToPersonAction.objects.filter(person=person.id)
-
-        if len(actions)>0:
-
-            for action in actions:
-                action.delete() # удаляем все прочих участников для данного персонажа
-                other_action = PersonToPersonAction.objects.get(person = action.other_person.id, other_person=person.id)
-                other_action.delete() # Удаляем персонаж из группы для всех участников группы
-            response = 'Игрок %s удален из группы'
-
-        else:  # данный персонаж не состоит в  группе
-
-            response = 'Персонаж %s не состоит в группе'
-
-    except ObjectDoesNotExist: # Персонаж не найден
-        responce = 'Персонаж  не найден'
-
-    finally:
-        return HttpResponse(response)
+    template_name = 'poll/busy_person/busy_persons_list.html'
+    context_object_name = 'busy_persons_list'
+    queryset = Person.objects.filter(status=0)
+    login_url = 'poll:login'
 
 
-class OwnerAPIView(generics.ListCreateAPIView):
-    queryset = Owner.objects.all()
+class PersonsFreezListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр  списка заморозки персонажей
+    """
+    template_name = 'poll/freez_person/freez_persons_list.html'
+    context_object_name = 'freez_persons_list'
+    queryset = Person.objects.filter(status=2)
+    login_url = 'poll:login'
+
+
+class PersonsListView(LoginRequiredMixin, ListView):
+    """
+    Список Персонажей
+    """
+    template_name = 'poll/person/persons_list.html'
+    context_object_name = 'persons_list'
+    queryset = Person.objects.all()
+    login_url = 'poll:login'
+
+
+class PersonDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр информации по персонажу
+    """
+    template_name = 'poll/person/person_detail.html'
+    context_object_name = 'person_detail'
+    # queryset = Person.objects.all()
+    model = Person
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_'] = ['Свободен' if context['person_detail'].status == 1
+                              else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
+        person_group = Person.objects.get(
+            id=context['person_detail'].pk).group_set.all()  # Это Queryset - список групп из 1 группы
+        amount = person_group.count()  # это к-во групп с нашим персонажем - или 0, или 1
+        members = Membership.objects.filter(
+            inviter=Person.objects.get(id=context['person_detail'].pk))  # Membership с участием нашего Person
+        amount1 = members.count()
+
+        # Person может быть inviter, участник группы или никто
+        # Если amount=0 и amount1>1 - наш person - это inviter
+        # Если не inviter, но участник группы - >= 1 (число людей в группе), иначе 0
+        if amount >= 1:
+            context['group_status'] = 'в группе'
+            context['inviter_person'] = Membership.objects.filter(group_id=person_group[0].id)[0].inviter
+            context['participants'] = person_group[
+                0].members.all()  # Queryset список Person - членов гРуппы, без inviter
+
+            # Если не inviter или не состоит в группе - получится 0
+        elif amount == 0 and amount1 == 0:
+            context['group_status'] = 'не в группе'
+            # это inviter
+        else:
+            context['group_status'] = 'в группе'
+            participants = []
+            for member in members:
+                participants.append(member.person)
+            context['inviter_person'] = members[0].inviter
+            context['participants'] = participants
+
+        info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
+
+        points = dict()
+        for key, value in info.summary_points.items():
+            points[slovar.dict_points_start.get(key)] = value
+
+        permissions = dict()
+        for key, value in info.summary_permissions.items():
+            permissions[slovar.dict_permissions_start.get(key)] = value
+
+        resistances = dict()
+        for key, value in info.summary_resistances.items():
+            resistances[slovar.dict_resistances_start.get(key)] = value
+
+        equipment = dict()
+        for key, value in info.summary_equipment.items():
+            equipment[slovar.dict_equipment_start.get(key)] = value
+
+        context['summary_points'] = points
+        context['summary_permissions'] = permissions
+        context['summary_resistances'] = resistances
+        context['summary_equipment'] = equipment
+        context['unallocated_points'] = info.unallocated_points
+        context['unallocated_permissions'] = info.unallocated_permissions
+
+        health = round(25 * (points['Стамина'] * 0.2
+                             + points['Интеллект'] * 0.2
+                             + points['Сила'] * 0.5
+                             + points['Ловкость'] * 0.4
+                             + points['Рассудок'] * 0.4
+                             + (permissions['Гематомантия'] * 0.1
+                                + permissions['Ботаника'] * 0.1
+                                + permissions['Псифистика'] * 0.1)) ** 1.5, 0)
+        context['health'] = health
+
+        mental_health = round(10 * (points['Интеллект'] * 0.4
+                                    + points['Вера'] * 0.3
+                                    + points['Рассудок'] * 0.5
+                                    + (permissions['Псифистика'] * 0.1
+                                       - abs(permissions['Элафристика']
+                                             - permissions['Катифристика']) * 0.1)) ** 1.2, 0)
+        context['mental_health'] = mental_health
+
+        endurance = round(15 * (points['Стамина'] * 0.5
+                                + points['Колдовство'] * 0.4
+                                + points['Сила'] * 0.2
+                                + points['Ловкость'] * 0.4
+                                + (permissions['Гематомантия'] * 0.1
+                                   )) ** 1.2, 0)
+        context['endurance'] = endurance
+
+        mana = round(15 * (points['Колдовство'] * 0.5
+                           + points['Интеллект'] * 0.4
+                           + points['Вера'] * 0.2
+                           + permissions['Псифистика'] * 0.1
+                           + abs(permissions['Элафристика']
+                                 - permissions['Катифристика'])) ** 1.2, 0)
+        context['mana'] = mana
+
+        hungry = round(5 * (points['Сила'] * 0.3
+                            + points['Ловкость'] * 0.3
+                            + points['Стамина'] * 0.3
+                            ) ** 1.05, 0)
+        context['hungry'] = hungry
+
+        intoxication = round(5 * (points['Сила'] * 0.7
+                                  + points['Ловкость'] * 0.1
+                                  + points['Стамина'] * 0.1
+                                  + permissions['Гематомантия'] * 0.1
+                                  ) ** 1.05, 0)
+        context['intoxication'] = intoxication
+
+        load_capacity = round(5 * (points['Стамина'] * 0.4
+                                   + points['Сила'] * 0.5
+                                   + points['Ловкость'] * 0.2
+                                   ) ** 1.05, 0)
+        context['load_capacity'] = load_capacity
+
+        # context['main_points'] = slovar.dict_points_start.get(max(points, key=points.get))
+        # context['main_permission'] = slovar.dict_permissions_start.get(max(permissions, key=permissions.get))
+        context['main_points'] = max(points, key=points.get)
+        context['main_permission'] = max(permissions, key=permissions.get)
+        context['avg_magic_resistance'] = round((resistances.get('Устойчивость к огню') +
+                                                 resistances.get('Устойчивость к воде') +
+                                                 resistances.get('Устойчивость к воздуху') +
+                                                 resistances.get('Устойчивость к земле') +
+                                                 resistances.get('Устойчивость к молниям') +
+                                                 resistances.get('Устойчивость к свету') +
+                                                 resistances.get('Устойчивость ко тьме')
+                                                 ) / 7, 0)
+        context['avg_physic_resistance'] = round((resistances.get('Устойчивость к дроблению') +
+                                                  resistances.get('Устойчивость к порезам') +
+                                                  resistances.get('Устойчивость к протыканию')
+                                                  ) / 3, 0)
+        return context
+
+
+class GroupDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр информации по конкретной группе
+    """
+    template_name = 'poll/group/group_detail.html'
+    context_object_name = 'group_detail'
+    model = Group
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        members = kwargs['object'].members.through.objects.filter(group__id=self.object.pk)
+        # members = self.members.through.objects.filter(group__id=self.id)
+        context['members'] = members
+        try:
+            context['inviter_person'] = members[0].inviter
+        except:
+            context['inviter_person'] = "В группу никто не приглашен"
+        return context
+
+
+class GroupsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр списка групп Персонажей
+    """
+    template_name = 'poll/group/groups_list.html'
+    context_object_name = 'groups_list'
+    model = Group
+    login_url = 'poll:login'
+
+
+class GroupCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой группы
+    """
+    model = Group
+    context_object_name = 'Group'
+    fields = ['group_name', 'members']
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        #     members = self.object.members.through.objects.filter(group__id=self.object.pk)
+        return context
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана группа
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        inviter = get_object_or_404(Person, id=self.kwargs.get('pk'))
+        group = form.save(commit=False)
+        members = group.members.all()
+        for member in members:
+            member.through.membership.inviter = inviter
+
+        form.instance.group = group
+        group.save()
+        return super().form_valid(form)
+
+
+class GroupUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Редактирование группы
+    """
+    model = Group
+    fields = ['group_name', 'members']
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена группа
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class GroupDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление группы
+    """
+    model = Group
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:groups-list')
+    context_object_name = 'group_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group_name'] = context['group_detail'].group_name
+        return context
+
+
+class MembershipListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр списка связей
+    """
+    model = Membership
+    template_name = 'poll/membership/members_list.html'
+    context_object_name = 'members_list'
+    login_url = 'poll:login'
+
+
+class MembershipDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр информации по конкретному виду связи
+    """
+    template_name = 'poll/membership/membership_detail.html'
+    context_object_name = 'membership_detail'
+    model = Membership
+    login_url = 'poll:login'
+
+
+class MembershipCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой связи
+    """
+    model = Membership
+    fields = ['group', 'person', 'inviter', 'invite_reason']
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class MembershipUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Редактирование группы
+    """
+    model = Membership
+    fields = ['group', 'person', 'inviter', 'invite_reason']
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class MembershipDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление связи
+    """
+    model = Membership
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:membership-list')
+    context_object_name = 'membership_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group_name'] = context['membership_detail'].group.group_name
+        context['person_name'] = context['membership_detail'].person.person_name
+        context['inviter'] = context['membership_detail'].person.membership_invites
+        return context
+
+
+class RacesListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Рас
+    """
+    template_name = 'poll/race/races_list.html'
+    context_object_name = 'races_list'
+    model = Race
+    login_url = 'poll:login'
+
+
+class RaceCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой Расы
+    """
+    model = Race
+    fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
+              'start_resistanses', 'start_permissions', 'equipment']
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class RaceUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Расы
+    """
+    model = Race
+
+    fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
+              'start_resistanses', 'start_permissions', 'equipment']
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class RaceDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Расы
+    """
+    model = Race
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:race-list')
+    context_object_name = 'race_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['race_name'] = context['race_detail'].race_name
+        return context
+
+
+class RaceDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по расе
+    """
+    template_name = 'poll/race/race_detail.html'
+    context_object_name = 'race_detail'
+    model = Race
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        start_points = dict()
+        for key, value in context['race_detail'].start_points.items():
+            start_points[slovar.dict_points_start.get(key)] = value
+
+        finish_points = dict()
+        for key, value in context['race_detail'].finish_points.items():
+            finish_points[slovar.dict_points_max.get(key)] = value
+
+        start_permissions = dict()
+        for key, value in context['race_detail'].start_permissions.items():
+            start_permissions[slovar.dict_permissions_start.get(key)] = value
+
+        start_resistances = dict()
+        for key, value in context['race_detail'].start_resistanses.items():
+            start_resistances[slovar.dict_resistances_start.get(key)] = value
+
+        equipment = dict()
+        for key, value in context['race_detail'].equipment.items():
+            equipment[slovar.dict_equipment_start.get(key)] = value
+
+        context['start_points'] = start_points
+        context['finish_points'] = finish_points
+        context['start_permissions'] = start_permissions
+        context['start_resistances'] = start_resistances
+        context['equipment'] = equipment
+        return context
+
+
+class PersonBarDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр среза информации по персонажу
+    """
+    template_name = 'poll/person_bar/person_bar_detail.html'
+    context_object_name = 'person_bar_detail'
+    model = PersonBar
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['race'] = context['person_bar_detail'].race
+        context['person'] = context['person_bar_detail'].person
+        for item in context['person_bar_detail'].summary_points:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_permissions:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_resistances:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].summary_equipment:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].unallocated_points:
+            context[item[0]] = item
+        for item in context['person_bar_detail'].unallocated_permissions:
+            context[item[0]] = item
+        return context
+
+
+class ActionDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по команде
+    """
+    template_name = 'poll/action/action_detail.html'
+    context_object_name = 'action_detail'
+    queryset = Action.objects.all()
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in context['action_detail'].action_points.items():
+            action_points[slovar.dict_points.get(key)] = value
+        context['action_points'] = action_points
+
+        for key, value in context['action_detail'].action_permissions.items():
+            action_permissions[slovar.dict_permissions.get(key)] = value
+        context['action_permissions'] = action_permissions
+
+        for key, value in context['action_detail'].action_resistanses.items():
+            action_resistanses[slovar.dict_resistances.get(key)] = value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in context['action_detail'].action_equipment.items():
+            action_equipment[slovar.dict_equipment.get(key)] = value
+        context['action_equipment'] = action_equipment
+        return context
+
+
+class ActionsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Действий
+    """
+    template_name = 'poll/action/actions_list.html'
+    context_object_name = 'actions_list'
+    model = Action
+    login_url = 'poll:login'
+
+
+class ActionDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Действия
+    """
+    model = Action
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:actions-list')
+    context_object_name = 'raction_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class ActionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Действия
+    """
+    # model = Action
+    form_class = ActionForm
+    context_object_name = 'action_update'
+    queryset = Action.objects.all()
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+    # fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
+    #           'action_resistanses', 'action_equipment']
+    #
+    # for key, value in slovar.dict_points.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_permissions.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_resistances.items():
+    #     fields.append(value)
+    # for key, value in slovar.dict_equipment.items():
+    #     fields.append(value)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in context['action_detail'].action_points.items():
+            action_points[slovar.dict_points.get(key)] = value
+        context['action_points'] = action_points
+
+        for key, value in context['action_detail'].action_permissions.items():
+            action_permissions[slovar.dict_permissions.get(key)] = value
+        context['action_permissions'] = action_permissions
+
+        for key, value in context['action_detail'].action_resistanses.items():
+            action_resistanses[slovar.dict_resistances.get(key)] = value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in context['action_detail'].action_equipment.items():
+            action_equipment[slovar.dict_equipment.get(key)] = value
+        context['action_equipment'] = action_equipment
+
+        return context
+
+    def get_success_url(self):
+        return reverse('action_update', kwargs={'pk': self.object.id})
+
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+        # form.instance.action_equipment = self.action_equipment
+        # form.instance.action_resistanses = self.action_resistanses
+        # form.instance.action_permissions = self.action_permissions
+        # form.instance.action_points = self.action_points
+        form.instance.updated_by = self.request.user
+
+        return super().form_valid(form)
+
+
+class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Действия
+    """
+    context_object_name = 'action_add'
+    queryset = Action.objects.all()
+
+    login_url = 'poll:login'
+    fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
+              'action_resistanses', 'action_equipment']
+
+    for key, value in slovar.dict_points.items():
+        fields.append(value)
+    for key, value in slovar.dict_permissions.items():
+        fields.append(value)
+    for key, value in slovar.dict_resistances.items():
+        fields.append(value)
+    for key, value in slovar.dict_equipment.items():
+        fields.append(value)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        action_permissions = dict()
+        action_resistanses = dict()
+        action_points = dict()
+        action_equipment = dict()
+
+        for key, value in slovar.dict_points.items():
+            action_points[key] = context.action_points.get(value).value
+        context['action_points'] = action_points
+
+        for key, value in slovar.dict_permissions.items():
+            action_permissions[key] = context.action_permissions.get(value).value
+        context['action_permissions'] = action_permissions
+
+        for key, value in slovar.dict_resistances.items():
+            action_resistanses[key] = context.action_resistanses.get(value).value
+        context['action_resistanses'] = action_resistanses
+
+        for key, value in slovar.dict_equipment.items():
+            action_equipment[key] = context.action_equipment.get(value).value
+        context['action_equipment'] = action_equipment
+
+        return context
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        # form.instance.action_equipment = self.action_equipment
+        # form.instance.action_resistanses = self.action_resistanses
+        # form.instance.action_permissions = self.action_permissions
+        # form.instance.action_points = self.action_points
+        # form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+#  REST API
+
+
+class OwnerViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Owner
     serializer_class = OwnerSerializer
 
 
-class PersonAPIView(generics.ListCreateAPIView):
-    queryset = Person.objects.all()
+class PersonViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Person
     serializer_class = PersonSerializer
 
 
-class RelationTypeAPIView(generics.ListCreateAPIView):
-    queryset = RelationType.objects.all()
-    serializer_class = RelationTypeSerializer
+class GroupViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Group
+    serializer_class = GroupSerializer
 
 
-class PersonToPersonActionAPIView(generics.ListCreateAPIView):
-    queryset = PersonToPersonAction.objects.all()
-    serializer_class = PersonToPersonActionSerializer
+class MembershipViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Membership
+    serializer_class = MembershipSerializer
 
 
+class RaceViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+    model = Race
+    serializer_class = RaceSerializer

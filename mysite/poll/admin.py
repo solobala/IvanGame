@@ -17,3 +17,4 @@ admin.site.register(FractionFraction)
 admin.site.register(PersonFraction)
 admin.site.register(PersonLocation)
 
+

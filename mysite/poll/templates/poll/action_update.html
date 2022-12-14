@@ -1,0 +1,48 @@
+<!-- templates/poll/action_update.html -->
+{% extends "poll/header.html"  %}
+{% block content %}
+<h1 xmlns:width="http://www.w3.org/1999/xhtml">Изменение данных Действия</h1>
+{{ form.non_field_errors }}
+<form method="post">
+    {% csrf_token %}
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li> {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </ul>
+    <div style="margin-left:20px;margin-top:20px">
+        <table >
+            <tbody>
+            <table>
+                {% for field in form %}
+                    <tr>
+                        <td>{{ field.label_tag }}</td>
+                        <td>
+                            {{ field.errors }}
+                            {{ field }}
+                        </td>
+                        <td>
+                            {% if field.help_text %}
+                            {{ field.help_text }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+            </tbody>
+        </table>
+    </div>
+    <input type="submit" value="Save">
+</form>
+<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+<p><a href="{% url 'poll:actions-list' %}"> Список действий </a></p>
+<p><a href="{% url 'poll:action-delete' action_update.pk %}"> Удалить действие </a></p>
+{% endblock content %}

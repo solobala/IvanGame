@@ -1,71 +1,216 @@
 {% extends "poll/header.html" %}
 {% block content %}
   <h1>Действие: {{ action_detail.action_name }}</h1>
-  <p><strong>Алиас: </strong> {{ action_detail.action_alias }}</p>
-  <p><strong>Описание: </strong> {{ action_detail.action_description|safe }}</p>
-  <p><strong>Характеристики: </strong> {{ action_detail.action_points }}</p>
   <div style="margin-left:20px;margin-top:20px">
-    <h4>Очки характеристик: </h4>
-        <table class="editorDemoTable">
-            <tbody>
-            {% for key, value in  action_points.items %}
-                <tr>
-                    <td>{{ key }}  </td>
-                    <td>{{ value }} </td>
-                </tr>
-             {% endfor %}
-            </tbody>
-        </table>
+  <p><h4>Алиас: </h4> {{ action_detail.action_alias }}</p>
+  <p><h4>Описание: </h4> {{ action_detail.action_description|safe }}</p>
   </div>
+  <div style="margin-left:20px;margin-top:20px">
+           <table class="editorDemoTable" width="350" border="1">
+            <tbody>
+             <tr >
+                 <td colspan="2"><h4>Очки характеристик: </h4></td>
 
- <p><strong>Сопротивляемость: </strong> {{ action_detail.action_resistanses }}</p>
-  <div style="margin-left:20px;margin-top:20px">
-    <h4> Очки сопротивлений:  </h4>
-        <table class="editorDemoTable">
-            <tbody>
-            {% for key, value in  action_resistanses.items %}
-                <tr>
-                    <td>{{ key }} </td>
-                    <td>{{ value }} </td>
-                </tr>
-             {% endfor %}
+</tr>
+              <tr>
+                <td>Стамина: </td>
+                <td>{{ action_detail.SP }} </td>
+            </tr>
+            <tr>
+                <td>Колдовство: </td>
+                <td>{{ action_detail.MP }}</td>
+            </tr>
+            <tr>
+                <td>Интеллект: </td>
+                <td>{{ action_detail.IP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Сила: </td>
+                 <td>{{ action_detail.PP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Ловкость: </td>
+                <td>{{ action_detail.AP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Вера: </td>
+                <td>{{ action_detail.FP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Удача: </td>
+                <td>{{ action_detail.LP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Харизма: </td>
+                <td>{{ action_detail.CP }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Рассудок: </td>
+                <td>{{ action_detail.BP }}
+                 </td>
+            </tr>
+ <tr>
+    <td colspan="2"><h4>Очки навыков: </h4></td>
+</tr>
+            <tr>
+                <td>Пирокинектика: </td>
+                 <td>{{ action_detail.Fire_access }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Гидрософистика: </td>
+                 <td>{{ action_detail.Water_access }}
+                </td>
+            </tr>
+            <tr>
+                <td>Аэрософистика: </td>
+                  <td>{{ action_detail.Wind_access }}
+            </tr>
+            <tr>
+                <td>Геомантия: </td>
+                 <td>{{ action_detail.Dirt_access }}
+            </tr>
+            <tr>
+                <td>Киловактика: </td>
+                 <td>{{ action_detail.Lightning_access }}
+            </tr>
+            <tr>
+                <td>Элафристика: </td>
+                 <td>{{ action_detail.Holy_access }}
+            </tr>
+            <tr>
+                <td>Катифристика: </td>
+                 <td>{{ action_detail.Curse_access }}
+            </tr>
+            <tr>
+                <td>Гематомантия: </td>
+                <td>{{ action_detail.Bleed_access }}
+            </tr>
+            <tr>
+                <td>Ботаника: </td>
+                <td>{{ action_detail.Nature_access }}
+            </tr>
+            <tr>
+                <td>Псифистика: </td>
+              <td>{{ Mental_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Двуручного оружия: </td>
+                 <td>{{ action_detail.Twohanded_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Древкового оружия: </td>
+               <td>{{ action_detail.Polearm_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Одноручного оружия: </td>
+                <td>{{ action_detail.Onehanded_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Колющего оружия: </td>
+                <td>{{ action_detail.Stabbing_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Режущего оружия: </td>
+                <td>{{ action_detail.Cutting_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Дробящего оружия: </td>
+                <td>{{ action_detail.Crushing_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Стрелкового оружия: </td>
+                <td>{{ action_detail.Small_arms_access }}
+            </tr>
+            <tr>
+                <td>Владение навыками Щитов: </td>
+                <td>{{ action_detail.Shields_access }}
+            </tr>
+            <tr>
+                <td colspan="2"><h4> Очки сопротивлений:  </h4></td>
+
+            <tr>
+                <td>Устойчивость к огню: </td>
+                 <td>{{ action_detail.fire_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к воде: </td>
+                 <td>{{ action_detail.water_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к воздуху: </td>
+                 <td>{{ action_detail.wind_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к земле: </td>
+                 <td>{{ action_detail.dirt_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к молниям: </td>
+                 <td>{{ action_detail.lightning_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к свету: </td>
+                 <td>{{ action_detail.holy_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость ко тьме: </td>
+                 <td>{{ action_detail.curse_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к дроблению: </td>
+                 <td>{{ action_detail.crush_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к порезам: </td>
+                 <td>{{ action_detail.cut_res }}
+            </tr>
+            <tr>
+                <td>Устойчивость к протыканию: </td>
+                 <td>{{ action_detail.stab_res }}
+            </tr>
+             <td colspan="2"><h4>Снаряжение: </h4></td>
+            <tr>
+                <td>Шлем: </td>
+                <td>{{ action_detail.helmet_status }}
+            </tr>
+            <tr>
+                <td>Нагрудник: </td>
+                <td>{{ action_detail.chest_status }}
+            </tr>
+            <tr>
+                <td>Сапоги: </td>
+                <td>{{ action_detail.shoes_status }}
+            </tr>
+            <tr>
+                <td>Наручи: </td>
+                <td>{{ action_detail.gloves_status }}
+            </tr>
+            <tr>
+                <td>Прочее: </td>
+                <td>{{ action_detail.item_status }}
+            </tr>
             </tbody>
         </table>
-  </div>
- <p><strong>Умения: </strong> {{ action_detail.action_permissions }}</p>
-  <div style="margin-left:20px;margin-top:20px">
-    <h4>Очки навыков: </h4>
-         <table class="editorDemoTable">
-            <tbody>
-            {% for key, value in  action_permissions.items %}
-                <tr>
-                    <td>{{ key }} </td>
-                    <td>{{ value }} </td>
-                </tr>
-             {% endfor %}
-            </tbody>
-        </table>
-  </div>
- <p><strong>Снаряжение: </strong> {{ action_detail.action_equipment }}</p>
-  <div style="margin-left:20px;margin-top:20px">
-    <h4>Слоты под: </h4>
-        <table class="editorDemoTable">
-            <tbody>
-            {% for key, value in  action_equipment.items %}
-                <tr>
-                    <td>{{ key }} </td>
-                    <td>{{ value }} </td>
-                </tr>
-             {% endfor %}
-            </tbody>
-        </table>
-  </div>
+ </div>
+<hr><hr/>
 {% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:action-update' action_detail.pk %}">+ Изменить Действие</a></p>
-<p><a href="{% url 'poll:action-delete' action_detail.pk %}">- Удалить Действие</a></p>
+
+<p align="left"> <a href="{% url 'poll:action-update' action_detail.pk %}">+ Изменить Действие</a></p>
+<p align="left"><a href="{% url 'poll:action-delete' action_detail.pk %}">- Удалить Действие</a></p>
+
 {% endif %}
-<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+
+<p align="left"><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p align="left"><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p align="left"><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p align="left"><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+<p align="left"><a href="{% url 'poll:actions-list' %}"> Список действий </a></p>
+
 {% endblock %}

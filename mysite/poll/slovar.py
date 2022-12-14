@@ -34,7 +34,7 @@ dict_resistances = {
     "water_res": 'Устойчивость к воде',
     "wind_res": 'Устойчивость к воздуху',
     "dirt_res": 'Устойчивость к земле',
-    "lightning": 'Устойчивость к молниям',
+    "lightning_res": 'Устойчивость к молниям',
     "holy_res": 'Устойчивость к свету',
     "curse_res": 'Устойчивость ко тьме',
     "crush_res": 'Устойчивость к дроблению',
@@ -43,11 +43,11 @@ dict_resistances = {
 }
 
 dict_equipment = {
-    "HELMET_STATUS": 'Шлем',
-    "CHEST_STATUS": 'Нагрудник',
-    "SHOES_STATUS": 'Сапоги',
-    "GLOVES_STATUS": 'Наручи',
-    "ITEM_SLOT": 'Прочее'
+    "helmet_status": 'Шлем',
+    "chest_status": 'Нагрудник',
+    "shoes_status": 'Сапоги',
+    "gloves_status": 'Наручи',
+    "item_status": 'Прочее'
 }
 
 dict_points_start = {
@@ -112,3 +112,6 @@ dict_equipment_start = {
     "GLOVES_STATUS_START": 'Наручи',
     "ITEM_SLOT_START": 'Прочее'
 }
+mypoints = dict()
+for key in dict_points.keys():
+    mypoints[key]= 0

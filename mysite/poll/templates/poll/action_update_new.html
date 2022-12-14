@@ -1,0 +1,296 @@
+<!-- templates/poll/action_update.html -->
+{% extends "poll/header.html"  %}
+{% block content %}
+<h1 xmlns:width="http://www.w3.org/1999/xhtml">Изменение данных Действия</h1>
+{{ form.non_field_errors }}
+<form method="post">
+    {% csrf_token %}
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li> {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </ul>
+    <div style="margin-left:20px;margin-top:20px">
+        <table class="editorDemoTable">
+            <tbody>
+            <tr>
+                <td>Название действия:</td>
+                <td> {{ form.action_name.errors }}<input id="action_id" name="action_name" type="text" style="width: 200px;"
+                           value="{{ action_update.action_name }}"/>
+                    {% else %}
+                <input type="text"  name="action_name">
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Алиас:</td>
+                <td>  {{ form.action_alias.errors }}<input id="action_alias" name="action_alias" type="text" style="width: 200px;"
+                           value="{{ action_update.action_alias }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Описание:</td>
+                <td><textarea id="action_description" name="action_description" type="text" style="width:200px;">
+                    {{ action_update.action_description }}
+                    </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>Характеристики (формула):</td>
+                <td><textarea id="action_points" name="action_points" type="text" style="width: 78px; height: 270px">
+                {{ action_update.action_points }}
+                 </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>Стамина:</td>
+                <td>
+                    <div>{{ form.SP.errors }}<input id="SP" name="SP" type="number" style="width: 50px;" value="{{ action_update.SP }}"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Колдовство:</td>
+                <td>{{ form.MP.errors }}<input id="MP" name="MP" type="number" style="width: 50px;" value="{{ action_update.MP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Интеллект:</td>
+                <td>{{ form.IP.errors }}<input id="IP" name="IP" type="number" style="width: 50px;" value="{{ action_update.IP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Сила:</td>
+                <td><input id="PP" name="PP" type="number" style="width: 50px;" value="{{ action_update.PP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Ловкость:</td>
+                <td>{{ form.AP.errors }}<input id="AP" name="AP" type="number" style="width: 50px;" value="{{ action_update.AP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Вера:</td>
+                <td>{{ form.FP.errors }}<input id="FP" name="FP" type="number" style="width: 50px;" value="{{ action_update.FP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Удача:</td>
+                <td>{{ form.LP.errors }}<input id="LP" name="LP" type="number" style="width: 50px;" value="{{ action_update.LP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Харизма:</td>
+                <td>{{ form.CP.errors }}<input id="CP" name="CP" type="number" style="width: 50px;" value="{{ action_update.CP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Рассудок:</td>
+                <td>{{ form.BP.errors }}<input id="BP" name="BP" type="number" style="width: 50px;" value="{{ action_update.BP }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Умения (навыки):</td>
+                <td>
+                    <textarea id="action_permissions" name="action_permissions" style="width:200px; height:450px">{{ action_update.action_permissions }} </textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Пирокинектика:</td>
+                <td>{{ form.Fire_access.errors }}<input id="Fire_access" name="Fire_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Fire_access }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Гидрософистика:</td>
+                <td>{{ form.Water_access.errors }}<input id="Water_access" name="Water_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Water_access }}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Аэрософистика:</td>
+                <td>{{ form.Wind_access.errors }}<input id="Wind_access" name="Wind_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Wind_access }}"/>
+            </tr>
+            <tr>
+                <td>Геомантия:</td>
+                <td>{{ form.Dirt_access.errors }}<input id="Dirt_access" name="Dirt_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Dirt_access }}"/>
+            </tr>
+            <tr>
+                <td>Киловактика:</td>
+                <td>{{ form.Lightning_access.errors }}<input id="Lightning_access" name="Lightning_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Lightning_access }}"/>
+            </tr>
+            <tr>
+                <td>Элафристика:</td>
+                <td><{{ form.Holy_access.errors }}input id="Holy_access" name="Holy_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Holy_access }}"/>
+            </tr>
+            <tr>
+                <td>Катифристика:</td>
+                <td><input id="Curse_access" name="Curse_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Curse_access }}"/>
+            </tr>
+            <tr>
+                <td>Гематомантия:</td>
+                <td><input id="Bleed_access" name="Bleed_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Bleed_access }}"/>
+            </tr>
+            <tr>
+                <td>Ботаника:</td>
+                <td><input id="Nature_access" name="Nature_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Nature_access }}"/>
+            </tr>
+            <tr>
+                <td>Псифистика:</td>
+                <td><input id="Mental_access" name="Mental_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Mental_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Двуручного оружия:</td>
+                <td><input id="Twohanded_access" name="Twohanded_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Twohanded_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Древкового оружия:</td>
+                <td><input id="Polearm_access" name="Polearm_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Polearm_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Одноручного оружия:</td>
+                <td><input id="Onehanded_access" name="Onehanded_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Onehanded_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Колющего оружия:</td>
+                <td><input id="Stabbing_access" name="Stabbing_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Stabbing_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Режущего оружия:</td>
+                <td><input id="Cutting_access" name="Cutting_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Cutting_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Дробящего оружия:</td>
+                <td><input id="Crushing_access" name="Crushing_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Crushing_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Стрелкового оружия:</td>
+                <td><input id="Small_arms_access" name="Small_arms_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Small_arms_access }}"/>
+            </tr>
+            <tr>
+                <td>Владение навыками Щитов:</td>
+                <td><input id="Shields_access" name="Shields_access" type="number" style="width: 50px; "
+                           value="{{ action_update.Shields_access }}"/>
+            </tr>
+            <tr>
+                <td>Сопротивляемость:</td>
+                <td>
+                    <textarea id="action_resistances" name="action_resistances" style="width:200px; height:160px"
+                              required>{{ action_update.action_resistances }} </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>Устойчивость к огню:</td>
+                <td><input id="fire_res" name="fire_res" type="number" style="width: 50px; "
+                           value="{{ action_update.fire_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к воде:</td>
+                <td><input id="water_res" name="water_res" type="number" style="width: 50px; "
+                           value="{{ action_update.water_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к воздуху:</td>
+                <td><input id="wind_res" name="wind_res" type="number" style="width: 50px; "
+                           value="{{ action_update.wind_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к земле:</td>
+                <td><input id="dirt_res" name="dirt_res" type="number" style="width: 50px; "
+                           value="{{ action_update.dirt_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к молниям:</td>
+                <td><input id="lightning_res" name="lightning_res" type="number" style="width: 50px; "
+                           value="{{ action_update.lightning_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к свету:</td>
+                <td><input id="holy_res" name="holy_res" type="number" style="width: 50px; "
+                           value="{{ action_update.holy_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость ко тьме:</td>
+                <td><input id="curse_res" name="curse_res" type="number" style="width: 50px; "
+                           value="{{ action_update.curse_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к дроблению:</td>
+                <td><input id="crush_res" name="crush_res" type="number" style="width: 50px; "
+                           value="{{ action_update.crush_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к порезам:</td>
+                <td><input id="cut_res" name="cut_res" type="number" style="width: 50px; "
+                           value="{{ action_update.cut_res }}"/>
+            </tr>
+            <tr>
+                <td>Устойчивость к протыканию:</td>
+                <td><input id="stab_res" name="stab_res" type="number" style="width: 50px; "
+                           value="{{ action_update.stab_res }}"/>
+            </tr>
+            <tr>
+                <td>Снаряжение:</td>
+                <td><textarea id="action_equipment" name="action_equipment" type="text"
+                              style="width:160px; height:180px">
+                    {{ action_update.action_equipment }}
+                    </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>Шлем:</td>
+                <td><input id="helmet_status" name="helmet_status" type="number" style="width: 50px; "
+                           value="{{ action_update.helmet_status }}"/>
+            </tr>
+            <tr>
+                <td>Нагрудник:</td>
+                <td><input id="chest_status" name="chest_status" type="number" style="width: 50px; "
+                           value="{{ action_update.chest_status }}"/>
+            </tr>
+            <tr>
+                <td>Сапоги:</td>
+                <td><input id="shoes_status" name="shoes_status" type="number" style="width: 50px; "
+                           value="{{ action_update.shoes_status }}"/>
+            </tr>
+            <tr>
+                <td>Наручи:</td>
+                <td><input id="gloves_status" name="gloves_status" type="number" style="width: 50px; "
+                           value="{{ action_update.gloves_status }}"/>
+            </tr>
+            <tr>
+                <td>Прочее:</td>
+                <td><input id="item_status" name="item_status" type="number" style="width: 50px; "
+                           value="{{ action_update.item_status }}"/>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <input type="submit" value="Save">
+</form>
+<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
+<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
+<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
+<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+<p><a href="{% url 'poll:actions-list' %}"> Список действий </a></p>
+<p><a href="{% url 'poll:action-delete' action_update.pk %}"> Удалить действие </a></p>
+{% endblock content %}

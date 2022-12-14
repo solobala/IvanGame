@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-
-
+from .slovar import mypoints
+import json
 # Create your models here.
 
 
@@ -593,12 +593,11 @@ class PersonBar(models.Model):
 
 
 class Action(models.Model):
+
     action_name = models.CharField(max_length=128, blank=True, null=True)
     action_alias = models.CharField(max_length=128, blank=True, null=True)
     action_description = models.TextField(verbose_name='Описание', blank=True, null=True)
-
-    action_points = models.JSONField(verbose_name='Характеристики',
-                                     default=dict)
+    action_points = models.JSONField(verbose_name='Характеристики', blank=True, null=True)
     SP = models.IntegerField(verbose_name="Стамина", default=0)
     MP = models.IntegerField(verbose_name="Колдовство", default=0)
     IP = models.IntegerField(verbose_name="Интеллект", default=0)
@@ -608,40 +607,39 @@ class Action(models.Model):
     LP = models.IntegerField(verbose_name="Удача", default=0)
     CP = models.IntegerField(verbose_name="Харизма", default=0)
     BP = models.IntegerField(verbose_name="Рассудок", default=0)
-    action_resistanses = models.JSONField(verbose_name='Сопротивляемость', default=dict)
+    action_resistances = models.JSONField(verbose_name='Сопротивляемость', blank=True, null=True)
     fire_res = models.IntegerField(verbose_name="Сопротивляемость огню", default=0)
     water_res = models.IntegerField(verbose_name="Сопротивляемость воде", default=0)
     wind_res = models.IntegerField(verbose_name="Сопротивляемость ветру", default=0)
     dirt_res = models.IntegerField(verbose_name="Сопротивляемость земле", default=0)
-    lightning_rest = models.IntegerField(verbose_name="Сопротивляемость молниям", default=0)
+    lightning_res = models.IntegerField(verbose_name="Сопротивляемость молниям", default=0)
     holy_res = models.IntegerField(verbose_name="Сопротивляемость свету", default=0)
     curse_res = models.IntegerField(verbose_name="Сопротивляемость тьме", default=0)
     crush_res = models.IntegerField(verbose_name="Сопротивляемость дроблению", default=0)
     cut_res = models.IntegerField(verbose_name="Сопротивляемость порезам", default=0)
     stab_res = models.IntegerField(verbose_name="Сопротивляемость протыканию", default=0)
 
-    action_permissions = models.JSONField(verbose_name='Умения',
-                                          default=dict)
+    action_permissions = models.JSONField(verbose_name='Умения', blank=True, null=True)
     Fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
     Water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
     Wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
     Dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
-    Lightning_accesst = models.IntegerField(verbose_name="Киловактика", default=0)
+    Lightning_access = models.IntegerField(verbose_name="Киловактика", default=0)
     Holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
     Curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
     Bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
     Nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
     Mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
     Twohanded_access = models.IntegerField(verbose_name="Владение навыками Двуручного оружия", default=0)
-    Polearm_acces = models.IntegerField(verbose_name="Владение навыками Древкового оружия", default=0)
+    Polearm_access = models.IntegerField(verbose_name="Владение навыками Древкового оружия", default=0)
     Onehanded_access = models.IntegerField(verbose_name="Владение навыками Одноручного оружия", default=0)
-    Stabbing_accesst = models.IntegerField(verbose_name="Владение навыками Колющего оружия", default=0)
+    Stabbing_access = models.IntegerField(verbose_name="Владение навыками Колющего оружия", default=0)
     Cutting_access = models.IntegerField(verbose_name="Владение навыками Режущего оружия", default=0)
     Crushing_access = models.IntegerField(verbose_name="Владение навыками Дробящего оружия", default=0)
-    Small_arms_acces = models.IntegerField(verbose_name="Владение навыками Стрелкового оружия", default=0)
+    Small_arms_access = models.IntegerField(verbose_name="Владение навыками Стрелкового оружия", default=0)
     Shields_access = models.IntegerField(verbose_name="Владение навыками Щитов", default=0)
 
-    action_equipment = models.JSONField(verbose_name='Снаряжение', default=dict)
+    action_equipment = models.JSONField(verbose_name='Снаряжение', blank=True, null=True)
     helmet_status = models.IntegerField(verbose_name='Шлем', default=0)
     chest_status = models.IntegerField(verbose_name='Нагрудник', default=0)
     shoes_status = models.IntegerField(verbose_name='Сапоги', default=0)
@@ -662,4 +660,6 @@ class Action(models.Model):
         return reverse('poll:action-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        super(Action, self).save(*args, **kwargs)
+
+

@@ -19,7 +19,7 @@ from .models import Owner, Person, Group, Membership, Race, PersonBar, Action
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import NewUserForm, ActionForm
+from .forms import NewUserForm, ActionUpdateForm
 from django.http import JsonResponse
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
@@ -960,32 +960,14 @@ class ActionDetailView(LoginRequiredMixin, DetailView):
     """
     template_name = 'poll/action/action_detail.html'
     context_object_name = 'action_detail'
-    queryset = Action.objects.all()
+    model = Action
+    # queryset = Action.objects.all()
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        action_permissions = dict()
-        action_resistanses = dict()
-        action_points = dict()
-        action_equipment = dict()
 
-        for key, value in context['action_detail'].action_points.items():
-            action_points[slovar.dict_points.get(key)] = value
-        context['action_points'] = action_points
-
-        for key, value in context['action_detail'].action_permissions.items():
-            action_permissions[slovar.dict_permissions.get(key)] = value
-        context['action_permissions'] = action_permissions
-
-        for key, value in context['action_detail'].action_resistanses.items():
-            action_resistanses[slovar.dict_resistances.get(key)] = value
-        context['action_resistanses'] = action_resistanses
-
-        for key, value in context['action_detail'].action_equipment.items():
-            action_equipment[slovar.dict_equipment.get(key)] = value
-        context['action_equipment'] = action_equipment
         return context
 
 
@@ -1006,11 +988,12 @@ class ActionDeleteView(LoginRequiredMixin, DeleteView):
     model = Action
     template_name_suffix = '_delete'
     success_url = reverse_lazy('poll:actions-list')
-    context_object_name = 'raction_detail'
+    context_object_name = 'action_update'
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['action_name'] = context['action_update'].action_name
         return context
 
 
@@ -1018,52 +1001,27 @@ class ActionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование Действия
     """
-    # model = Action
-    form_class = ActionForm
+    model = Action
+    form_class = ActionUpdateForm
     context_object_name = 'action_update'
-    queryset = Action.objects.all()
     template_name_suffix = '_update'
     login_url = 'poll:login'
-    # fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
-    #           'action_resistanses', 'action_equipment']
-    #
-    # for key, value in slovar.dict_points.items():
-    #     fields.append(value)
-    # for key, value in slovar.dict_permissions.items():
-    #     fields.append(value)
-    # for key, value in slovar.dict_resistances.items():
-    #     fields.append(value)
-    # for key, value in slovar.dict_equipment.items():
-    #     fields.append(value)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        action_permissions = dict()
-        action_resistanses = dict()
-        action_points = dict()
-        action_equipment = dict()
 
-        for key, value in context['action_detail'].action_points.items():
-            action_points[slovar.dict_points.get(key)] = value
-        context['action_points'] = action_points
+    def actionupdate(self, request, pk):
+        action = get_object_or_404(Action, pk=pk)
+        if request.method == "POST":
+            f = ActionUpdateForm(self.request.POST, instance=action)
+            if f.is_valid():
+                f.save()
+                messages.add_message(request, messages.INFO, 'Action updated.')
+                return redirect(reverse('action_update', args=[action.id]))
 
-        for key, value in context['action_detail'].action_permissions.items():
-            action_permissions[slovar.dict_permissions.get(key)] = value
-        context['action_permissions'] = action_permissions
+            # if request is GET the show unbound form to the user, along with data
+        else:
+            f = ActionUpdateForm(instance=action)
 
-        for key, value in context['action_detail'].action_resistanses.items():
-            action_resistanses[slovar.dict_resistances.get(key)] = value
-        context['action_resistanses'] = action_resistanses
-
-        for key, value in context['action_detail'].action_equipment.items():
-            action_equipment[slovar.dict_equipment.get(key)] = value
-        context['action_equipment'] = action_equipment
-
-        return context
-
-    def get_success_url(self):
-        return reverse('action_update', kwargs={'pk': self.object.id})
-
+        return render(request, 'poll/action_update.html', {'form': f, 'action': action})
 
     def form_valid(self, form):
         """
@@ -1071,10 +1029,7 @@ class ActionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
         :param form:
         :return:
         """
-        # form.instance.action_equipment = self.action_equipment
-        # form.instance.action_resistanses = self.action_resistanses
-        # form.instance.action_permissions = self.action_permissions
-        # form.instance.action_points = self.action_points
+
         form.instance.updated_by = self.request.user
 
         return super().form_valid(form)
@@ -1086,44 +1041,98 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     context_object_name = 'action_add'
     queryset = Action.objects.all()
-
+    template_name = 'add/action_form.html'
     login_url = 'poll:login'
-    fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'action_permissions',
-              'action_resistanses', 'action_equipment']
-
-    for key, value in slovar.dict_points.items():
-        fields.append(value)
-    for key, value in slovar.dict_permissions.items():
-        fields.append(value)
-    for key, value in slovar.dict_resistances.items():
-        fields.append(value)
-    for key, value in slovar.dict_equipment.items():
-        fields.append(value)
+    fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
+              'LP', 'CP', 'BP', 'action_resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
+              'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'action_permissions', 'Fire_access',
+              'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
+              'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
+              'Onehanded_access',
+              'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access', 'Shields_access',
+              'action_equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status', 'item_status']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        action_permissions = dict()
-        action_resistanses = dict()
-        action_points = dict()
-        action_equipment = dict()
+        mydict = dict()
+        for key in slovar.dict_points.keys():
+            mydict[key] = context['form'].fields.get(key).initial
 
-        for key, value in slovar.dict_points.items():
-            action_points[key] = context.action_points.get(value).value
-        context['action_points'] = action_points
+        if context['form'].fields.get('action_points').initial is None:
+            context['form'].fields['action_points'].initial = mydict
 
-        for key, value in slovar.dict_permissions.items():
-            action_permissions[key] = context.action_permissions.get(value).value
-        context['action_permissions'] = action_permissions
+        mydict = dict()
+        for key in slovar.dict_permissions.keys():
+            mydict[key] = context['form'].fields.get(key).initial
 
-        for key, value in slovar.dict_resistances.items():
-            action_resistanses[key] = context.action_resistanses.get(value).value
-        context['action_resistanses'] = action_resistanses
+        if context['form'].fields.get('action_permissions').initial is None:
+            context['form'].fields['action_permissions'].initial = mydict
 
-        for key, value in slovar.dict_equipment.items():
-            action_equipment[key] = context.action_equipment.get(value).value
-        context['action_equipment'] = action_equipment
+        mydict = dict()
+        for key in slovar.dict_resistances.keys():
+            mydict[key] = context['form'].fields.get(key).initial
 
+        if context['form'].fields.get('action_resistances').initial is None:
+            context['form'].fields['action_resistances'].initial = mydict
+
+        mydict = dict()
+        for key in slovar.dict_equipment.keys():
+            mydict[key] = context['form'].fields.get(key).initial
+
+        if context['form'].fields.get('action_equipment').initial is None:
+            context['form'].fields['action_equipment'].initial = mydict
         return context
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pk = super().kwargs['pk']
+
+        self.cleaned_data.update({'action_name': cleaned_data.get('action_name'),
+                                  'action_alias': cleaned_data.get('action_alias'),
+                                  'action_description': cleaned_data.get('action_description')})
+
+        action_points = dict()
+        for key in slovar.dict_points.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_points[key] = self.cleaned_data[key]
+        print(action_points)
+        self.cleaned_data.update({'action_points': action_points})
+        action_permissions = dict()
+        for key in slovar.dict_permissions.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_permissions[key] = self.cleaned_data[key]
+        self.cleaned_data["action_permissions"] = action_permissions
+        action_resistances = dict()
+        for key in slovar.dict_resistances.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_resistances[key] = self.cleaned_data[key]
+        self.cleaned_data["action_resistances"] = action_resistances
+        action_equipment = dict()
+        for key in slovar.dict_equipment.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            action_equipment[key] = self.cleaned_data[key]
+        self.cleaned_data.update({"action_equipment": action_equipment})
+        action = Action.objects.get(id=pk)
+        action.action_points.set(action_points)
+        action.action_equipment.set(action_equipment)
+        action.action_resistances.set(action_resistances)
+        action.action_permissions.set(action_permissions)
+        action.save()
+
+        if self.request.method == "POST":
+            f = ActionCreateView(self.request.POST, instance=action)
+            if f.is_valid():
+                f.save()
+                messages.add_message(self.request, messages.INFO, 'Action updated.')
+                return redirect(reverse('action_update', args=[action.id]))
+
+            # if request is GET the show unbound form to the user, along with data
+        else:
+            f = ActionUpdateForm(instance=action)
+
+        return render(self.request, 'poll/action_update.html', {'form': f, 'action': action})
+
+        return self.cleaned_data
 
     def form_valid(self, form):
         """
@@ -1131,11 +1140,7 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         :param form:
         :return:
         """
-        # form.instance.action_equipment = self.action_equipment
-        # form.instance.action_resistanses = self.action_resistanses
-        # form.instance.action_permissions = self.action_permissions
-        # form.instance.action_points = self.action_points
-        # form.instance.created_by = self.request.user
+
         return super().form_valid(form)
 
 
