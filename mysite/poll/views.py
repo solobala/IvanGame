@@ -1,4 +1,4 @@
-import json
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout  # add this
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
@@ -15,11 +15,11 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
-from .models import Owner, Person, Group, Membership, Race, PersonBar, Action
+from .models import Owner, Person, Group, Membership, Race, PersonBar, Action, Location, Feature
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import NewUserForm, ActionUpdateForm
+from .forms import NewUserForm, ActionUpdateForm, FeatureUpdateForm
 from django.http import JsonResponse
 from django.forms.models import inlineformset_factory
 from django.urls import reverse
@@ -33,9 +33,9 @@ from django.urls import reverse
 from rest_framework import generics
 from . import slovar
 
-PersonFormset = inlineformset_factory(
-    Owner, Person, fields=('person_name',)
-)
+# PersonFormset = inlineformset_factory(
+#     Owner, Person, fields=('person_name',)
+# )
 
 
 class JsonableResponseMixin:
@@ -165,7 +165,7 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
     model = Owner
     fields = ['owner_name', 'owner_description', 'link']
     login_url = 'poll:login'
-
+    permission_required = 'poll.special_status'  # new
     def get_context_data(self, **kwargs):
         # we need to overwrite get_context_data
         # to make sure that our formset is rendered
@@ -232,7 +232,7 @@ class OwnerUpdateView(LoginRequiredMixin,
     fields = ['owner_name', 'owner_description', 'link']
     template_name_suffix = '_update'
     login_url = 'poll:login'
-
+    permission_required = 'poll.special_status'  # new
     # def get_context_data(self, **kwargs):
     #     # we need to overwrite get_context_data
     #     # to make sure that our formset is rendered.
@@ -312,36 +312,36 @@ class OwnerDetailView(LoginRequiredMixin,
     """
     template_name = 'poll/owner/owner_detail.html'
     context_object_name = 'owner_detail'
-    # model = Owner
+    #model = Owner
     queryset = Owner.objects.all()
     login_url = 'poll:login'
     permission_required = 'poll.special_status'  # new
 
-    # def get_queryset(request, self):
+    # def get_queryset( self):
     #     """
     #     Просмотр детальной информации по владельцу указанного персонажа
     #     """
     #     selected_person = get_object_or_404(Person, person_name=self.kwargs['person_name'])
     #     context = {'owner_detail': selected_person.owner}
     #     return render(request, 'poll/owner/owner_detail.html', context)
-    #
-    # def get(self, request, *args, **kwargs):
-    #     self.object = self.get_object(queryset=Owner.objects.all())
-    #     return super().get(request, *args, **kwargs)
-    #
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Owner.objects.all())
+        return super().get(request, *args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
         return context
 
-    # def get_success_url(self):
-    #     # return reverse("owners-list")
-    #     return reverse_lazy(
-    #         "/poll/owner/owner-detail",
-    #         kwargs={"pk": self.object.pk}
-    #     )
-    #
+    def get_success_url(self):
+        # return reverse("owners-list")
+        return reverse_lazy(
+            "/poll/owner/owner-detail",
+            kwargs={"pk": self.object.pk}
+        )
+
     # def get_queryset(self):
     #     return self.object.person_set.all()
 
@@ -410,7 +410,7 @@ class PersonCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     Добавление нового персонажа
     """
     model = Person
-    fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
+    fields = ['person_name', 'person_img', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
               'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
     login_url = 'poll:login'
 
@@ -434,7 +434,7 @@ class PersonUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     Редактирование персонажа
     """
     model = Person
-    fields = ['person_name', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
+    fields = ['person_name', 'person_img', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
               'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
     template_name_suffix = '_update'
     login_url = 'poll:login'
@@ -461,41 +461,66 @@ class PersonDeleteView(LoginRequiredMixin, DeleteView):
     queryset = Person.objects.all()
     login_url = 'poll:login'
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['person_name'] = context['person_detail'].person_name
         return context
 
 
-class PersonsFreeListView(LoginRequiredMixin, ListView):
+class StatusPersonsListView(LoginRequiredMixin, ListView):
     """
     Просмотр  списка свободных персонажей
     """
-    template_name = 'poll/free_person/free_persons_list.html'
+    template_name = 'poll/person/persons_list.html'
 
-    context_object_name = 'free_persons_list'
-    queryset = Person.objects.filter(status=1)
     login_url = 'poll:login'
 
+    def get_context_object_name(self, object_list):
+        context_object_name = 'persons_list_' + str(self.kwargs['status'])
+        return context_object_name
 
-class PersonsBusyListView(LoginRequiredMixin, ListView):
-    """
-    Просмотр  списка занятых персонажей
-    """
-    template_name = 'poll/busy_person/busy_persons_list.html'
-    context_object_name = 'busy_persons_list'
-    queryset = Person.objects.filter(status=0)
-    login_url = 'poll:login'
+    def get_queryset(self):
+
+        return Person.objects.filter(status=self.kwargs['status'])
+
+    def get_context_data(self,  **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status'] = self.kwargs['status']
+
+        return context
 
 
-class PersonsFreezListView(LoginRequiredMixin, ListView):
-    """
-    Просмотр  списка заморозки персонажей
-    """
-    template_name = 'poll/freez_person/freez_persons_list.html'
-    context_object_name = 'freez_persons_list'
-    queryset = Person.objects.filter(status=2)
-    login_url = 'poll:login'
+
+# class PersonsFreeListView(LoginRequiredMixin, ListView):
+#     """
+#     Просмотр  списка свободных персонажей
+#     """
+#     template_name = 'poll/free_person/free_persons_list.html'
+#
+#     context_object_name = 'free_persons_list'
+#     queryset = Person.objects.filter(status=1)
+#     login_url = 'poll:login'
+#
+#
+# class PersonsBusyListView(LoginRequiredMixin, ListView):
+#     """
+#     Просмотр  списка занятых персонажей
+#     """
+#     template_name = 'poll/busy_person/busy_persons_list.html'
+#     context_object_name = 'busy_persons_list'
+#     queryset = Person.objects.filter(status=0)
+#     login_url = 'poll:login'
+#
+#
+# class PersonsFreezListView(LoginRequiredMixin, ListView):
+#     """
+#     Просмотр  списка заморозки персонажей
+#     """
+#     template_name = 'poll/freez_person/freez_persons_list.html'
+#     context_object_name = 'freez_persons_list'
+#     queryset = Person.objects.filter(status=2)
+#     login_url = 'poll:login'
 
 
 class PersonsListView(LoginRequiredMixin, ListView):
@@ -628,8 +653,6 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                                    ) ** 1.05, 0)
         context['load_capacity'] = load_capacity
 
-        # context['main_points'] = slovar.dict_points_start.get(max(points, key=points.get))
-        # context['main_permission'] = slovar.dict_permissions_start.get(max(permissions, key=permissions.get))
         context['main_points'] = max(points, key=points.get)
         context['main_permission'] = max(permissions, key=permissions.get)
         context['avg_magic_resistance'] = round((resistances.get('Устойчивость к огню') +
@@ -644,6 +667,9 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                                                   resistances.get('Устойчивость к порезам') +
                                                   resistances.get('Устойчивость к протыканию')
                                                   ) / 3, 0)
+        # context['rov'] = rov
+        # context['fov'] = fov
+        # context['person_img'] = person_img
         return context
 
 
@@ -836,8 +862,7 @@ class RaceCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     Создание новой Расы
     """
     model = Race
-    fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
-              'start_resistanses', 'start_permissions', 'equipment']
+    fields = '__all__'
     login_url = 'poll:login'
 
     def form_valid(self, form):
@@ -856,10 +881,15 @@ class RaceUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     model = Race
 
-    fields = ['race_name', 'race_description', 'lifetime', 'start_points', 'finish_points',
-              'start_resistanses', 'start_permissions', 'equipment']
+    fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
+    context_object_name = 'race_update'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
 
     def form_valid(self, form):
         """
@@ -877,7 +907,7 @@ class RaceDeleteView(LoginRequiredMixin, DeleteView):
     """
     model = Race
     template_name_suffix = '_delete'
-    success_url = reverse_lazy('poll:race-list')
+    success_url = reverse_lazy('poll:races-list')
     context_object_name = 'race_detail'
     login_url = 'poll:login'
 
@@ -911,7 +941,7 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
             start_permissions[slovar.dict_permissions_start.get(key)] = value
 
         start_resistances = dict()
-        for key, value in context['race_detail'].start_resistanses.items():
+        for key, value in context['race_detail'].start_resistances.items():
             start_resistances[slovar.dict_resistances_start.get(key)] = value
 
         equipment = dict()
@@ -961,7 +991,7 @@ class ActionDetailView(LoginRequiredMixin, DetailView):
     template_name = 'poll/action/action_detail.html'
     context_object_name = 'action_detail'
     model = Action
-    # queryset = Action.objects.all()
+    #queryset = Action.objects.all()
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
@@ -1040,17 +1070,19 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     Создание нового Действия
     """
     context_object_name = 'action_add'
-    queryset = Action.objects.all()
+    model = Action
+    # queryset = Action.objects.all()
     template_name = 'add/action_form.html'
     login_url = 'poll:login'
-    fields = ['action_name', 'action_alias', 'action_description', 'action_points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
-              'LP', 'CP', 'BP', 'action_resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
-              'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'action_permissions', 'Fire_access',
-              'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
-              'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
-              'Onehanded_access',
-              'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access', 'Shields_access',
-              'action_equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status', 'item_status']
+    fields = '__all__'
+    # fields = ['action_name', 'action_alias', 'action_description', 'points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
+    #           'LP', 'CP', 'BP', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
+    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'Fire_access',
+    #           'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
+    #           'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
+    #           'Onehanded_access',
+    #           'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access', 'Shields_access',
+    #           'equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status', 'item_status']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1058,29 +1090,29 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         for key in slovar.dict_points.keys():
             mydict[key] = context['form'].fields.get(key).initial
 
-        if context['form'].fields.get('action_points').initial is None:
-            context['form'].fields['action_points'].initial = mydict
+        if context['form'].fields.get('points').initial is None:
+            context['form'].fields['points'].initial = mydict
 
         mydict = dict()
         for key in slovar.dict_permissions.keys():
             mydict[key] = context['form'].fields.get(key).initial
 
-        if context['form'].fields.get('action_permissions').initial is None:
-            context['form'].fields['action_permissions'].initial = mydict
+        if context['form'].fields.get('permissions').initial is None:
+            context['form'].fields['permissions'].initial = mydict
 
         mydict = dict()
         for key in slovar.dict_resistances.keys():
             mydict[key] = context['form'].fields.get(key).initial
 
-        if context['form'].fields.get('action_resistances').initial is None:
-            context['form'].fields['action_resistances'].initial = mydict
+        if context['form'].fields.get('resistances').initial is None:
+            context['form'].fields['resistances'].initial = mydict
 
         mydict = dict()
         for key in slovar.dict_equipment.keys():
             mydict[key] = context['form'].fields.get(key).initial
 
-        if context['form'].fields.get('action_equipment').initial is None:
-            context['form'].fields['action_equipment'].initial = mydict
+        if context['form'].fields.get('equipment').initial is None:
+            context['form'].fields['equipment'].initial = mydict
         return context
 
     def clean(self):
@@ -1096,27 +1128,27 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
             self.cleaned_data.update({key: cleaned_data.get(key)})
             action_points[key] = self.cleaned_data[key]
         print(action_points)
-        self.cleaned_data.update({'action_points': action_points})
+        self.cleaned_data.update({'points': action_points})
         action_permissions = dict()
         for key in slovar.dict_permissions.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             action_permissions[key] = self.cleaned_data[key]
-        self.cleaned_data["action_permissions"] = action_permissions
+        self.cleaned_data["permissions"] = action_permissions
         action_resistances = dict()
         for key in slovar.dict_resistances.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             action_resistances[key] = self.cleaned_data[key]
-        self.cleaned_data["action_resistances"] = action_resistances
+        self.cleaned_data["resistances"] = action_resistances
         action_equipment = dict()
         for key in slovar.dict_equipment.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             action_equipment[key] = self.cleaned_data[key]
-        self.cleaned_data.update({"action_equipment": action_equipment})
+        self.cleaned_data.update({"equipment": action_equipment})
         action = Action.objects.get(id=pk)
-        action.action_points.set(action_points)
-        action.action_equipment.set(action_equipment)
-        action.action_resistances.set(action_resistances)
-        action.action_permissions.set(action_permissions)
+        action.points.set(action_points)
+        action.equipment.set(action_equipment)
+        action.resistances.set(action_resistances)
+        action.permissions.set(action_permissions)
         action.save()
 
         if self.request.method == "POST":
@@ -1131,6 +1163,273 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
             f = ActionUpdateForm(instance=action)
 
         return render(self.request, 'poll/action_update.html', {'form': f, 'action': action})
+
+        # return self.cleaned_data
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class LocationsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка локаций
+    """
+    template_name = 'poll/location/locations_list.html'
+    context_object_name = 'locations_list'
+    model = Location
+    login_url = 'poll:login'
+
+
+class LocationCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой Локации
+    """
+    model = Location
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана связь
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class LocationUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Локации
+    """
+    model = Location
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class LocationDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Локации
+    """
+    model = Location
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:locations-list')
+    context_object_name = 'location_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location_name'] = context['location_detail'].location_name
+        return context
+
+
+class LocationDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по расе
+    """
+    template_name = 'poll/location/location_detail.html'
+    context_object_name = 'location_detail'
+    model = Location
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class FeatureDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Свойству
+    """
+    template_name = 'poll/feature/feature_detail.html'
+    context_object_name = 'feature_detail'
+    model = Feature
+    # queryset = Feature.objects.all()
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+
+        return context
+
+
+class FeaturesListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Свойств
+    """
+    template_name = 'poll/feature/features_list.html'
+    context_object_name = 'features_list'
+    model = Feature
+    login_url = 'poll:login'
+
+
+class FeatureDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Свойства
+    """
+    model = Feature
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:features-list')
+    context_object_name = 'feature_update'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['featuren_name'] = context['feature_update'].feature_name
+        return context
+
+
+class FeatureUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Свойства
+    """
+    model = Feature
+    form_class = FeatureUpdateForm
+    context_object_name = 'feature_update'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def featureupdate(self, request, pk):
+        feature = get_object_or_404(Action, pk=pk)
+        if request.method == "POST":
+            f = FeatureUpdateForm(self.request.POST, instance=feature)
+            if f.is_valid():
+                f.save()
+                messages.add_message(request, messages.INFO, 'Feature updated.')
+                return redirect(reverse('action_update', args=[feature.id]))
+            # if request is GET the show unbound form to the user, along with data
+        else:
+            f = ActionUpdateForm(instance=feature)
+        return render(request, 'poll/action_update.html', {'form': f, 'action': feature})
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена связь
+        :param form:
+        :return:
+        """
+
+        form.instance.updated_by = self.request.user
+
+        return super().form_valid(form)
+
+
+class FeatureCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Действия
+    """
+    context_object_name = 'feature_add'
+    queryset = Feature.objects.all()
+    template_name = 'add/feature_form.html'
+    login_url = 'poll:login'
+    fields ='__all__'
+    # fields = ['feature_name', 'feature_description', 'points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
+    #           'LP', 'CP', 'BP', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
+    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'Fire_access',
+    #           'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
+    #           'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
+    #           'Onehanded_access', 'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access',
+    #           'Shields_access', 'equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status',
+    #           'item_status', rov, fov]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mydict = dict()
+        for key in slovar.dict_points.keys():
+            mydict[key] = context['form'].fields.get(key).initial
+
+        if context['form'].fields.get('points').initial is None:
+            context['form'].fields['points'].initial = mydict
+
+        mydict = dict()
+        for key in slovar.dict_permissions.keys():
+            mydict[key] = context['form'].fields.get(key).initial
+
+        if context['form'].fields.get('permissions').initial is None:
+            context['form'].fields['permissions'].initial = mydict
+
+        mydict = dict()
+        for key in slovar.dict_resistances.keys():
+            mydict[key] = context['form'].fields.get(key).initial
+
+        if context['form'].fields.get('resistances').initial is None:
+            context['form'].fields['resistances'].initial = mydict
+
+        mydict = dict()
+        for key in slovar.dict_equipment.keys():
+            mydict[key] = context['form'].fields.get(key).initial
+
+        if context['form'].fields.get('equipment').initial is None:
+            context['form'].fields['equipment'].initial = mydict
+        return context
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pk = super().kwargs['pk']
+
+        self.cleaned_data.update({'feature_name': cleaned_data.get('feature_name'),
+
+                                  'feature_description': cleaned_data.get('feature_description')})
+
+        points = dict()
+        for key in slovar.dict_points.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            points[key] = self.cleaned_data[key]
+
+        self.cleaned_data.update({'points': points})
+        permissions = dict()
+        for key in slovar.dict_permissions.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            permissions[key] = self.cleaned_data[key]
+        self.cleaned_data["permissions"] = permissions
+        resistances = dict()
+        for key in slovar.dict_resistances.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            resistances[key] = self.cleaned_data[key]
+        self.cleaned_data["resistances"] = resistances
+        equipment = dict()
+        for key in slovar.dict_equipment.keys():
+            self.cleaned_data.update({key: cleaned_data.get(key)})
+            equipment[key] = self.cleaned_data[key]
+        self.cleaned_data.update({"equipment": equipment})
+        feature = Feature.objects.get(id=pk)
+        feature.points.set(points)
+        feature.equipment.set(equipment)
+        feature.resistances.set(resistances)
+        feature.permissions.set(permissions)
+        feature.save()
+
+        if self.request.method == "POST":
+            f = FeatureCreateView(self.request.POST, instance=feature)
+            if f.is_valid():
+                f.save()
+                messages.add_message(self.request, messages.INFO, 'Feature updated.')
+                return redirect(reverse('feature_update', args=[feature.id]))
+
+            # if request is GET the show unbound form to the user, along with data
+        else:
+            f = FeatureUpdateForm(instance=feature)
+
+        return render(self.request, 'poll/feature_update.html', {'form': f, 'feature': feature})
 
         return self.cleaned_data
 

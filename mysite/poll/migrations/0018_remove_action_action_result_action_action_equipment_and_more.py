@@ -13,17 +13,17 @@ class Migration(migrations.Migration):
         migrations.RemoveField(model_name="action", name="action_result",),
         migrations.AddField(
             model_name="action",
-            name="action_equipment",
+            name="equipment",
             field=models.JSONField(blank=True, null=True, verbose_name="Снаряжение"),
         ),
         migrations.AddField(
             model_name="action",
-            name="action_permissions",
+            name="permissions",
             field=models.JSONField(blank=True, null=True, verbose_name="Умения"),
         ),
         migrations.AddField(
             model_name="action",
-            name="action_points",
+            name="points",
             field=models.JSONField(
                 blank=True, null=True, verbose_name="Характеристики"
             ),

@@ -12,12 +12,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name="action",
-            name="action_equipment",
+            name="equipment",
             field=models.JSONField(default=dict, verbose_name="Снаряжение"),
         ),
         migrations.AlterField(
             model_name="action",
-            name="action_permissions",
+            name="permissions",
             field=models.JSONField(default=dict, verbose_name="Умения"),
         ),
         migrations.AlterField(

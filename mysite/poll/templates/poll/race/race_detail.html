@@ -1,84 +1,74 @@
 {% extends "poll/header.html" %}
 {% block content %}
-<h1>Раса: {{ race_detail.get_race_name_display }}</h1>
-<p><strong>Описание: </strong> {{ race_detail.race_description|safe }}</p>
-<p><strong>Продолжительность жизни: </strong> {{ race_detail.lifetime }}</p>
 
 <div style="margin-left:20px;margin-top:20px">
-    <h4>Стартовые очки характеристик: </h4>
-    <table class="editorDemoTable">
+    <p> {{ race_detail.race_description|safe }}</p>
+    <p><h4>Продолжительность жизни: </h4> {{ race_detail.lifetime }}
+    <table class="editorDemoTable" width="350" border="1">
         <tbody>
+        <tr>
+            <td colspan="2"><h4>Стартовые очки характеристик: </h4></td>
+        </tr>
         {% for key, value in start_points.items %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <tr>
+            <td colspan="2"><h4>Предельные очки характеристик: </h4></td>
+        </tr>
 
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Предельные очки характеристик: </h4>
-    <table class="editorDemoTable">
-        <tbody>
         {% for key, value in finish_points.items %}
         <tr>
-            <td>{{ key }}</td>
+            <td> {{ key }}</td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Стартовые очки сопротивлений: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+        <tr>
+            <td colspan="2"><h4>Стартовые очки устойчивости: </h4></td>
+        </tr>
         {% for key, value in start_resistances.items %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <tr>
+            <td colspan="2"><h4>Стартовые очки навыков: </h4></td>
+        </tr>
 
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Стартовые очки навыков: </h4>
-    <table class="editorDemoTable">
-        <tbody>
         {% for key, value in start_permissions.items %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <tr>
+            <td colspan="2"><h4>Снаряжение: </h4></td>
+        </tr>
 
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Снаряжение: </h4>
-    <table class="editorDemoTable">
-        <tbody>
         {% for key, value in equipment.items %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
+        <tr>
+            <td><h4>Дальность обзора: </h4></td>
+            <td>{{ rov }}</td>
+        </tr>
+        <tr>
+            <td><h4>Область обзора: </h4></td>
+            <td>{{ rov }}</td>
+        </tr>
         </tbody>
     </table>
+    {% if user.username == 'gameadmin' %}
+    <p><a href="{% url 'poll:race-update' race_detail.pk %}">+ Изменить данные расы?</a></p>
+    <p><a href="{% url 'poll:race-delete' race_detail.pk %}">- Удалить расу?</a></p>
+    {% endif %}
 </div>
-{% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:race-update' race_detail.pk %}">+ Изменить данные расы</a></p>
-<p><a href="{% url 'poll:race-delete' race_detail.pk %}">- Удалить расу</a></p>
-{% endif %}
-<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+
+
 {% endblock %}

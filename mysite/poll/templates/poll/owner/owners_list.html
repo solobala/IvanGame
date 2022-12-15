@@ -1,13 +1,14 @@
 {% extends "poll/header.html" %}
 {% block content %}
-    <h1>Список игроков</h1>
+ <div style="width:300px; margin-left:20px;margin-top:20px">
+    <h1>Игроки</h1>
     <ul>
     {% for owner in owners_list %}
         <li><a href="/poll/owner/{{ owner.id }}/">{{ owner.owner_name }}</a></li>
     {% endfor %}
     </ul>
-
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:owner-add' %}">+ Добавить Игрока?</a></p>
+{% endif %}
+ </div>
 {% endblock %}

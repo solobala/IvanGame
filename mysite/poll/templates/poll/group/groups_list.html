@@ -1,13 +1,12 @@
 {% extends "poll/header.html" %}
 {% block content %}
+ <div style="width:300px; margin-left:20px;margin-top:20px">
     <h1>Список групп</h1>
     <ul>
     {% for group in groups_list %}
         <li><a href="/poll/group/{{ group.id }}/">{{ group.group_name }}</a></li>
     {% endfor %}
     </ul>
-<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+<p><a href="{% url 'poll:group-add' %}">+ Добавить Группу?</a></p>
+ </div>
 {% endblock %}

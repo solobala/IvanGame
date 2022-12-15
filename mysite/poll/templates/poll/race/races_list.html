@@ -1,13 +1,11 @@
 {% extends "poll/header.html" %}
 {% block content %}
-    <h1>Список рас</h1>
+ <div style="width:300px; margin-left:20px;margin-top:20px">
+    <h1>Расы</h1>
     <ul>
     {% for race in races_list %}
         <li><a href="/poll/race/{{ race.id }}/">{{ race.get_race_name_display }}</a></li>
     {% endfor %}
     </ul>
-<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
+ </div>
 {% endblock %}

@@ -4,17 +4,9 @@
     <h1>Игрок</h1>
 <form  method="post">
     {% csrf_token %}
-
+    {{ form.media }}
     {{ form.as_p }}
     <input type="submit" value="Save">
 </form>
- {% if owner %}
-       <a href="{% url 'poll:owner-detail' owner.id %}">
-           <button>Отмена</button>
-       </a>
-   {% else %}
-       <a href="{% url 'poll:owner-list' %}">
-           <button>Отмена</button>
-       </a>
-   {% endif %}
+
 {% endblock content %}

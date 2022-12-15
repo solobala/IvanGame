@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name="action",
-            name="action_points",
+            name="points",
             field=models.JSONField(
                 default='{"SP": 0, "MP": 0, "IP": 0, "PP": 0, "AP": 0, "FP": 0, "LP": 0, "CP": 0, "BP": 0}',
                 verbose_name="Характеристики",

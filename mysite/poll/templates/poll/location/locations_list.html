@@ -1,0 +1,16 @@
+{% extends "poll/header.html" %}
+{% block content %}
+<div style="width:300px; margin-left:20px;margin-top:20px">
+    <h1>Локации и Дистрикты</h1>
+   <ul class="list-group">
+    {% for action in actions_list %}
+        <li class="list-group-item" aria-current="true"><a href="/poll/location/{{ location.id }}/">{{ location.location_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:location-add' %}">+ Добавить Локацию?</a></p>
+{% endif %}
+</div>
+{% endblock %}
+
+

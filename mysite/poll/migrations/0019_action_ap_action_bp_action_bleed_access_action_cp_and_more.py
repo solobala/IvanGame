@@ -186,7 +186,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="action",
-            name="action_equipment",
+            name="equipment",
             field=models.JSONField(
                 default={
                     "chest_status": 0,
@@ -200,7 +200,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="action",
-            name="action_permissions",
+            name="permissions",
             field=models.JSONField(
                 default={
                     "crush_res": 0,
@@ -219,7 +219,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="action",
-            name="action_points",
+            name="points",
             field=models.JSONField(
                 default={
                     "AP": 0,

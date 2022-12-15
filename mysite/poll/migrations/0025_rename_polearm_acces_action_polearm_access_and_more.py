@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name="action",
             old_name="action_resistanses",
-            new_name="action_resistances",
+            new_name="resistances",
         ),
     ]

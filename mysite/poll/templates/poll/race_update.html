@@ -2,11 +2,16 @@
 {% extends "poll/header.html" %}
 {% block content %}
     <h1>Изменение данных расы</h1>
+ <div style="width:350px; margin-left:20px;margin-top:20px">
 <form method="post">
     {% csrf_token %}
 
-
+    {{ form.media }}
     {{ form.as_p }}
     <input type="submit" value="Save">
 </form>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:race-delete' race_update.pk %}"> Удалить Расу? </a></p>
+{% endif %}
+      </div>
 {% endblock content %}

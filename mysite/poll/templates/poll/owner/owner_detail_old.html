@@ -11,12 +11,13 @@
      <ul>
         {% for selected_person in owner_detail.person_set.all %}
             <li>
-                {% if owner_detail.created_by.username == user.username
-                and selected_person.created_by.username == user.username
-                and owner_detail.id == selected_person.owner.id %}
+
+                {% if owner_detail.created_by.username == user.username and selected_person.created_by.username == user.username and owner_detail.id == selected_person.owner.id %}
                 <a href="/poll/person/{{ selected_person.id }}/">{{ selected_person.person_name }}</a>
-                {% elif owner_detail.id != selected_person.owner.id %}
+                {% endif %}
+                {% if owner_detail.id != selected_person.owner.id %}
                 <a href="/poll/person/other/{{ selected_person.id }}/">{{ selected_person.person_name }}</a>
+                {% endif %}
             </li>
         {% endfor %}
      </ul>

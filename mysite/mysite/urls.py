@@ -15,7 +15,7 @@ Including another URLconf
 """
 
 # from django.conf.urls import url
-
+from django.template.defaulttags import url
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
@@ -23,25 +23,28 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.conf import settings
 
-
 admin.autodiscover()
 
 urlpatterns = [
 
-    path('admin/', admin.site.urls),
-    path('', include('poll.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
-    # path('poll/', include('django.contrib.auth.urls')),
-    # path('poll/', include('allauth.urls')),
-    path('accounts/', include('allauth.urls')),
+                  path('admin/', admin.site.urls),
+                  path('', include('poll.urls')),
+                  path('accounts/', include('django.contrib.auth.urls')),
+                  # url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+                  # path('poll/', include('django.contrib.auth.urls')),
+                  # path('poll/', include('allauth.urls')),
+                  path('accounts/', include('allauth.urls')),
 
-    path('password_reset/done/',
-         auth_views.PasswordResetDoneView.as_view(template_name='poll/password/password_reset_done.html'),
-         name='password_reset_done'),
-    path('reset/<uidb64>/<token>/',
-         auth_views.PasswordResetConfirmView.as_view(template_name="poll/password/password_reset_confirm.html"),
-         name='password_reset_confirm'),
-    path('reset/done/',
-         auth_views.PasswordResetCompleteView.as_view(template_name='poll/password/password_reset_complete.html'),
-         name='password_reset_complete'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+                  path('password_reset/done/',
+                       auth_views.PasswordResetDoneView.as_view(template_name='poll/password/password_reset_done.html'),
+                       name='password_reset_done'),
+                  path('reset/<uidb64>/<token>/',
+                       auth_views.PasswordResetConfirmView.as_view(
+                           template_name="poll/password/password_reset_confirm.html"),
+                       name='password_reset_confirm'),
+                  path('reset/done/',
+                       auth_views.PasswordResetCompleteView.as_view(
+                           template_name='poll/password/password_reset_complete.html'),
+                       name='password_reset_complete'),
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
+                                                                                           document_root=settings.MEDIA_ROOT)

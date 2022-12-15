@@ -1,82 +1,79 @@
 {% extends "poll/header.html" %}
 
 {% block content %}
-<h1>Персонаж: {{ person_detail.person_name }}</h1>
+<h2>{{ person_detail.person_name }}</h2>
 <div style="margin-left:20px;margin-top:20px">
 
-    <table class="editorDemoTable">
+    <table class="editorDemoTable" width="350" border="3">
         <tbody>
         <tr>
-            <td><strong> Владелец: </strong></td>
-            <td><strong><a href="/poll/owner/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></strong></td>
+            <td><h5> Владелец: </h5></td>
+            <td><a href="/poll/owner/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
         </tr>
         <tr>
-            <td><strong>Краткое описание:</strong></td>
+            <td><h5>Краткое описание:</h5></td>
             <td> {{ person_detail.description }}</td>
         </tr>
         <tr>
-            <td><strong>Ссылка:</strong></td>
+            <td><h5>Ссылка:</h5></td>
             <td>{{ person_detail.link }}</td>
         </tr>
         <tr>
-            <td><strong>Биография:</strong></td>
+            <td><h5>Биография:</h5></td>
             <td> {{ person_detail.biography }}</td>
         </tr>
         <tr>
-            <td><strong>Характер:</strong></td>
+            <td><h5>Характер:</h5></td>
             <td> {{ person_detail.character }}</td>
         </tr>
         <tr>
-            <td><strong>Интересы:</strong></td>
+            <td><h5>Интересы:</h5></td>
             <td> {{ person_detail.interests }}</td>
         </tr>
         <tr>
-            <td><strong>Фобии:</strong></td>
+            <td><h5>Фобии:</h5></td>
             <td> {{ person_detail.phobias }}</td>
         </tr>
         <tr>
-            <td><strong>Раса:</strong></td>
+            <td><h5>Раса:</h5></td>
             <td>{{ person_detail.race }}</td>
         </tr>
         <tr>
-            <td><strong>Слабости и особенности:</strong></td>
+            <td><h5>Слабости и особенности:</h5></td>
             <td>{{ person_detail.race }}</td>
         </tr>
         <tr>
-            <td><strong>Основная характеристика:</strong></td>
+            <td><h5>Основная характеристика:</h5></td>
             <td>{{ main_points }}</td>
         </tr>
         <tr>
-            <td><strong>Основное умение:</strong></td>
+            <td><h5>Основное умение:</h5></td>
             <td>{{ main_permission }}</td>
         </tr>
         <tr>
-            <td><strong>Мeсто возрождения:</strong></td>
+            <td><h5>Мeсто возрождения:</h5></td>
             <td>{{ person_detail.location_birth }}</td>
         </tr>
         <tr>
-            <td><strong>Дата рождения:</strong></td>
+            <td><h5>Дата рождения:</h5></td>
             <td>{{ person_detail.birth_date }}</td>
         </tr>
         <tr>
-            <td><strong>Мeсто смерти:</strong></td>
+            <td><h5>Мeсто смерти:</h5></td>
             <td>{{ person_detail.location_death }}</td>
         </tr>
         <tr>
-            <td><strong>Дата смерти:</strong></td>
+            <td><h5>Дата смерти:</h5></td>
             <td>{{ person_detail.death_date }}</td>
         </tr>
         <tr>
-            <td><strong>Текущий статус:</strong></td>
+            <td><h5>Текущий статус:</h5></td>
             <td>{{ status_ }}</td>
         </tr>
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Текущие кондиции: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+
+        <tr>
+            <td colspan="2"><h5>Текущие кондиции: </h5></td>
+        </tr>
         <tr>
             <td>Здоровье:</td>
             <td>{{ health }}</td>
@@ -106,40 +103,31 @@
             <td>{{ load_capacity }}</td>
         </tr>
         <tr>
-            <td>Среднее сопротивление к физическому урону:</td>
+            <td>Устойчивость к физ. урону:</td>
             <td>{{ avg_physic_resistance }}</td>
         </tr>
         <tr>
-            <td>Среднее сопротивление к магическому урону:</td>
+            <td>Устойчивость к маг. урону:</td>
             <td>{{ avg_magic_resistance }}</td>
         </tr>
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <table class="editorDemoTable">
-        <tbody>
         <tr>
-            <td><strong>Членство в группе:</strong></td>
+            <td><h5>Членство в группе:</h5></td>
             <td>{{ group_status }}</td>
         </tr>
         {% if group_status != 'в группе' %}
         <tr>
             {% if person_detail.created_by.username == user.username %}
-            <td>
-
+            <td colspan="2">
                 <p><a href="{% url 'poll:group-add' person_detail.id %}"> + Организовать группу? </a></p>
                 <p><a href="{% url 'poll:membership-update' person_detail.id %}"> + Вступить в группу? </a></p>
-
             </td>
-            <td></td>
             {% endif %}
             {% else %}
-            <td><strong> Организатор группы : </strong></td>
+            <td><h6> Организатор группы : </h6></td>
             <td><a href="/poll/person/{{inviter_person.id }}/"> {{inviter_person.person_name}}</a></td>
         </tr>
         <tr>
-            <td><strong>Участники группы: </strong></td>
+            <td><h6>Участники группы: </h6></td>
             <td>
                 {% for participant in participants %}
                 <ul>
@@ -158,32 +146,25 @@
                 {% endif %}
             </td>
             <td></td>
-
-
         </tr>
         {% endif %}
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Текущие очки характеристик: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+        <tr>
+            <td colspan="2"><h5>Характеристики: </h5></td>
+        </tr>
+
         {% for key, value in summary_points.items %}
         <tr>
             <td>
-               {{ key}}
+                {{ key}}
             </td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Текущие очки сопротивлений: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+
+        <tr>
+            <td colspan="2"><h5>Устойчивость: </h5></td>
+        </tr>
+
         {% for key, value in summary_resistances.items %}
         <tr>
             <td>
@@ -192,28 +173,21 @@
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Текущие очки навыков: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+        <tr>
+            <td colspan="2"><h5>Навыки: </h5></td>
+        </tr>
+
         {% for key, value in summary_permissions.items %}
         <tr>
             <td>
-              {{ key }}
+                {{ key }}
             </td>
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <h4>Снаряжение: </h4>
-    <table class="editorDemoTable">
-        <tbody>
+        <tr>
+            <td colspan="2"><h5>Снаряжение: </h5></td>
+        </tr>
 
         {% for key, value in summary_equipment.items %}
         <tr>
@@ -221,36 +195,26 @@
             <td>{{ value }}</td>
         </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div style="margin-left:20px;margin-top:20px">
-    <table class="editorDemoTable">
-        <tbody>
         <tr>
-            <td>Нераспределенные очки:</td>
+            <td><h5>Нераспределенные очки: </h5></td>
             <td>{{ unallocated_points}}</td>
         </tr>
 
         <tr>
-            <td>Нераспределенные умения:</td>
+            <td><h5>Нераспределенные умения: </h5></td>
             <td>{{ unallocated_permissions}}</td>
         </tr>
+
+
         </tbody>
     </table>
-
-
 </div>
-
+<hr>
 {% if person_detail.created_by.username == user.username %}
 <p><a href="{% url 'poll:person-update' person_detail.id %}">+ Редактировать Персонаж </a></p>
 <p><a href="{% url 'poll:person-delete' person_detail.pk %}">- Удалить Персонаж</a></p>
 {% endif %}
-<p><a href="{% url 'poll:owners-list' %}"> Список игроков </a></p>
-<p><a href="{% url 'poll:persons-list' %}"> Список персонажей </a></p>
-<p><a href="{% url 'poll:races-list' %}"> Список рас </a></p>
-<p><a href="{% url 'poll:groups-list' %}"> Список групп </a></p>
-<p><a href="{% url 'poll:actions-list' %}"> Список Действий </a></p>
+
 {% endblock %}
 
 

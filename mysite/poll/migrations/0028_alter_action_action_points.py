@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name="action",
-            name="action_points",
+            name="points",
             field=models.JSONField(
                 default={
                     "AP": 0,
