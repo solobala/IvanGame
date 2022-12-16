@@ -4,7 +4,7 @@
     <h1>Добавление  персонажей в группу</h1>
 <form method="post">
     {% csrf_token %}
-
+ {{ form.media }}
    {{ form.as_p }}
     <input type="submit" value="Save">
 </form>

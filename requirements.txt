@@ -6,3 +6,4 @@ djangorestframework
 django-js-asset
 django-ckeditor
 Pillow
+django-bootstrap v5

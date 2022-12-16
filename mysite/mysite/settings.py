@@ -196,10 +196,10 @@ BOOTSTRAP5 = {
     'javascript_in_head': False,
 
     # Label class to use in horizontal forms
-    'horizontal_label_class': 'col-md-3',
+    'horizontal_label_class': 'col-md-4',
 
     # Field class to use in horizontal forms
-    'horizontal_field_class': 'col-md-9',
+    'horizontal_field_class': 'col-md-6',
 
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': True,
@@ -239,11 +239,29 @@ CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_RESTRICT_BY_USER = True
-CKEDITOR_BROWSE_SHOW_DIRS  = True
+CKEDITOR_BROWSE_SHOW_DIRS = True
 CKEDITOR_CONFIGS = {
-    'default': {
+
+    'custom1': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ],
+        'height': 200,
+        'width': 360,
+    },
+    'custom': {
         'toolbar': 'default',
         'height': 200,
-        'width': 300,
-    }
+        'width': 360,
+    },
+    'default': {
+
+        'height': 100,
+        'width': 360,
+    },
 }
+

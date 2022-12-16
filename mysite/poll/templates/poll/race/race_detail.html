@@ -2,6 +2,7 @@
 {% block content %}
 
 <div style="margin-left:20px;margin-top:20px">
+    <p><h4>Изображение: </h4> <img src="{{ object.race_img.url }}">
     <p> {{ race_detail.race_description|safe }}</p>
     <p><h4>Продолжительность жизни: </h4> {{ race_detail.lifetime }}
     <table class="editorDemoTable" width="350" border="1">

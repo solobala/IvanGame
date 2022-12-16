@@ -170,10 +170,10 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
         # we need to overwrite get_context_data
         # to make sure that our formset is rendered
         data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            data["persons"] = PersonFormset(self.request.POST)
-        else:
-            data["persons"] = PersonFormset()
+        # if self.request.POST:
+        #     data["persons"] = PersonFormset(self.request.POST)
+        # else:
+        #     data["persons"] = PersonFormset()
         return data
 
     def form_valid(self, form):
@@ -574,7 +574,7 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                 participants.append(member.person)
             context['inviter_person'] = members[0].inviter
             context['participants'] = participants
-
+        # Берем информацию из PersonBar
         info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
 
         points = dict()

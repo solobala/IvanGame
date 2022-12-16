@@ -26,16 +26,15 @@ class Owner(models.Model):
             self.Status.BUSY,
         }
 
-    owner_name = models.CharField(max_length=45, blank=True, null=True)
-    owner_description = RichTextField(max_length=200, blank=True, null=True)
-    link = models.CharField(max_length=9, blank=True, null=True)
+    owner_name = models.CharField('Игрок', max_length=45, blank=True, null=True)
+    owner_description = RichTextField('Описание', max_length=200, blank=True, null=True)
+    link = models.CharField('Ссылка', max_length=9, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     owner_status = models.CharField(
         max_length=1,
         choices=Status.choices,
         default=Status.WITHOUT,)
-    owner_img = models.ImageField(default='media/python.png')
-
+    owner_img = models.ImageField('Изображениеэ', upload_to='media/euploads')
 
     def __str__(self):
         # return self
@@ -144,17 +143,17 @@ class Race(models.Model):
             self.other
         }
 
-    race_name = models.CharField(max_length=20, choices=Races.choices, default=Races.HUMAN)
-    race_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    race_img = models.ImageField(default='media/python.png')
-    lifetime = models.IntegerField(verbose_name='Продолжительность жизни', default=100)
-    start_points = models.JSONField(verbose_name='Стартовые очки характеристик')
-    finish_points = models.JSONField(verbose_name='Предельные очки характеристик')
-    start_resistances = models.JSONField(verbose_name='Стартовые очки сопротивлений')
-    start_permissions = models.JSONField(verbose_name='Стартовые очки навыков')
-    equipment = models.JSONField(verbose_name='Снаряжение')
-    fov = models.IntegerField(verbose_name='Область обзора', default=0)
-    rov = models.IntegerField(verbose_name='Дальность обзора', default=0)
+    race_name = models.CharField('Раса', max_length=20, choices=Races.choices, default=Races.HUMAN)
+    race_description = RichTextField('Описание',  blank=True, null=True)
+    race_img = models.ImageField('Изображение', default='media/python.png')
+    lifetime = models.IntegerField('Продолжительность жизни',  default=100)
+    start_points = models.JSONField('Стартовые характеристики')
+    finish_points = models.JSONField('Максимальные характеристики')
+    start_resistances = models.JSONField('Устойчивость')
+    start_permissions = models.JSONField('Навыки')
+    equipment = models.JSONField('Снаряжение')
+    fov = models.IntegerField('Область обзора',  default=0)
+    rov = models.IntegerField('Дальность обзора',  default=0)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -244,7 +243,7 @@ class Person(models.Model):
         }
 
     person_name = models.CharField(max_length=45, blank=True, null=True)
-    person_img = models.ImageField(default='media/python.png')
+    person_img = models.ImageField(default='media/euploads/python.png')
     owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True)
     link = models.CharField(max_length=30, blank=True, null=True)
     biography = RichTextField(blank=True, null=True)
@@ -269,10 +268,6 @@ class Person(models.Model):
         #  return reverse('poll:person_detail', args=[str(self.id)])
         return reverse('poll:person-detail', kwargs={'pk': self.pk})
 
-    @property
-    def full_name(self):
-        """Возвращает имя Персонажа"""
-        return "%s" % self.person_name
 
     class Meta:
         managed = True
@@ -285,9 +280,31 @@ class Person(models.Model):
         # app_label = 'poll'
 
 
+class Zone(models.Model):
+    zone_name = models.CharField(max_length=128, blank=True, null=True)
+    zone_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'zone'
+        verbose_name = "zone"
+        verbose_name_plural = "Zones"
+        ordering = ['zone_name']
+
+    def __str__(self):
+        return "%s" % self.zone_name
+
+    def get_absolute_url(self):
+        return reverse('poll:zone-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
 class Location(models.Model):
     location_name = models.CharField(max_length=128, blank=True, null=True)
-    location_description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    location_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    zone = models.ForeignKey(Zone, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -301,6 +318,54 @@ class Location(models.Model):
 
     def get_absolute_url(self):
         return reverse('poll:location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class Region(models.Model):
+    region_name = models.CharField(max_length=128, blank=True, null=True)
+    region_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    x = models.IntegerField(blank=True, null=True)
+    y = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'region'
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
+        ordering = ['region_name']
+
+    def __str__(self):
+        return "%s" % self.region_name
+
+    def get_absolute_url(self):
+        return reverse('poll:region-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class District(models.Model):
+    district_name = models.CharField(max_length=30, blank=True, null=True)
+    district_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    x = models.IntegerField(blank=True, null=True)
+    y = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'district'
+        verbose_name = "District"
+        verbose_name_plural = "Districts"
+        ordering = ['district_name']
+
+    def __str__(self):
+        return "%s" % self.distrtict_name
+
+    def get_absolute_url(self):
+        return reverse('poll:district-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -642,6 +707,7 @@ class PersonBar(models.Model):
     summary_permissions = models.JSONField(verbose_name='Суммарные очки умений', blank=True, null=True)
     summary_resistances = models.JSONField(verbose_name='Суммарные очки сопротивлений', blank=True, null=True)
     summary_equipment = models.JSONField(verbose_name='Суммарные слоты экипировки', blank=True, null=True)
+
     unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
     unallocated_permissions = models.IntegerField(verbose_name='Нераспределенные очки умений', default=0)
 
@@ -661,8 +727,8 @@ class PersonBar(models.Model):
 
 class Action(Info):
 
-    action_name = models.CharField(max_length=128, blank=True, null=True)
-    action_alias = models.CharField(max_length=128, blank=True, null=True)
+    action_name = models.CharField(verbose_name='Название',max_length=100, blank=True, null=True)
+    action_alias = models.CharField(verbose_name='Алиас', max_length=100, blank=True, null=True)
     action_description = RichTextField(verbose_name='Описание', blank=True, null=True)
     agg_points = None
 

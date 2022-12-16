@@ -1,10 +1,12 @@
 <!-- templates/person/person_update.html -->
 {% extends "poll/header.html"  %}
 {% block content %}
+  {% load bootstrap5 %}
     <h1>Изменение данных группы</h1>
 <form method="post">
     {% csrf_token %}
-    {{form}}
+
+     {{ form.media }}
 <!--    {{ form.as_p }}-->
     <input type="submit" value="Save">
 </form>

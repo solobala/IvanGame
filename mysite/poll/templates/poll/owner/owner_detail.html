@@ -7,9 +7,9 @@
    <table class="editorDemoTable" width="350" border="1">
       <tbody>
       <tr>
-          <td rowspan="4">{{owner_detail.owner_img}}</td>
-
-           <td rowspan="4">{{ owner_detail.link }}
+          <td rowspan="4"><img src="{{ object.owner_img.url }}"></td>
+          <td rowspan="4">{{ owner_detail.person_set.all|first}}</td>
+           <td >{{ owner_detail.link }}
            <p>{{owner_status_}}</p>
             <p> {{owner_detail.created_by.user.date_joined|date:"SHORT_DATE_FORMAT"}}</p>
                <p> {{owner_detail.created_by.user.last_login|date:"SHORT_DATE_FORMAT"}}</p>

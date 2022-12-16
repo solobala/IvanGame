@@ -1,0 +1,62 @@
+<!-- templates/poll/action_update.html -->
+{% extends "poll/header.html"  %}
+{% block content %}
+<h1 xmlns:width="http://www.w3.org/1999/xhtml">Изменение Действия</h1>
+{{ form.non_field_errors }}
+<form method="post">
+    {% csrf_token %}
+    {{ form.media }}
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li> {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    </ul>
+    <div style="margin-left:20px;margin-top:20px">
+        <table class="editorDemoTable" width="450" border="1">
+            <tbody>
+
+                {% for field in form %}
+                {% if field.name == "points" or field.name == "permissions" or field.name == "resistances" or field.name == "equipment"  or field.name == "action_description"%}
+                <tr>
+                    <td colspan="2">{{ field.label_tag }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        {{ field.errors }}
+                        {{ field }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                    <td>
+                        {{ field.errors }}
+                        {{ field }}
+                    </td>
+                    <td>
+                        {% if field.help_text %}
+                        {{ field.help_text }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Save"></td>
+                </tr>
+            </table>
+            </tbody>
+        </table>
+
+    </div>
+
+</form>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:action-delete' action_update.pk %}"> Удалить Действие? </a></p>
+{% endif %}
+{% endblock content %}

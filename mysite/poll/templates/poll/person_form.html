@@ -5,7 +5,9 @@
 <form method="post">
     {% csrf_token %}
   {{ form.media }}
-   {{ form.as_p }}
+  {% bootstrap_form form %}
+  {% buttons %}
     <input type="submit" value="Save">
+   { % endbuttons %}
 </form>
 {% endblock content %}

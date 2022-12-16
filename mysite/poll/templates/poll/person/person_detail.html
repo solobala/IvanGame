@@ -11,6 +11,10 @@
             <td><a href="/poll/owner/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
         </tr>
         <tr>
+            <td><h5>Изображение:</h5></td>
+            <td> <img src="{{ object.person_img.url }}"></td>
+        </tr>
+        <tr>
             <td><h5>Краткое описание:</h5></td>
             <td> {{ person_detail.description }}</td>
         </tr>
