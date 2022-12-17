@@ -1,0 +1,12 @@
+<!-- templates/location/location_delete.html -->
+{% extends "poll/header.html"  %}
+
+{% block content %}
+    <h1>Удаление Локации</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+      <p>Are you sure you want to delete "{{ location_detail.location_name }}"?</p>
+      <input type="submit" value="Confirm" />
+    </form>
+{% endblock content %}

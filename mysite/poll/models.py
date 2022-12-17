@@ -268,7 +268,6 @@ class Person(models.Model):
         #  return reverse('poll:person_detail', args=[str(self.id)])
         return reverse('poll:person-detail', kwargs={'pk': self.pk})
 
-
     class Meta:
         managed = True
         db_table = 'person'
@@ -303,7 +302,7 @@ class Zone(models.Model):
 
 class Location(models.Model):
     location_name = models.CharField(max_length=128, blank=True, null=True)
-    location_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    location_description = RichTextField(verbose_name='Описание', blank=True, null=True)
     zone = models.ForeignKey(Zone, on_delete=models.DO_NOTHING)
 
     class Meta:

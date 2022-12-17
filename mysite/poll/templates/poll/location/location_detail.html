@@ -1,0 +1,25 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ location_detail.location_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+    <p><h4>Название: </h4> {{ location_detail.location_name }}</p>
+    <p><h4>Описание: </h4> {{ location_detail.location_description|safe }}</p>
+    <p><h4>Зона: </h4> {{ location_detail.zone }}</p>
+
+           <table class="editorDemoTable" width="350" border="1">
+            <tbody>
+
+            </tbody>
+        </table>
+ </div>
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:action-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
+<p align="left"><a href="{% url 'poll:action-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

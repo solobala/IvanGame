@@ -4,7 +4,19 @@ from .models import Owner, Person, Group, Membership, Race, Clan, Fraction, Loca
 from .models import FractionFraction,  PersonFraction, PersonLocation
 
 
-admin.site.register(Owner)
+class PersonInline(admin.TabularInline):
+    model = Person
+
+
+class OwnerAdmin(admin.ModelAdmin):
+    inlines = [
+        PersonInline,
+    ]
+    list_display = ("owner_name",)
+
+
+admin.site.register(Owner, OwnerAdmin)
+# admin.site.register(Owner)
 admin.site.register(Person)
 admin.site.register(Group)
 admin.site.register(Membership)
@@ -19,4 +31,3 @@ admin.site.register(PersonLocation)
 admin.site.register(Region)
 admin.site.register(District)
 admin.site.register(Zone)
-

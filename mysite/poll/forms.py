@@ -1,9 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Action, Feature
+from .models import Action, Feature, Owner, Person
 from ckeditor.widgets import CKEditorWidget
 from . import slovar
+from django.forms.models import inlineformset_factory
 
 
 class NewUserForm(UserCreationForm):
@@ -203,7 +204,7 @@ class FeatureUpdateForm(forms.ModelForm):
     class Meta:
         model = Feature
 
-        fields = ['feature_name',  'feature_description']
+        fields = ['feature_name', 'feature_description']
         for key in slovar.dict_points.keys():
             fields.append(key)
         fields.append('points')
@@ -248,3 +249,40 @@ class FeatureUpdateForm(forms.ModelForm):
             equipment[key] = self.cleaned_data[key]
         self.cleaned_data.update({"equipment": equipment})
         return self.cleaned_data
+
+
+class OwnerForm(forms.ModelForm):
+    class Meta:
+        model = Owner
+        fields = '__all__'
+        widgets = {
+            'owner_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'owner_description': forms.Textarea(attrs={'class': 'form-control'}),
+            'link': forms.URLInput(attrs={'class': 'form-control'}),
+            'owner_img': forms.FileInput(attrs={'class': 'form-control'})
+        }
+
+
+class PersonForm(forms.ModelForm):
+    model = Person
+    fields = '__all__'
+    widgets = {
+        'person_name': forms.TextInput(attrs={'class': 'form-control'}),
+        'person_img': forms.FileInput(attrs={'class': 'form-control'}),
+        'link': forms.URLInput(attrs={'class': 'form-control'}),
+        'biography': forms.Textarea(attrs={'class': 'form-control'}),
+        'character': forms.Textarea(attrs={'class': 'form-control'}),
+        'interests': forms.Textarea(attrs={'class': 'form-control'}),
+        'phobias': forms.Textarea(attrs={'class': 'form-control'}),
+        'race': forms.Select(attrs={'class': 'form-control'}),
+        'location_birth': forms.Select(attrs={'class': 'form-control'}),
+        'birth_date': forms.DateInput(attrs={'class': 'form-control'}),
+        'location_death': forms.Select(attrs={'class': 'form-control'}),
+        'death_date': forms.DateInput(attrs={'class': 'form-control'}),
+    }
+
+
+PersonFormSet = inlineformset_factory(
+    Owner, Person, fields=('owner', 'person_name', 'person_img', 'link', 'biography', 'character', 'interests',
+                           'phobias', 'race', 'location_birth', 'birth_date', 'location_death', 'death_date',),
+    form=PersonForm, extra=1, can_delete=True, can_delete_extra=True)
