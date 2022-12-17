@@ -193,7 +193,7 @@ class OwnerTests(TestCase):
         self.assertTemplateUsed(response, 'poll/owner/owner_detail.html')
 
     def test_owner_update_view(self):  # new
-        response = self.client.post(reverse('post_edit', args='0'), {
+        response = self.client.post(reverse('owner-update', args='0'), {
             'owner_name':'Test',
             'owner_description': 'Test_description',
             'link': 'test_link',
@@ -204,6 +204,6 @@ class OwnerTests(TestCase):
 
     def test_owner_delete_view(self):  # new
         response = self.client.get(
-            reverse('post_delete', args='0'))
+            reverse('owner-delete', args='0'))
 
         self.assertEqual(response.status_code, 000)
