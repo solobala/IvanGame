@@ -34,7 +34,7 @@ class Owner(models.Model):
         max_length=1,
         choices=Status.choices,
         default=Status.WITHOUT,)
-    owner_img = models.ImageField('Изображениеэ', upload_to='media/euploads')
+    owner_img = models.ImageField('Изображение', upload_to='media/euploads')
 
     def __str__(self):
         # return self
@@ -242,20 +242,20 @@ class Person(models.Model):
             self.Status.FREEZED
         }
 
-    person_name = models.CharField(max_length=45, blank=True, null=True)
-    person_img = models.ImageField(default='media/euploads/python.png')
+    person_name = models.CharField('Персонаж', max_length=45, blank=True, null=True)
+    person_img = models.ImageField('Изображение', default='media/euploads/python.png')
     owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True)
-    link = models.CharField(max_length=30, blank=True, null=True)
-    biography = RichTextField(blank=True, null=True)
-    character = RichTextField(blank=True, null=True)
-    interests = RichTextField(blank=True, null=True)
-    phobias = RichTextField(blank=True, null=True)
-    race = models.ForeignKey(Race, on_delete=models.CASCADE, null=True)
-    location_birth = models.IntegerField(blank=True, null=True)
-    birth_date = models.DateTimeField(blank=True, null=True)
-    location_death = models.IntegerField(blank=True, null=True)
-    death_date = models.DateTimeField(blank=True, null=True)
-    status = models.IntegerField(choices=Status.choices, default=Status.FREE)
+    link = models.CharField('Ссылка', max_length=30, blank=True, null=True)
+    biography = RichTextField('Биография', blank=True, null=True)
+    character = RichTextField('Характер', blank=True, null=True)
+    interests = RichTextField('Интересы', blank=True, null=True)
+    phobias = RichTextField('Фобии', blank=True, null=True)
+    race = models.ForeignKey(Race, verbose_name='Раса', on_delete=models.CASCADE, null=True)
+    location_birth = models.IntegerField('Место возрождения', blank=True, null=True)
+    birth_date = models.DateTimeField('Дата рождения', blank=True, null=True)
+    location_death = models.IntegerField('Место гибели', blank=True, null=True)
+    death_date = models.DateTimeField('Дата гибели', blank=True, null=True)
+    status = models.IntegerField('Статус', choices=Status.choices, default=Status.FREE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # free = FreePersonManager()
     # busy = BusyPersonManager()
