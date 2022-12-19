@@ -3,7 +3,7 @@
 <div style="width:300px; margin-left:20px;margin-top:20px">
     <h1>Локации и Дистрикты</h1>
    <ul class="list-group">
-    {% for action in actions_list %}
+    {% for location in locations_list %}
         <li class="list-group-item" aria-current="true"><a href="/poll/locations/{{ location.id }}/">{{ location.location_name }}</a></li>
     {% endfor %}
     </ul>

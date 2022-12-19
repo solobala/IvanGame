@@ -186,24 +186,6 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
     def get_success_url(self):
         return reverse("owners-list")
 
-    # def add_owner(owner_name, owner_description, link):
-    #     """
-    #     Добавление нового игрока в список
-    #     :param owner_name:
-    #     :param owner_description:
-    #     :param link:
-    #     :return:
-    #     """
-    #     try:
-    #         Owner.objects.get(owner_name=owner_name)
-    #         response = 'Игрок %s уже существует'
-    #     except ObjectDoesNotExist:
-    #         b = Owner(owner_name=owner_name, owner_description=owner_description, link=link)
-    #         b.save()
-    #         response = 'Игрок %s добавлен'
-    #     finally:
-    #         return HttpResponse(response)
-
 
 class OwnerUpdateView(LoginRequiredMixin,
                       PermissionRequiredMixin, JsonableResponseMixin, UpdateView):
@@ -367,24 +349,6 @@ class OwnersFreeListView(LoginRequiredMixin, ListView):
     login_url = 'poll:login'
 
 
-# class OwnerPersonListView(ListView):
-#     """
-#     Просмотр  списка персонажей игрока
-#     """
-#     template_name = 'poll/person/persons_by_owner.html'
-#     context_object_name = 'persons_by_owner'
-#
-#     def get_queryset(self):
-#         self.owner = get_object_or_404(Owner, owner_name=self.kwargs['owner'])
-#         return Person.objects.filter(owner=self.owner)
-#
-#     def get_context_data(self, **kwargs):
-#         # Call the base implementation first to get a context
-#         context = super().get_context_data(**kwargs)
-#         # Add in the publisher
-#         context['owner'] = self.owner
-#         return context
-
 class PersonCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Добавление нового персонажа
@@ -456,7 +420,7 @@ class StatusPersonsListView(LoginRequiredMixin, ListView):
     login_url = 'poll:login'
 
     def get_context_object_name(self, object_list):
-        context_object_name = 'persons_list_' + str(self.kwargs['status'])
+        context_object_name = 'status_persons_list_' + str(self.kwargs['status'])
         return context_object_name
 
     def get_queryset(self):
@@ -1280,7 +1244,7 @@ class FeaturesListView(LoginRequiredMixin, ListView):
     """
     template_name = 'poll/feature/features_list.html'
     context_object_name = 'features_list'
-    model = Feature
+    queryset = Feature.objects.all()
     login_url = 'poll:login'
 
 
@@ -1317,11 +1281,11 @@ class FeatureUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
             if f.is_valid():
                 f.save()
                 messages.add_message(request, messages.INFO, 'Feature updated.')
-                return redirect(reverse('action_update', args=[feature.id]))
+                return redirect(reverse('feature_update', args=[feature.id]))
             # if request is GET the show unbound form to the user, along with data
         else:
-            f = ActionUpdateForm(instance=feature)
-        return render(request, 'poll/action_update.html', {'form': f, 'action': feature})
+            f = FeatureUpdateForm(instance=feature)
+        return render(request, 'poll/feature_update.html', {'form': f, 'feature': feature})
 
     def form_valid(self, form):
         """

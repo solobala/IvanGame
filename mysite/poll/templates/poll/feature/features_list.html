@@ -3,7 +3,7 @@
  <div style="width:300px; margin-left:20px;margin-top:20px">
     <h1>Свойства</h1>
    <ul class="list-group">
-    {% for action in actions_list %}
+    {% for feature in features_list %}
         <li class="list-group-item" aria-current="true"><a href="/poll/features/{{ feature.id }}/">{{ feature.feature_name }}</a></li>
     {% endfor %}
     </ul>
