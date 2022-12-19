@@ -2,10 +2,11 @@ from django.test import Client, TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import SimpleTestCase
-from mysite.poll.models import Owner, Person
-from mysite.poll.forms import NewUserForm
+
+from ..models import Owner, Person
+from ..forms import NewUserForm
 from django.urls import reverse, resolve
-from mysite.poll.views import index
+from ..views import index
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.mysite.settings")
 
@@ -30,12 +31,12 @@ class CustomUserTests(TestCase):
     def test_create_superuser(self):
         User = get_user_model()
         admin_user = User.objects.create_superuser(
-            username='gameadmin',
-            email='superadmin@email.com',
-            password='testpass123'
+            username='superadmin',
+            email='solobala@yandex.ru',
+            password='2305623056'
         )
         self.assertEqual(admin_user.username, 'superadmin')
-        self.assertEqual(admin_user.email, 'superadmin@email.com')
+        self.assertEqual(admin_user.email, 'solobala@yandex.ru')
         self.assertTrue(admin_user.is_active)
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)

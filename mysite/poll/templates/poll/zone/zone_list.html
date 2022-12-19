@@ -1,14 +1,14 @@
 {% extends "poll/header.html" %}
 {% block content %}
  <div style="width:300px; margin-left:20px;margin-top:20px">
-    <h1>Действия</h1>
+    <h1>Зоны</h1>
    <ul class="list-group">
     {% for action in actions_list %}
-        <li class="list-group-item" aria-current="true"><a href="/poll/actions/{{ action.id }}/">{{ action.action_alias }}</a></li>
+        <li class="list-group-item" aria-current="true"><a href="/poll/zones/{{ zone.id }}/">{{ zone.zone_name }}</a></li>
     {% endfor %}
     </ul>
 {% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:action-add' %}">+ Добавить Действие?</a></p>
+<p><a href="{% url 'poll:zone-add' %}">+ Добавить Зону?</a></p>
 {% endif %}
  </div>
 {% endblock %}

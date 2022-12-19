@@ -1,12 +1,12 @@
-<!-- templates/action/action_delete.html -->
+<!-- templates/zone/zone_delete.html -->
 {% extends "poll/header.html"  %}
 
 {% block content %}
-    <h1>Удаление действия</h1>
+    <h1>Удаление Зоны</h1>
     <form action="" method="post">
         {% csrf_token %}
         {{form}}
-      <p>Are you sure you want to delete "{{ action_update.action_name }}"?</p>
+      <p>Are you sure you want to delete "{{ zone_detail.zone_name }}"?</p>
       <input type="submit" value="Confirm" />
     </form>
 {% endblock content %}

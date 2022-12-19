@@ -5,7 +5,7 @@
     <h1>Свободные Персонажи</h1>
        <ul>
         {% for person in persons_list_1 %}
-            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
         {% endfor %}
         </ul>
 
@@ -13,7 +13,7 @@
     <h1>Занятые Персонажи</h1>
        <ul>
         {% for person in persons_list_2 %}
-            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
         {% endfor %}
         </ul>
 
@@ -21,7 +21,7 @@
     <h1>Заморозка</h1>
        <ul>
         {% for person in persons_list_0 %}
-            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
         {% endfor %}
         </ul>
 
@@ -30,7 +30,7 @@
 
          <ul>
         {% for person in persons_list %}
-            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
         {% endfor %}
         </ul>
 <p><a href="{% url 'poll:person-add' %}">+ Добавить Персонаж?</a></p>

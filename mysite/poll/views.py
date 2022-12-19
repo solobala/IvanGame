@@ -14,21 +14,15 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
-from .models import Owner, Person, Group, Membership, Race, PersonBar, Action, Location, Feature
+from .models import Owner, Person, Group, Membership, Race, PersonBar, Action, Location, Feature, Fraction, Zone, Region
 from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
+from .serializers import FractionSerializer, LocationSerializer, ZoneSerializer, ActionSerializer, RegionSerializer
+from .serializers import FeatureSerializer
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import NewUserForm, ActionUpdateForm, FeatureUpdateForm, OwnerForm
 from django.http import JsonResponse
-
 from django.urls import reverse
-
-# from django.forms import ModelForm
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework import status
-# from django.http import Http404
-# from rest_framework import mixins
 from rest_framework import generics
 from . import slovar
 from .forms import PersonFormSet
@@ -161,7 +155,7 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
     model = Owner
     fields = ['owner_name', 'owner_description', 'link']
     login_url = 'poll:login'
-    permission_required = 'poll.special_status'  # new
+    permission_required = 'poll.can_edit_owners'  # new
 
     def get_context_data(self, **kwargs):
         # we need to overwrite get_context_data
@@ -221,51 +215,9 @@ class OwnerUpdateView(LoginRequiredMixin,
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
-    permission_required = 'poll.special_status'  # new
+    permission_required = 'poll.can_edit_owners'  # new
 
-    # def get_context_data(self, **kwargs):
-    #     # we need to overwrite get_context_data
-    #     # to make sure that our formset is rendered.
-    #     # the difference with CreateView is that
-    #     # on this view we pass instance argument
-    #     # to the formset because we already have
-    #     # the instance created
-    #     data = super().get_context_data(**kwargs)
-    #     if self.request.POST:
-    #         data["persons"] = PersonFormset(self.request.POST, instance=self.object)
-    #     else:
-    #         data["persons"] = PersonFormset(instance=self.object)
-    #     return data
 
-    # def manage_books(request, owner_id):
-    #     owner = Owner.objects.get(pk=owner_id)
-    #     PersonInlineFormSet = inlineformset_factory(Owner, Person, fields=('person_name',))
-    #     if request.method == "POST":
-    #         formset = PersonInlineFormSet(request.POST, request.FILES, instance=owner)
-    #         if formset.is_valid():
-    #             formset.save()
-    #             # Do something. Should generally end with a redirect. For example:
-    #             return HttpResponseRedirect(owner.get_absolute_url())
-    #     else:
-    #         formset = PersonInlineFormSet(instance=owner)
-    #     return render(request, 'manage_books.html', {'formset': formset})
-
-    # def form_valid(self, form):
-    #     context = self.get_context_data()
-    #     persons = context["persons"]
-    #     self.object = form.save()
-    #     if persons.is_valid():
-    #         persons.instance = self.object
-    #         persons.save()
-    #     form.instance.updated_by = self.request.user
-    #     return super().form_valid(form)
-
-    # def get_success_url(self):
-    #     # return reverse("poll:owners-list")
-    #     # return reverse("poll:owner-detail")
-    #     return reverse_lazy(
-    #         "poll:owner-detail", kwargs={"pk": self.object.pk}
-    #      )
     def form_valid(self, form):
         """
         Сведения о том, кем был изменен игрок
@@ -305,7 +257,7 @@ class OwnerDetailView(LoginRequiredMixin,
     # model = Owner
     queryset = Owner.objects.all()
     login_url = 'poll:login'
-    permission_required = 'poll.special_status'  # new
+    permission_required = 'poll.can_edit_owners'  # new
 
     # def get_queryset( self):
     #     """
@@ -327,7 +279,7 @@ class OwnerDetailView(LoginRequiredMixin,
     def get_success_url(self):
         # return reverse("owners-list")
         return reverse_lazy(
-            "/poll/owner/owner-detail",
+            "/poll/owners/owner-detail",
             kwargs={"pk": self.object.pk}
         )
 
@@ -399,7 +351,7 @@ class OwnerCreate(OwnerInline, CreateView):
             person = Person.objects.get(id=pk)
         except Person.DoesNotExist:
             messages.success(request, 'Object Does not Exist')
-            return redirect('owner: update_owner', pk=person.owner.id)
+            return redirect('owner: update_owner', pk=person.owner.id) #  Уточнить update_owner или owner-update
         person.delete()
         messages.success(request, 'Персонаж успешно удален')
         return redirect('poll: owner-update', pk=person.owner.id)
@@ -1497,26 +1449,56 @@ class FeatureCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
 #  REST API
 
 
-class OwnerViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    model = Owner
+class OwnerViewSet(viewsets.ModelViewSet):
+    queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
 
 
-class PersonViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    model = Person
+class PersonViewSet(viewsets.ModelViewSet):
+    queryset = Person.objects.all()
     serializer_class = PersonSerializer
 
 
-class GroupViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    model = Group
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
-class MembershipViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    model = Membership
+class MembershipViewSet(viewsets.ModelViewSet):
+    queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
 
 
-class RaceViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
-    model = Race
+class RaceViewSet(viewsets.ModelViewSet):
+    queryset = Race.objects.all()
     serializer_class = RaceSerializer
+
+
+class FractionViewSet(viewsets.ModelViewSet):
+    queryset = Fraction.objects.all()
+    serializer_class = FractionSerializer
+
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
+
+class ZoneViewSet(viewsets.ModelViewSet):
+    queryset = Zone.objects.all()
+    serializer_class = ZoneSerializer
+
+
+class ActionViewSet(viewsets.ModelViewSet):
+    queryset = Action.objects.all()
+    serializer_class = ActionSerializer
+
+
+class RegionViewSet(viewsets.ModelViewSet):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+
+
+class FeatureViewSet(viewsets.ModelViewSet):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer

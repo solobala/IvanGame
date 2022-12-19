@@ -7,33 +7,32 @@
 
 <form method="post"  class="form-horizontal" >
     {% csrf_token %}
-     {% if messages %}
+    {% if messages %}
     <ul class="messages">
         {% for message in messages %}
         <li> {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
-  {% bootstrap_form_errors form type='non_fields' %}
 
+  {% bootstrap_form_errors form type='non_fields' %}
     {% for field in form %}
          {{ field.errors }}
-    {% if field.name == "action_description" %}
-     {% bootstrap_field field exclude="action_description" %}
-{% load static %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-{{ field.label_tag }}
-    {{field|safe}}
-    {% else %}
-         {%  if field.name  in "points permissions resistances equipment" %}
-        {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-3' %}
-        {% elif field.name in "action_name action_alias action_description" %}
-         {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-3' %}
+        {% if field.name == "action_description" %}
+            {% bootstrap_field field exclude="action_description" %}
+            {% load static %}
+            <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+            <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+            {{ field.label_tag }}  {{field|safe}}
         {% else %}
-         {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-6' %}
-    {% endif %}
-    {% endif %}
+                {% if field.name  in "points permissions resistances equipment" %}
+            {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-3' %}
+                {% elif field.name in "action_name action_alias action_description" %}
+             {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-3' %}
+                {% else %}
+             {% bootstrap_field field layout='horizontal' horizontal_label_class='col-sm-6' %}
+                {% endif %}
+        {% endif %}
     {%  endfor %}
 
 

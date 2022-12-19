@@ -1,7 +1,7 @@
-<!-- templates/location/location_update.html -->
+<!-- templates/feature/feature_update.html -->
 {% extends "poll/header.html" %}
 {% block content %}
-    <h1>Изменение Локации</h1>
+    <h1>Изменение Свойства</h1>
  <div style="width:350px; margin-left:20px;margin-top:20px">
 <form method="post">
     {% csrf_token %}
@@ -11,7 +11,7 @@
     <input type="submit" value="Save">
 </form>
 {% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:location-delete' location_update.pk %}"> Удалить Локацию? </a></p>
+<p><a href="{% url 'poll:feature-delete' feature_update.pk %}"> Удалить Свойство? </a></p>
 {% endif %}
       </div>
 {% endblock content %}

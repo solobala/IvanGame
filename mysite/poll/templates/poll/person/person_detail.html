@@ -8,7 +8,7 @@
         <tbody>
         <tr>
             <td><h5> Владелец: </h5></td>
-            <td><a href="/poll/owner/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
+            <td><a href="/poll/owners/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
         </tr>
         <tr>
             <td><h5>Изображение:</h5></td>
@@ -128,14 +128,14 @@
             {% endif %}
             {% else %}
             <td><h6> Организатор группы : </h6></td>
-            <td><a href="/poll/person/{{inviter_person.id }}/"> {{inviter_person.person_name}}</a></td>
+            <td><a href="/poll/persons/{{inviter_person.id }}/"> {{inviter_person.person_name}}</a></td>
         </tr>
         <tr>
             <td><h6>Участники группы: </h6></td>
             <td>
                 {% for participant in participants %}
                 <ul>
-                    <li><a href="/poll/person/{{ participant.id }}/"> {{ participant.person_name }}</a></li>
+                    <li><a href="/poll/persons/{{ participant.id }}/"> {{ participant.person_name }}</a></li>
                 </ul>
                 {% endfor %}
             </td>

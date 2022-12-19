@@ -18,7 +18,7 @@ Including another URLconf
 from django.template.defaulttags import url
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-
+from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.conf import settings
@@ -26,7 +26,6 @@ from django.conf import settings
 admin.autodiscover()
 
 urlpatterns = [
-
                   path('admin/', admin.site.urls),
                   path('', include('poll.urls')),
                   path('accounts/', include('django.contrib.auth.urls')),

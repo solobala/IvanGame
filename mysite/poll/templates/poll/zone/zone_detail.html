@@ -1,0 +1,19 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ zone_detail.zone_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+  <p><h4>Название: </h4> {{ zone_detail.feature_name }}</p>
+  <p><h4>Описание: </h4> {{ zone_detail.feature_description|safe }}</p>
+  </div>
+
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:zone-update' zone_detail.pk %}">+ Изменить Зону</a></p>
+<p align="left"><a href="{% url 'poll:zone-delete' zone_detail.pk %}">- Удалить Зону</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

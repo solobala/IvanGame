@@ -200,8 +200,8 @@
 <hr>
 {% if user.username == 'gameadmin' %}
 
-<p align="left"> <a href="{% url 'poll:action-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
-<p align="left"><a href="{% url 'poll:action-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+<p align="left"> <a href="{% url 'poll:feature-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
+<p align="left"><a href="{% url 'poll:feature-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
 
 {% endif %}
 

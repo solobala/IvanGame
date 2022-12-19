@@ -70,7 +70,7 @@ class Owner(models.Model):
         verbose_name_plural = "Owners"
         # app_label = 'poll'
         permissions = [
-            ('special_status', 'Can edit all owners'),
+            ('can_edit_owners', 'Can edit all owners'),
         ]
 
 
@@ -244,7 +244,7 @@ class Person(models.Model):
 
     person_name = models.CharField('Персонаж', max_length=45, blank=True, null=True)
     person_img = models.ImageField('Изображение', default='media/euploads/python.png')
-    owner = models.ForeignKey('Owner', on_delete=models.CASCADE, blank=True, null=True)
+    owner = models.ForeignKey('Owner', verbose_name='Владелец', on_delete=models.CASCADE, blank=True, null=True)
     link = models.CharField('Ссылка', max_length=30, blank=True, null=True)
     biography = RichTextField('Биография', blank=True, null=True)
     character = RichTextField('Характер', blank=True, null=True)
@@ -274,14 +274,14 @@ class Person(models.Model):
         verbose_name = "Person"
         verbose_name_plural = "Persons"
         permissions = [
-            ('special_status', 'Can list all persons'),
+            ('can_list_persons', 'Can list all persons'),
         ]
         # app_label = 'poll'
 
 
 class Zone(models.Model):
-    zone_name = models.CharField(max_length=128, blank=True, null=True)
-    zone_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    zone_name = models.CharField('Название', max_length=128, blank=True, null=True)
+    zone_description = RichTextField(verbose_name='Описание', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -301,9 +301,9 @@ class Zone(models.Model):
 
 
 class Location(models.Model):
-    location_name = models.CharField(max_length=128, blank=True, null=True)
+    location_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     location_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    zone = models.ForeignKey(Zone, on_delete=models.DO_NOTHING)
+    # zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -323,11 +323,19 @@ class Location(models.Model):
 
 
 class Region(models.Model):
-    region_name = models.CharField(max_length=128, blank=True, null=True)
+    region_name = models.CharField('Название', max_length=128, blank=True, null=True)
     region_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    x = models.IntegerField(blank=True, null=True)
-    y = models.IntegerField(blank=True, null=True)
+    coordinates = models.CharField('Координаты', max_length=14, blank=True, null=True)
+    x = models.IntegerField('X', blank=True, null=True)
+    y = models.IntegerField('Y', blank=True, null=True)
+    row = models.IntegerField('row', blank=True, null=True)
+    column = models.IntegerField('column', blank=True, null=True)
+    fraction = models.IntegerField('Фракция', blank=True, null=True)
+    zone = models.IntegerField('Зона', blank=True, null=True)
+    location = models.IntegerField('Локация', blank=True, null=True)
+    # zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.CASCADE)
+    # location = models.ForeignKey(Location, verbose_name='Локация', on_delete=models.CASCADE)
+
 
     class Meta:
         managed = True
@@ -467,7 +475,7 @@ class Clan(models.Model):
 
 
 class Fraction(models.Model):
-    fraction_name = models.CharField(max_length=128, blank=True, null=True)
+    fraction_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     fraction_description = models.TextField(verbose_name='Описание', blank=True, null=True)
 
     class Meta:

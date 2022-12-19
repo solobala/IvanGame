@@ -3,7 +3,7 @@
     <h1>Список участников группы</h1>
         <ul>
         {% for participant in group_list %}
-            <li><a href="/poll/person/{{ person.id }}/">{{ person.person_name }}</a></li>
+            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
         {% endfor %}
         </ul>
 {% endblock %}

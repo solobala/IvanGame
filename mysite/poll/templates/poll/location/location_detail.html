@@ -4,7 +4,7 @@
   <div style="margin-left:20px;margin-top:20px">
     <p><h4>Название: </h4> {{ location_detail.location_name }}</p>
     <p><h4>Описание: </h4> {{ location_detail.location_description|safe }}</p>
-    <p><h4>Зона: </h4> {{ location_detail.zone }}</p>
+    <p><h4>Локация: </h4> {{ location_detail.zone }}</p>
 
            <table class="editorDemoTable" width="350" border="1">
             <tbody>
@@ -15,8 +15,8 @@
 <hr>
 {% if user.username == 'gameadmin' %}
 
-<p align="left"> <a href="{% url 'poll:action-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
-<p align="left"><a href="{% url 'poll:action-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+<p align="left"> <a href="{% url 'poll:location-update' location.pk %}">+ Изменить Локацию</a></p>
+<p align="left"><a href="{% url 'poll:location-delete' location.pk %}">- Удалить Локацию</a></p>
 
 {% endif %}
 

@@ -3,7 +3,7 @@
 {% extends "header.html" %}
 
 {% block content %}
-<form enctype="multipart/form-data" class="container" method="post" id="product_form">
+<form enctype="multipart/form-data" class="container" method="post" id="owner_form">
     {% csrf_token %}
     <!-- main form start --- in our case product form -->
     <div class="card">
@@ -30,16 +30,16 @@
     <!-- main form end --- in our case product form -->
 
 
-     <!-- inline form for Variant start -->
+     <!-- inline form for Persom start -->
 
-    <!-- EXPLAINING with named_formsets.variants as formset -->
+    <!-- EXPLAINING with named_formsets.persons as formset -->
     <!-- Note: named_formsets is used in get_context_data function in views.py -->
-    <!-- Note: here variants is our VariantFormSet name, used in get_named_formsets function in views.py -->
+    <!-- Note: here persons is our PersonFormSet name, used in get_named_formsets function in views.py -->
     {% with named_formsets.persons as formset %}
         {{ formset.management_form }}
         <script type="text/html" id="persons-template">  // id="inlineformsetname-template"
             // id='inlineformsetname-__prefix__'
-            <tr id="variants-__prefix__" class= hide_all>
+            <tr id="persons-__prefix__" class= hide_all>
                 {% for fields in formset.empty_form.hidden_fields %}
                     {{ fields }}
                 {% endfor %}
@@ -55,31 +55,31 @@
             </div>
             <table class="table card-header">
                 <thead class="text-secondary">
-                    <th>person_name <span style="color: red;" class="required">*</span></th>
-                    <th>person_img <span style="color: red;" class="required">*</span></th>
-                    <th>owner <span style="color: red;" class="required">*</span></th>
-                    <th>link <span style="color: red;" class="required">*</span></th>
-                    <th>biography <span style="color: red;" class="required">*</span></th>
-                    <th>character <span style="color: red;" class="required">*</span></th>
-                    <th>interests <span style="color: red;" class="required">*</span></th>
-                    <th>phobias <span style="color: red;" class="required">*</span></th>
-                    <th>race <span style="color: red;" class="required">*</span></th>
-                    <th>location_birth <span style="color: red;" class="required">*</span></th>
-                     <th>birth_date <span style="color: red;" class="required">*</span></th>
-                    <th>location_death <span style="color: red;" class="required">*</span></th>
-                     <th>death_date <span style="color: red;" class="required">*</span></th>
-                     <th>status <span style="color: red;" class="required">*</span></th>
-                    <th>Delete?</th>
-                    <th>Custom Delete btn</th>
+                    <tr>person_name <span style="color: red;" class="required">*</span></tr>
+                    <tr>person_img <span style="color: red;" class="required">*</span></tr>
+                    <tr>owner <span style="color: red;" class="required">*</span></tr>
+                    <tr>link <span style="color: red;" class="required">*</span></tr>
+                    <tr>biography <span style="color: red;" class="required">*</span></tr>
+                    <tr>character <span style="color: red;" class="required">*</span></tr>
+                    <tr>interests <span style="color: red;" class="required">*</span></tr>
+                    <tr>phobias <span style="color: red;" class="required">*</span></tr>
+                    <tr>race <span style="color: red;" class="required">*</span></tr>
+                    <tr>location_birth <span style="color: red;" class="required">*</span></tr>
+                    <tr>birth_date <span style="color: red;" class="required">*</span></tr>
+                    <tr>location_death <span style="color: red;" class="required">*</span></tr>
+                     <tr>death_date <span style="color: red;" class="required">*</span></tr>
+                     <tr>status <span style="color: red;" class="required">*</span></tr>
+                    <tr>Delete?</tr>
+                    <tr>Custom Delete btn</tr>
                 </thead>
-                <tbody id="item-variants">  <!-- id="item-inlineformsetname" -->
+                <tbody id="item-persons">  <!-- id="item-inlineformsetname" -->
                     <!-- formset non forms errors -->
                     {% for error in formset.non_form_errors %}
                         <span style="color: red">{{ error }}</span>
                     {% endfor %}
                     {% for formss in formset %}
                         {{ formss.management_form }}
-                        <tr id="variants-{{ forloop.counter0 }}" class= hide_all>  <!-- id="inlineformsetname-counter" -->
+                        <tr id="persons-{{ forloop.counter0 }}" class= hide_all>  <!-- id="inlineformsetname-counter" -->
                             {{ formss.id }}
                             {% for field in formss.visible_fields %}
                                 <td>
@@ -108,7 +108,7 @@
                                             </button>
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="{% url 'products:delete_variant' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
+                                                <a href="{% url 'products:delete_person' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
@@ -120,7 +120,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <a href="#" id="add-variant-button" class="btn btn-secondary add-variants">Add More</a> <!-- id="add-inlineformsetname-button" -->
+            <a href="#" id="add-person-button" class="btn btn-secondary add-persons">Add More</a> <!-- id="add-inlineformsetname-button" -->
         </div>
 
         {% endwith %}
@@ -134,31 +134,17 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 
 <script>
-    $(document).ready(function() {
-        // when user clicks add more btn of images
-      $('.add-images').click(function(ev) {
-          ev.preventDefault();
-          var count = $('#item-images').children().length;
-          var tmplMarkup = $('#images-template').html();
-          var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-          $('#item-images').append(compiledTmpl);
-
-          // update form count
-          $('#id_images-TOTAL_FORMS').attr('value', count+1);
-      });
-  });
-
   $(document).ready(function() {
     // when user clicks add more btn of variants
-      $('.add-variants').click(function(ev) {
+      $('.add-persons').click(function(ev) {
           ev.preventDefault();
-          var count = $('#item-variants').children().length;
-          var tmplMarkup = $('#variants-template').html();
+          var count = $('#item-persons').children().length;
+          var tmplMarkup = $('#persons-template').html();
           var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-          $('#item-variants').append(compiledTmpl);
+          $('#item-persons').append(compiledTmpl);
 
           // update form count
-          $('#id_variants-TOTAL_FORMS').attr('value', count+1);
+          $('#id_persons-TOTAL_FORMS').attr('value', count+1);
       });
   });
 </script>

@@ -4,7 +4,7 @@
     <h1>Локации и Дистрикты</h1>
    <ul class="list-group">
     {% for action in actions_list %}
-        <li class="list-group-item" aria-current="true"><a href="/poll/location/{{ location.id }}/">{{ location.location_name }}</a></li>
+        <li class="list-group-item" aria-current="true"><a href="/poll/locations/{{ location.id }}/">{{ location.location_name }}</a></li>
     {% endfor %}
     </ul>
 {% if user.username == 'gameadmin' %}

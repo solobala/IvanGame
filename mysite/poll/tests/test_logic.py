@@ -1,5 +1,5 @@
 from django.test import TestCase
-from mysite.poll.logic import operations
+from ..logic import operations
 # import os
 # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.mysite.settings")
 

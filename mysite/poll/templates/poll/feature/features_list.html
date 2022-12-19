@@ -4,11 +4,11 @@
     <h1>Свойства</h1>
    <ul class="list-group">
     {% for action in actions_list %}
-        <li class="list-group-item" aria-current="true"><a href="/poll/feature/{{ feature.id }}/">{{ feature.feature_name }}</a></li>
+        <li class="list-group-item" aria-current="true"><a href="/poll/features/{{ feature.id }}/">{{ feature.feature_name }}</a></li>
     {% endfor %}
     </ul>
 {% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:action-add' %}">+ Добавить Свойство?</a></p>
+<p><a href="{% url 'poll:feature-add' %}">+ Добавить Свойство?</a></p>
 {% endif %}
  </div>
 {% endblock %}
