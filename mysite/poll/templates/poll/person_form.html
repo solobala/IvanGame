@@ -1,13 +1,25 @@
 <!-- templates/person/person_form.html -->
 {% extends "poll/header.html" %}
+{% load bootstrap5 %}
 {% block content %}
     <h1>Персонаж</h1>
-<form method="post">
-    {% csrf_token %}
-  {{ form.media }}
   {% bootstrap_form form %}
-  {% buttons %}
-    <input type="submit" value="Save">
-   { % endbuttons %}
+{{ form.non_field_errors }}
+<form  enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+     {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li> {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+  {% bootstrap_form_errors form type='non_fields' %}
+    {% for field in form %}
+         {{ field.errors }}
+  {{ form.media }}
+{%  endfor %}
+   {% buttons submit='OK' reset="Cancel" %}{% endbuttons %}
 </form>
 {% endblock content %}

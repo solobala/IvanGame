@@ -222,6 +222,7 @@ class OwnerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     context_object_name = 'owner_detail'
     queryset = Owner.objects.all()
     login_url = 'poll:login'
+    permission_required = 'poll.can_delete_owners'  # new
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1415,8 +1416,8 @@ class FractionsListView(LoginRequiredMixin, ListView):
     Просмотр полного списка Фракций
     """
     template_name = 'poll/fraction/fractions_list.html'
-    context_object_name = 'lfractions_list'
-    model = Location
+    context_object_name = 'fractions_list'
+    model = Fraction
     login_url = 'poll:login'
 
 
@@ -1442,7 +1443,7 @@ class FractionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование Фракции
     """
-    model = Location
+    model = Fraction
 
     fields = '__all__'
     template_name_suffix = '_update'
@@ -1470,7 +1471,7 @@ class FractionDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['fraction_name'] = context['fraction_detail'].location_name
+        context['fraction_name'] = context['fraction_detail'].fraction_name
         return context
 
 

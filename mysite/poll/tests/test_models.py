@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import SimpleTestCase
 
-from ..models import Owner, Person
+from ..models import Owner, Person, Race
 from ..forms import NewUserForm
 from django.urls import reverse, resolve
 from ..views import index
@@ -55,7 +55,7 @@ class OwnerModelTest(TestCase):
             password='testpass123'
         )
 
-        self.special_permission = Permission.objects.get(codename='special_status')
+        self.special_permission = Permission.objects.get(codename='can_edit_owners')
 
         self.owner = Owner.objects.create(
             owner_name='Test',
@@ -65,30 +65,32 @@ class OwnerModelTest(TestCase):
             owner_img='media/euploads/python.png'
         )
 
-        self.person = Person.objects.create(
-            person_name='Test_Person',
-            person_img='media/euploads/python.png',
-            owner=self.owner,
-            link='Test_person_link',
-            biography='test_biography',
-            character='test_character',
-            interests='test_interests',
-            phobias='test_phobias',
-            race=1,
-            location_birth=1,
-            birth_date='22.10.2022',
-            location_death=1,
-            death_date='22.10.2022',
-            status=1
-        )
+        # self.person = Person.objects.create(
+        #     person_name='Test_Person',
+        #     person_img='media/euploads/python.png',
+        #     owner=self.owner,
+        #     link='Test_person_link',
+        #     biography='test_biography',
+        #     character='test_character',
+        #     interests='test_interests',
+        #     phobias='test_phobias',
+        #     race=Race.objects.get(race_name='Человек').id,
+        #     location_birth=1,
+        #     birth_date='22.10.2022',
+        #     location_death=1,
+        #     death_date='22.10.2022',
+        #     status=1
+        # )
 
     # проверяем, что объект с заданным именем был создан
     def test_create_owner(self):
-        owner = Owner.objects.get(id=1)
-        expected_object_name = f'{owner.text}'
-        self.assertEqual(expected_object_name, 'str(owner)')
+        owner = Owner.objects.get(id=self.owner.id)
+        expected_object_name = f'{owner.owner_name}'
+        self.assertEqual(expected_object_name, 'Test')
 
+    # проверяем, что страница по нужному адресу
     def test_get_absolute_url(self):
-        owner = Owner.objects.get(id=1)
+        owner = Owner.objects.get(id=self.owner.id)
+        expected_url = '/owner/' + str(self.owner.id)+'/'
         # This will also fail if the urlconf is not defined.
-        self.assertEquals(owner.get_absolute_url(), '/poll/owner/1')
+        self.assertEquals(owner.get_absolute_url(), expected_url)

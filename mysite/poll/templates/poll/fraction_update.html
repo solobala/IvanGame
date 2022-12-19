@@ -11,7 +11,7 @@
     <input type="submit" value="Save">
 </form>
 {% if user.username == 'gameadmin' %}
-<p><a href="{% url 'poll:fraction-delete' fraction_update.pk %}"> Удалить Фракцию? </a></p>
+<p><a href="{% url 'poll:fraction-delete'  fraction_update.pk %}"> Удалить Фракцию? </a></p>
 {% endif %}
       </div>
 {% endblock content %}

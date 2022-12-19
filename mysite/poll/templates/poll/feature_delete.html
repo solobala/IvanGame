@@ -6,7 +6,7 @@
     <form action="" method="post">
         {% csrf_token %}
         {{form}}
-      <p>Are you sure you want to delete "{{ feature_detail.feature_name }}"?</p>
+      <p>Are you sure you want to delete "{{ feature_update.feature_name }}"?</p>
       <input type="submit" value="Confirm" />
     </form>
 {% endblock content %}

@@ -2,7 +2,7 @@
 {% extends "poll/header.html" %}
 {% block content %}
     <h1>Изменение данных персонажа</h1>
-<form method="post">
+<form enctype="multipart/form-data" method="post">
     {% csrf_token %}
  {{ form.media }}
     {{ form.as_p }}

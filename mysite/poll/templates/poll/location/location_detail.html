@@ -15,8 +15,8 @@
 <hr>
 {% if user.username == 'gameadmin' %}
 
-<p align="left"> <a href="{% url 'poll:location-update' location.pk %}">+ Изменить Локацию</a></p>
-<p align="left"><a href="{% url 'poll:location-delete' location.pk %}">- Удалить Локацию</a></p>
+<p align="left"> <a href="{% url 'poll:location-update' location_detail.pk %}">+ Изменить Локацию</a></p>
+<p align="left"><a href="{% url 'poll:location-delete' location_detail.pk %}">- Удалить Локацию</a></p>
 
 {% endif %}
 

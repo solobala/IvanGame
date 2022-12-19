@@ -6,7 +6,7 @@ from . import views
 from .views import OwnerCreateView, OwnerDeleteView, OwnersListView, \
     OwnersFreeListView, RaceDetailView, RacesListView, PersonBarDetailView, ActionDetailView, \
     ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView, FeatureCreateView, FeatureUpdateView, \
-    FeatureDeleteView, OwnerCreate
+    FeatureDeleteView, FractionDetailView, FractionUpdateView, FractionDeleteView, FractionsListView, FractionCreateView
 from .views import PersonDetailView, PersonCreateView, PersonUpdateView, PersonDeleteView
 from .views import PersonsListView,  StatusPersonsListView, FeaturesListView, FeatureDetailView
 from .views import MembershipListView, MembershipDeleteView, MembershipUpdateView
@@ -38,13 +38,13 @@ urlpatterns = [
 
     path('poll/', views.index, name='index'),
 
-    # path('poll/group/', views.group, name='group'),
+    # path('poll/groups/', views.group, name='group'),
 
     path('poll/owners/', OwnersListView.as_view(), name='owners-list'),  # список игроков
 
     path('poll/free_owners/', OwnersFreeListView.as_view(), name='free-owners-list'),
     path('poll/owners/add/', OwnerCreateView.as_view(), name='owner-add'),  # new - не работает
-    # path('poll/owner/', OwnerCreate.as_view(), name='create_owner'),  # new - не работает
+
     path("poll/owners/<int:pk>/", views.OwnerDetailView.as_view(), name="owner-detail", ),
     path("poll/owners/<int:pk>/update/", views.OwnerUpdateView.as_view(), name="owner-update", ),
     path('poll/owners/<int:pk>/delete/', OwnerDeleteView.as_view(), name='owner-delete'),  # удаление
