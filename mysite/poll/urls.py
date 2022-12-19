@@ -89,7 +89,11 @@ urlpatterns = [
     path('poll/actions/add/', ActionCreateView.as_view(), name='action-add'),  # new action
     path('poll/actions/', ActionsListView.as_view(), name='actions-list'),  # просмотр списка действий
 
-    #  path('poll/fraction/', FractionsListView.as_view(), name='fractions-list'),  # просмотр списка действий
+    path('poll/fractions/<int:pk>/', FractionDetailView.as_view(), name='fraction-detail'),  # просмотр карточки свойства
+    path('poll/fractions/<int:pk>/update', FractionUpdateView.as_view(), name='fraction-update'),  # обновление свойства
+    path('poll/fractions/<int:pk>/delete', FractionDeleteView.as_view(), name='fraction-delete'),  # удаление свойства
+    path('poll/fractions/add/', FractionCreateView.as_view(), name='fraction-add'),  # new свойства
+    path('poll/fractions/', FractionsListView.as_view(), name='fractions-list'),  # просмотр списка действий
 
     path('poll/features/<int:pk>/', FeatureDetailView.as_view(), name='feature-detail'),  # просмотр карточки свойства
     path('poll/features/<int:pk>/update', FeatureUpdateView.as_view(), name='feature-update'),  # обновление свойства

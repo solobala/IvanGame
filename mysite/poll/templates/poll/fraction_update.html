@@ -1,0 +1,17 @@
+<!-- templates/fraction/fraction_update.html -->
+{% extends "poll/header.html" %}
+{% block content %}
+    <h1>Изменение Фракции</h1>
+ <div style="width:350px; margin-left:20px;margin-top:20px">
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.media }}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:fraction-delete' fraction_update.pk %}"> Удалить Фракцию? </a></p>
+{% endif %}
+      </div>
+{% endblock content %}

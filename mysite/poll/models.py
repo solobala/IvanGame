@@ -113,7 +113,7 @@ class Race(models.Model):
         ATHLANT = '20', 'Атлант',
         GOBLIN = '21', 'Гоблин',
         ORK = '22', 'Орк',
-        OTHER ='23', 'прочие'
+        OTHER = '23', 'прочие'
 
     def is_upperclass(self):
         return self.race_name in {
@@ -303,7 +303,6 @@ class Zone(models.Model):
 class Location(models.Model):
     location_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     location_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    # zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -330,12 +329,11 @@ class Region(models.Model):
     y = models.IntegerField('Y', blank=True, null=True)
     row = models.IntegerField('row', blank=True, null=True)
     column = models.IntegerField('column', blank=True, null=True)
-    fraction = models.IntegerField('Фракция', blank=True, null=True)
-    zone = models.IntegerField('Зона', blank=True, null=True)
+    # fraction = models.IntegerField('Фракция', blank=True, null=True)
+    # zone = models.IntegerField('Зона', blank=True, null=True)
     location = models.IntegerField('Локация', blank=True, null=True)
-    # zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.CASCADE)
-    # location = models.ForeignKey(Location, verbose_name='Локация', on_delete=models.CASCADE)
-
+    zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.CASCADE)
+    fraction = models.ForeignKey('Fraction', verbose_name='Фракция', on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -734,7 +732,7 @@ class PersonBar(models.Model):
 
 class Action(Info):
 
-    action_name = models.CharField(verbose_name='Название',max_length=100, blank=True, null=True)
+    action_name = models.CharField(verbose_name='Название', max_length=100, blank=True, null=True)
     action_alias = models.CharField(verbose_name='Алиас', max_length=100, blank=True, null=True)
     action_description = RichTextField(verbose_name='Описание', blank=True, null=True)
     agg_points = None

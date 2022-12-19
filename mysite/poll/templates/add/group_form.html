@@ -1,0 +1,13 @@
+<!-- templates/person/person_form.html -->
+{% extends "poll/header.html" %}
+{% block content %}
+  {% load bootstrap5 %}
+    <h1>Создание новой группы</h1>
+ <form role="form" method="post">
+        {% csrf_token %}
+        {% bootstrap_form_errors form type='non_fields' %}
+        {% bootstrap_field form.subject layout='horizontal' size='sm' %}
+        {% bootstrap_field form.message placeholder='bonkers' %}
+        {% buttons submit='OK' reset="Cancel" %}{% endbuttons %}
+    </form>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "poll/header.html" %}
+{% block content %}
+ <div style="width:300px; margin-left:20px;margin-top:20px">
+    <h1>Фракции</h1>
+   <ul class="list-group">
+    {% for fraction in fractions_list %}
+        <li class="list-group-item" aria-current="true"><a href="/poll/fractions/{{ fraction.id }}/">{{ fraction.fraction_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:zone-add' %}">+ Добавить Фракцию?</a></p>
+{% endif %}
+ </div>
+{% endblock %}
+
+

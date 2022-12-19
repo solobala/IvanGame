@@ -1,0 +1,19 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ fraction_detail.fraction_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+  <p><h4>Название: </h4> {{ fraction_detail.fraction_name }}</p>
+  <p><h4>Описание: </h4> {{ fraction_detail.fraction_description|safe }}</p>
+  </div>
+
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:fraction-update' fraction_detail.pk %}">+ Изменить Фракцию</a></p>
+<p align="left"><a href="{% url 'poll:fraction-delete' fraction_detail.pk %}">- Удалить Фракцию</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

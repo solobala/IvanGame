@@ -1410,6 +1410,85 @@ class FeatureCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         return super().form_valid(form)
 
 
+class FractionsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Фракций
+    """
+    template_name = 'poll/fraction/fractions_list.html'
+    context_object_name = 'lfractions_list'
+    model = Location
+    login_url = 'poll:login'
+
+
+class FractionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой Локации
+    """
+    model = Fraction
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана Фракции
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class FractionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Фракции
+    """
+    model = Location
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена Фракции
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class FractionDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Фракции
+    """
+    model = Fraction
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:fractions-list')
+    context_object_name = 'fraction_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fraction_name'] = context['fraction_detail'].location_name
+        return context
+
+
+class FractionDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Фракции
+    """
+    template_name = 'poll/fraction/fraction_detail.html'
+    context_object_name = 'fraction_detail'
+    model = Fraction
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
 #  REST API
 
 
