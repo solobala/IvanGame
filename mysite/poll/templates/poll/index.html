@@ -1,13 +1,7 @@
 {% extends "poll/header.html"  %}
 
 {% block content %}
-<h1>Ivan's game</h1>
 
-  <p>Welcome to <em>Ivan's game</em>, best choice for you.</p>
-
-<h2>Вход и регистрация</h2>
-
-  <p>Ivan's game has the following record counts:</p>
   <ul>
       <li><strong><a href="/poll/owners/">Игроки:</a></strong> {{ num_owners }}</li>
       <li><strong><a href="/poll/free_owners/">В т.ч. свободные игроки:</a></strong> {{ num_owners_available }}</li>

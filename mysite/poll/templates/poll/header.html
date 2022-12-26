@@ -116,6 +116,10 @@
                     <a class="nav-link" href="{% url 'poll:features-list' %}">Свойства</a>
                 </li>
                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'poll:fractions-list' %}">Фракции</a>
+                </li>
+
+                 <li class="nav-item">
                     <a class="nav-link"  href="{% url 'poll:persons-list' %}">Персонажи</a>
                 </li>
                <li class="nav-item dropdown">
@@ -126,12 +130,13 @@
               <li><a class="dropdown-item" href="/poll/0/persons/">Заморозка</a></li>
             </ul>
                 </li>
-                 <li>
-        <a href="/poll/zones/" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
-          Зоны
-        </a>
-      </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="{% url 'poll:zones-list' %}">Зоны</a>
+                </li>
+                 </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="{% url 'poll:logout' %}">Выход</a>
+                </li>
 
             </ul>
             <form class="d-flex" role="search">

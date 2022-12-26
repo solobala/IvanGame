@@ -1,0 +1,19 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ region_detail.region_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+
+  <p><h4>Описание: </h4> {{ region_detail.region_description|safe }}</p>
+  </div>
+
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:region-update' region_detail.pk %}">+ Изменить Регион</a></p>
+<p align="left"><a href="{% url 'poll:region-delete' region_detail.pk %}">- Удалить Региону</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

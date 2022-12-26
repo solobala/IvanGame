@@ -3,7 +3,7 @@
  <div style="width:300px; margin-left:20px;margin-top:20px">
     <h1>Зоны</h1>
    <ul class="list-group">
-    {% for action in actions_list %}
+    {% for zone in zones_list %}
         <li class="list-group-item" aria-current="true"><a href="/poll/zones/{{ zone.id }}/">{{ zone.zone_name }}</a></li>
     {% endfor %}
     </ul>

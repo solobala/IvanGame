@@ -42,8 +42,8 @@ class Owner(models.Model):
         return "%s" % self.owner_name
 
     def get_absolute_url(self):
-        # return reverse('poll:owner_detail', args=[str(self.id)])
-        return reverse('poll:owner-detail', kwargs={'pk': self.pk})
+        return f"/owners/{self.pk}/"
+        # return reverse('poll:owner-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         # возвращает объект Owner с добавленным owner_status
@@ -217,8 +217,8 @@ class Race(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        #  return reverse('poll:owner_detail', args=[str(self.id)])
-        return reverse('poll:race-detail', kwargs={'pk': self.pk})
+        return f"/races/{self.pk}/"
+        #return reverse('poll:race-detail', kwargs={'pk': self.pk})
 
     class Meta:
         managed = True
@@ -265,8 +265,8 @@ class Person(models.Model):
         return self.person_name
 
     def get_absolute_url(self):
-        #  return reverse('poll:person_detail', args=[str(self.id)])
-        return reverse('poll:person-detail', kwargs={'pk': self.pk})
+        return f"/persons/{self.pk}/"
+        #  return reverse('poll:person-detail', kwargs={'pk': self.pk})
 
     class Meta:
         managed = True
@@ -323,7 +323,7 @@ class Location(models.Model):
 
 class Region(models.Model):
     region_name = models.CharField('Название', max_length=128, blank=True, null=True)
-    region_description = RichTextUploadingField(verbose_name='Описание', blank=True, null=True)
+    region_description = RichTextField(verbose_name='Описание', blank=True, null=True)
     coordinates = models.CharField('Координаты', max_length=14, blank=True, null=True)
     x = models.IntegerField('X', blank=True, null=True)
     y = models.IntegerField('Y', blank=True, null=True)
@@ -622,12 +622,11 @@ class PersonLocation(models.Model):
     """
     person - персонаж
     location -  локация
-
-    reputation - репутация персонажа в текущей локации
+    reputation - поправка на репутацию персонажа в текущей локации
+    Текущее местонахождение персонажа
     """
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     location = models.ForeignKey('Location', on_delete=models.CASCADE)
-
     reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -730,12 +729,42 @@ class PersonBar(models.Model):
         db_table = 'person_bar'
 
 
-class Action(Info):
+class ActionType(models.Model):
+    """
+    Возможные типы действий
 
+    """
+    action_type_name = models.CharField(verbose_name='Тип действия', max_length=100, blank=True, null=True)
+    action_type_alias = models.CharField(verbose_name='Алиас типа', max_length=100, blank=True, null=True)
+    action_type_description = RichTextField(verbose_name='Описание типа', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'action_type'
+        verbose_name = "ActionType"
+        verbose_name_plural = "ActionTypes"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % (self.action_type_name)
+
+    def get_absolute_url(self):
+        return reverse('poll:action_type-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(ActionType, self).save(*args, **kwargs)
+
+
+class Action(Info):
+    """
+    Перечень Действий с указанием прайсов на них
+    """
     action_name = models.CharField(verbose_name='Название', max_length=100, blank=True, null=True)
     action_alias = models.CharField(verbose_name='Алиас', max_length=100, blank=True, null=True)
     action_description = RichTextField(verbose_name='Описание', blank=True, null=True)
     agg_points = None
+    duration = models.IntegerField(verbose_name="Срок", default=0)
+    action_type = models.ManyToManyField('ActionType', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -745,7 +774,7 @@ class Action(Info):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s, %s" % (self.action_name, self.action_alias)
+        return "%s" % (self.action_name)
 
     def get_absolute_url(self):
         return reverse('poll:action-detail', kwargs={'pk': self.pk})
@@ -774,3 +803,14 @@ class Feature(Info):
 
     def save(self, *args, **kwargs):
         super(Feature, self).save(*args, **kwargs)
+
+
+# class ActionLog(models.Model):
+#     """
+#     Журнал действий персонажей
+#     """
+#     person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
+#     action = models.ForeignKey('Action', on_delete=models.CASCADE, blank=True, null=True)
+#     move_number_begin = models.IntegerField(verbose_name='Номер хода - начало действия Персонажа')
+#     move_number_begin = models.IntegerField(verbose_name='Номер хода - конец действия Персонажа')
+#     action_type = models.ManyToManyField('ActionType', blank=True, null=True, verbose_name='тип действия Персонажа')

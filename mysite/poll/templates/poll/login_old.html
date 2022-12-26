@@ -1,0 +1,30 @@
+{% extends "poll/header_first.html" %}
+
+{% block content %}
+
+
+
+<!--Login--> 
+<div class="container py-5">
+  <h1>Login</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ login_form }}
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+  <p >Еще не зарегистрировались? <a href="../register">Регистрация</a>
+  <p >Забыли пароль?<a href="../password">Forgot password?</a></p>
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+<p>Войти с помощью: </p>
+{% for provider in socialaccount_providers %}
+    {% if provider.id == "openid" %}
+        {% for brand in provider.get_brands %}
+          <a title="{{brand.name}}" class="{{provider.id}} {{brand.id}}" href="{% provider_login_url provider.id openid=brand.openid_url process=process %}">{{brand.name}}</a>
+        {% endfor %}
+    {% endif %}
+    <a title="{{provider.name}}" class="{{provider.id}}" href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{{provider.name}}</a>
+{% endfor %}
+</div>
+
+{% endblock %}

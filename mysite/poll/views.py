@@ -67,7 +67,6 @@ def register_request(request):
         else:
             messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
-    # return render(request=request, template_name="poll/register.html", context={"register_form": form})
     return render(request=request, template_name="poll/register.html", context={"register_form": form})
 
 
@@ -80,7 +79,7 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.info(request, f"You are now logged in as {username}.")
+                messages.info(request, f"Вы вощли в систему как {username}.")
                 return redirect("poll:index")
             else:
                 messages.error(request, "Invalid username or password.")
@@ -88,13 +87,12 @@ def login_request(request):
             messages.error(request, "Invalid username or password.")
     form = AuthenticationForm()
     return render(request=request, template_name="poll/login.html", context={"login_form": form})
-    #  return render(request=request, template_name="poll/login.html", context={"login_form": form})
 
 
 def logout_request(request):
     logout(request)
-    messages.info(request, "You have successfully logged out.")
-    return redirect("poll:index")
+    # messages.info(request, "До свидания!")
+    return redirect("poll:login")
 
 
 def password_reset_request(request):
@@ -106,8 +104,8 @@ def password_reset_request(request):
             if associated_users.exists():
                 for user in associated_users:
                     subject = "Password Reset Requested"
-                    # email_template_name = "poll/password/password_reset_email.txt"
-                    email_template_name = "accounts/password/password_reset_email.txt"
+
+                    email_template_name = "poll/password/password_reset_email.txt"
                     c = {
                         "email": user.email,
                         'domain': '127.0.0.1:8000',
@@ -119,13 +117,13 @@ def password_reset_request(request):
                     }
                     email = render_to_string(email_template_name, c)
                     try:
-                        send_mail(subject, email, 'admin@example.com', [user.email], fail_silently=False)
+                        send_mail(subject, email, 'solobala@yandex.ru', [user.email], fail_silently=False)
                     except BadHeaderError:
                         return HttpResponse('Invalid header found.')
                     return redirect("/password_reset/done/")
     password_reset_form = PasswordResetForm()
-    # return render(request=request, template_name="poll/password/password_reset.html",
-    return render(request=request, template_name="accounts/password/password_reset.html",
+
+    return render(request=request, template_name="poll/password/password_reset.html",
                   context={"password_reset_form": password_reset_form})
 
 
@@ -187,8 +185,7 @@ class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequi
         return reverse("owners-list")
 
 
-class OwnerUpdateView(LoginRequiredMixin,
-                      PermissionRequiredMixin, JsonableResponseMixin, UpdateView):
+class OwnerUpdateView(LoginRequiredMixin, PermissionRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование данных игрока
     """
@@ -206,8 +203,6 @@ class OwnerUpdateView(LoginRequiredMixin,
         :param form:
         :return:
         """
-        # ModelFormMixin.success_url = "127.0.0.1:8000/poll/owner/5/owner-detail.html"
-
         form.instance.updated_by = self.request.user
         return super().form_valid(form)
 
@@ -230,8 +225,7 @@ class OwnerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         return context
 
 
-class OwnerDetailView(LoginRequiredMixin,
-                      PermissionRequiredMixin, JsonableResponseMixin, DetailView):
+class OwnerDetailView(LoginRequiredMixin,  PermissionRequiredMixin, JsonableResponseMixin, DetailView):
     """
     Просмотр детальной информации по игроку
     """
@@ -344,7 +338,7 @@ class OwnersFreeListView(LoginRequiredMixin, ListView):
     """
     Просмотр списка свободных игроков
     """
-    template_name = 'poll/free_owner/free_owners_list.html'
+    template_name = 'poll/free_owners/free_owners_list.html'
     context_object_name = 'free_owners_list'
     queryset = Owner.objects.filter(person__status=1).distinct('owner_name')
     login_url = 'poll:login'
@@ -432,37 +426,6 @@ class StatusPersonsListView(LoginRequiredMixin, ListView):
         context['status'] = self.kwargs['status']
 
         return context
-
-
-# class PersonsFreeListView(LoginRequiredMixin, ListView):
-#     """
-#     Просмотр  списка свободных персонажей
-#     """
-#     template_name = 'poll/free_person/free_persons_list.html'
-#
-#     context_object_name = 'free_persons_list'
-#     queryset = Person.objects.filter(status=1)
-#     login_url = 'poll:login'
-#
-#
-# class PersonsBusyListView(LoginRequiredMixin, ListView):
-#     """
-#     Просмотр  списка занятых персонажей
-#     """
-#     template_name = 'poll/busy_person/busy_persons_list.html'
-#     context_object_name = 'busy_persons_list'
-#     queryset = Person.objects.filter(status=0)
-#     login_url = 'poll:login'
-#
-#
-# class PersonsFreezListView(LoginRequiredMixin, ListView):
-#     """
-#     Просмотр  списка заморозки персонажей
-#     """
-#     template_name = 'poll/freez_person/freez_persons_list.html'
-#     context_object_name = 'freez_persons_list'
-#     queryset = Person.objects.filter(status=2)
-#     login_url = 'poll:login'
 
 
 class PersonsListView(LoginRequiredMixin, ListView):
@@ -1489,6 +1452,163 @@ class FractionDetailView(LoginRequiredMixin, DetailView):
 
         return context
 
+
+class ZonesListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Зон
+    """
+    template_name = 'poll/zone/zones_list.html'
+    context_object_name = 'zones_list'
+    model = Zone
+    login_url = 'poll:login'
+
+
+class ZoneCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой Зоны
+    """
+    model = Zone
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана Зона
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class ZoneUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Зоны
+    """
+    model = Zone
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена Зона
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class ZoneDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Зоны
+    """
+    model = Zone
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:zones-list')
+    context_object_name = 'zone_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['zone_name'] = context['zone_detail'].zone_name
+        return context
+
+
+class ZoneDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Зоне
+    """
+    template_name = 'poll/zone/zone_detail.html'
+    context_object_name = 'zone_detail'
+    model = Zone
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class RegionsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Регионов
+    """
+    template_name = 'poll/region/regions_list.html'
+    context_object_name = 'regions_list'
+    model = Region
+    login_url = 'poll:login'
+
+
+class RegionDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Региону
+    """
+    template_name = 'poll/region/region_detail.html'
+    context_object_name = 'region_detail'
+    model = Region
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class RegionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Региона
+    """
+    model = Region
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен Регион
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class RegionDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Региона
+    """
+    model = Region
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:regions-list')
+    context_object_name = 'region_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['region_name'] = context['region_detail'].region_name
+        return context
+
+
+class RegionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Региона
+    """
+    model = Region
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан Регион
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 #  REST API
 

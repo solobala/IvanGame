@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,8 +47,8 @@ INSTALLED_APPS = [
     "poll.apps.PollConfig",
     "rest_framework",
     "corsheaders",
-
-
+    'allauth.socialaccount.providers.vk',
+    'allauth.socialaccount.providers.yandex',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -59,7 +60,22 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
-    }
+    },
+
+    'vk': {
+            'APP': {
+                'client_id': '51512627',
+                'secret': 'A3af8HoDij0ANAM6VEja',
+                'key': ''
+                   }
+          },
+    'yandex': {
+            'APP': {
+                'client_id': 'cfd15f4278384626b3b0c8ceb1eb6f1d',
+                'secret': '15aa86a674944fceaaca7fd3b813aebc',
+
+                   }
+          },
 }
 
 #  CRISPY_TEMPLATE_PACK = 'uni_form'
@@ -72,6 +88,7 @@ AUTHENTICATION_BACKENDS = (
     # used for social authentications
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -81,9 +98,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
+    ]
 
-]
+CORS_ORIGIN_WHITELIST = (
+'http://localhost:3000',
+'http://localhost:8000',
+)
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -158,7 +179,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-from django.contrib.messages import constants as messages
+
 
 
 MESSAGE_TAGS = {
@@ -264,4 +285,26 @@ CKEDITOR_CONFIGS = {
         'width': 360,
     },
 }
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #для DEBUG
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'solobala@yandex.ru'
+EMAIL_HOST_PASSWORD = 'Trubnik1967'
+# если используется защищенное соединение
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_TO_EMAIL = 'solobala58@gmail.com'
 
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 60
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # False by default
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True  # True by default
+ACCOUNT_SESSION_REMEMBER = True
+LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
+ACCOUNT_ADAPTER = 'mysite.adapter.MyAccountAdapter'

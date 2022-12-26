@@ -1,0 +1,16 @@
+{% extends "poll/header.html" %}
+{% block content %}
+ <div style="width:300px; margin-left:20px;margin-top:20px">
+    <h1>Регионы</h1>
+   <ul class="list-group">
+    {% for region in regions_list %}
+        <li class="list-group-item" aria-current="true"><a href="/poll/regions/{{ region.id }}/">{{ region.region_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:region-add' %}">+ Добавить Регион?</a></p>
+{% endif %}
+ </div>
+{% endblock %}
+
+
