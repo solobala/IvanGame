@@ -74,6 +74,88 @@ class Owner(models.Model):
         ]
 
 
+class Info(models.Model):
+    agg_points = models.IntegerField(verbose_name='Характеристики', default=0)
+    points = models.JSONField(verbose_name='Характеристики', blank=True, null=True)
+    SP = models.IntegerField(verbose_name="Стамина", default=0)
+    MP = models.IntegerField(verbose_name="Колдовство", default=0)
+    IP = models.IntegerField(verbose_name="Интеллект", default=0)
+    PP = models.IntegerField(verbose_name="Сила", default=0)
+    AP = models.IntegerField(verbose_name="Ловкость", default=0)
+    FP = models.IntegerField(verbose_name="Вера", default=0)
+    LP = models.IntegerField(verbose_name="Удача", default=0)
+    CP = models.IntegerField(verbose_name="Харизма", default=0)
+    BP = models.IntegerField(verbose_name="Рассудок", default=0)
+
+    resistances = models.JSONField(verbose_name='Устойчивость', blank=True, null=True)
+    fire_res = models.IntegerField(verbose_name="к огню", default=0)
+    water_res = models.IntegerField(verbose_name="к воде", default=0)
+    wind_res = models.IntegerField(verbose_name="к ветру", default=0)
+    dirt_res = models.IntegerField(verbose_name="к земле", default=0)
+    lightning_res = models.IntegerField(verbose_name="к молниям", default=0)
+    holy_res = models.IntegerField(verbose_name="к свету", default=0)
+    curse_res = models.IntegerField(verbose_name="к тьме", default=0)
+    crush_res = models.IntegerField(verbose_name="к дроблению", default=0)
+    cut_res = models.IntegerField(verbose_name="к порезам", default=0)
+    stab_res = models.IntegerField(verbose_name="к протыканию", default=0)
+
+    permissions = models.JSONField(verbose_name='Навыки', blank=True, null=True)
+    Fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
+    Water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
+    Wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
+    Dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
+    Lightning_access = models.IntegerField(verbose_name="Киловактика", default=0)
+    Holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
+    Curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
+    Bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
+    Nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
+    Mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
+    Twohanded_access = models.IntegerField(verbose_name="Двуручное оружие", default=0)
+    Polearm_access = models.IntegerField(verbose_name="Древковое оружие", default=0)
+    Onehanded_access = models.IntegerField(verbose_name="Одноручное оружие", default=0)
+    Stabbing_access = models.IntegerField(verbose_name="Колющее оружие", default=0)
+    Cutting_access = models.IntegerField(verbose_name="Режущее оружие", default=0)
+    Crushing_access = models.IntegerField(verbose_name="Дробящее оружие", default=0)
+    Small_arms_access = models.IntegerField(verbose_name="Стрелковое оружие", default=0)
+    Shields_access = models.IntegerField(verbose_name="Щиты", default=0)
+
+    equipment = models.JSONField(verbose_name='Снаряжение', blank=True, null=True)
+    helmet_status = models.IntegerField(verbose_name='Шлем', default=0)
+    chest_status = models.IntegerField(verbose_name='Нагрудник', default=0)
+    shoes_status = models.IntegerField(verbose_name='Сапоги', default=0)
+    gloves_status = models.IntegerField(verbose_name='Наручи', default=0)
+    item_status = models.IntegerField(verbose_name='Прочее', default=0)
+
+    fov = models.IntegerField(verbose_name='Область обзора', default=0)
+    rov = models.IntegerField(verbose_name='Дальность обзора', default=0)
+    level = models.IntegerField(verbose_name='Уровень', default=0)
+
+    class Meta:
+        abstract = True
+
+
+class Feature(Info):
+
+    feature_name = models.CharField(max_length=128, blank=True, null=True)
+    feature_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'feature'
+        verbose_name = "Feature"
+        verbose_name_plural = "Features"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.feature_name
+
+    def get_absolute_url(self):
+        return reverse('poll:feature-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Feature, self).save(*args, **kwargs)
+
+
 class Race(models.Model):
     """
     Класс Раса  Персонажа (Person).
@@ -83,7 +165,7 @@ class Race(models.Model):
   удачи, харизмы и рассудка в формате JSON',
   `finish_points` json DEFAULT NULL COMMENT 'финишные значение очков стамины, маны, интелекта, силы, ловкости, веры,
   удачи, харизмы и рассудка в формате JSON',
-  `start_resistanses` json DEFAULT NULL COMMENT 'стартовые значение устойчивости к воздействию водой, огнем, ветром ,
+  `start_resistances` json DEFAULT NULL COMMENT 'стартовые значение устойчивости к воздействию водой, огнем, ветром ,
   `start_permissions` json DEFAULT NULL COMMENT 'стартовые значение разрешений на воздействие водой, огнем, ветром ',
   equipment json снаряжение json DEFAULT NULL COMMENT 'Стартовые значения количества слотов для экипировки',
   PRIMARY KEY (`race_id`)
@@ -186,8 +268,8 @@ class Race(models.Model):
         #
         # my_dict = dict(zip(keys, labels.split(', ')))
         # for key in keys:
-        #     sr[my_dict.get(key)] = json.loads(self.start_resistanses).get(key)
-        # self.start_resistanses = json.dumps(sr)
+        #     sr[my_dict.get(key)] = json.loads(self.start_resistances).get(key)
+        # self.start_resistances = json.dumps(sr)
         #
         # stp = dict()
         # keys = ["Fire_access_start", "Water_access_start", "Wind_access_start", "Dirt_access_start",
@@ -218,7 +300,7 @@ class Race(models.Model):
 
     def get_absolute_url(self):
         return f"/races/{self.pk}/"
-        #return reverse('poll:race-detail', kwargs={'pk': self.pk})
+        # return reverse('poll:race-detail', kwargs={'pk': self.pk})
 
     class Meta:
         managed = True
@@ -257,6 +339,7 @@ class Person(models.Model):
     death_date = models.DateTimeField('Дата гибели', blank=True, null=True)
     status = models.IntegerField('Статус', choices=Status.choices, default=Status.FREE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    features = models.ManyToManyField(Feature, blank=True, null=True)
     # free = FreePersonManager()
     # busy = BusyPersonManager()
     # freezed = FreezedPersonManager()
@@ -644,65 +727,6 @@ class PersonLocation(models.Model):
         super().save(*args, **kwargs)
 
 
-class Info(models.Model):
-    agg_points = models.IntegerField(verbose_name='Характеристики', default=0)
-    points = models.JSONField(verbose_name='Характеристики', blank=True, null=True)
-    SP = models.IntegerField(verbose_name="Стамина", default=0)
-    MP = models.IntegerField(verbose_name="Колдовство", default=0)
-    IP = models.IntegerField(verbose_name="Интеллект", default=0)
-    PP = models.IntegerField(verbose_name="Сила", default=0)
-    AP = models.IntegerField(verbose_name="Ловкость", default=0)
-    FP = models.IntegerField(verbose_name="Вера", default=0)
-    LP = models.IntegerField(verbose_name="Удача", default=0)
-    CP = models.IntegerField(verbose_name="Харизма", default=0)
-    BP = models.IntegerField(verbose_name="Рассудок", default=0)
-
-    resistances = models.JSONField(verbose_name='Устойчивость', blank=True, null=True)
-    fire_res = models.IntegerField(verbose_name="к огню", default=0)
-    water_res = models.IntegerField(verbose_name="к воде", default=0)
-    wind_res = models.IntegerField(verbose_name="к ветру", default=0)
-    dirt_res = models.IntegerField(verbose_name="к земле", default=0)
-    lightning_res = models.IntegerField(verbose_name="к молниям", default=0)
-    holy_res = models.IntegerField(verbose_name="к свету", default=0)
-    curse_res = models.IntegerField(verbose_name="к тьме", default=0)
-    crush_res = models.IntegerField(verbose_name="к дроблению", default=0)
-    cut_res = models.IntegerField(verbose_name="к порезам", default=0)
-    stab_res = models.IntegerField(verbose_name="к протыканию", default=0)
-
-    permissions = models.JSONField(verbose_name='Навыки', blank=True, null=True)
-    Fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
-    Water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
-    Wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
-    Dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
-    Lightning_access = models.IntegerField(verbose_name="Киловактика", default=0)
-    Holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
-    Curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
-    Bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
-    Nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
-    Mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
-    Twohanded_access = models.IntegerField(verbose_name="Двуручное оружие", default=0)
-    Polearm_access = models.IntegerField(verbose_name="Древковое оружие", default=0)
-    Onehanded_access = models.IntegerField(verbose_name="Одноручное оружие", default=0)
-    Stabbing_access = models.IntegerField(verbose_name="Колющее оружие", default=0)
-    Cutting_access = models.IntegerField(verbose_name="Режущее оружие", default=0)
-    Crushing_access = models.IntegerField(verbose_name="Дробящее оружие", default=0)
-    Small_arms_access = models.IntegerField(verbose_name="Стрелковое оружие", default=0)
-    Shields_access = models.IntegerField(verbose_name="Щиты", default=0)
-
-    equipment = models.JSONField(verbose_name='Снаряжение', blank=True, null=True)
-    helmet_status = models.IntegerField(verbose_name='Шлем', default=0)
-    chest_status = models.IntegerField(verbose_name='Нагрудник', default=0)
-    shoes_status = models.IntegerField(verbose_name='Сапоги', default=0)
-    gloves_status = models.IntegerField(verbose_name='Наручи', default=0)
-    item_status = models.IntegerField(verbose_name='Прочее', default=0)
-
-    fov = models.IntegerField(verbose_name='Область обзора', default=0)
-    rov = models.IntegerField(verbose_name='Дальность обзора', default=0)
-
-    class Meta:
-        abstract = True
-
-
 class PersonBar(models.Model):
     """ слепок состояния персонажа в моменты времени"""
     person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
@@ -711,9 +735,11 @@ class PersonBar(models.Model):
     summary_permissions = models.JSONField(verbose_name='Суммарные очки умений', blank=True, null=True)
     summary_resistances = models.JSONField(verbose_name='Суммарные очки сопротивлений', blank=True, null=True)
     summary_equipment = models.JSONField(verbose_name='Суммарные слоты экипировки', blank=True, null=True)
-
     unallocated_points = models.IntegerField(verbose_name='Нераспределенные очки характеристик', default=0)
     unallocated_permissions = models.IntegerField(verbose_name='Нераспределенные очки умений', default=0)
+    fov = models.IntegerField(verbose_name='Область обзора', default=0)
+    rov = models.IntegerField(verbose_name='Дальность обзора', default=0)
+    level = models.IntegerField(verbose_name='Уровень', default=0)
 
     def __str__(self):
         return "%s" % self.person.person_name
@@ -783,34 +809,115 @@ class Action(Info):
         super(Action, self).save(*args, **kwargs)
 
 
-class Feature(Info):
-
-    feature_name = models.CharField(max_length=128, blank=True, null=True)
-    feature_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+class Consumable(models.Model):
+    """
+    Расходники
+    """
+    consumable_name = models.CharField(max_length=128, blank=True, null=True)
+    consumable_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
+    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
+    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
+    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
+    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
+    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
 
     class Meta:
         managed = True
-        db_table = 'feature'
-        verbose_name = "Feature"
-        verbose_name_plural = "Features"
+        db_table = 'consumable'
+        verbose_name = "Consumable"
+        verbose_name_plural = "Consumable"
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % self.feature_name
+        return "%s" % self.consumable_name
 
     def get_absolute_url(self):
-        return reverse('poll:feature-detail', kwargs={'pk': self.pk})
+        return reverse('poll:consumable-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
-        super(Feature, self).save(*args, **kwargs)
+        super(Consumable, self).save(*args, **kwargs)
 
 
-# class ActionLog(models.Model):
-#     """
-#     Журнал действий персонажей
-#     """
-#     person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
-#     action = models.ForeignKey('Action', on_delete=models.CASCADE, blank=True, null=True)
-#     move_number_begin = models.IntegerField(verbose_name='Номер хода - начало действия Персонажа')
-#     move_number_begin = models.IntegerField(verbose_name='Номер хода - конец действия Персонажа')
-#     action_type = models.ManyToManyField('ActionType', blank=True, null=True, verbose_name='тип действия Персонажа')
+class Thing(models.Model):
+    """
+    артефекты
+    """
+    thing_name = models.CharField(max_length=128, blank=True, null=True)
+    thing_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
+    points_to_use = models.JSONField(verbose_name='очки характеристик для применения', blank=True, null=True)
+    equipment_to_use = models.JSONField(verbose_name='слоты для применения', blank=True, null=True)
+    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
+    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
+    permissions_from_use = models.JSONField(verbose_name='очки навыков от применения', blank=True, null=True)
+    equipment_from_use = models.JSONField(verbose_name='расширение слотов от применения', blank=True, null=True)
+    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
+    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
+    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
+
+    class Meta:
+        managed = True
+        db_table = 'thing'
+        verbose_name = "Thing"
+        verbose_name_plural = "Things"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.thing_name
+
+    def get_absolute_url(self):
+        return reverse('poll:thing-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Thing, self).save(*args, **kwargs)
+
+
+class History(models.Model):
+    """
+    Журнал действий персонажей
+    должен быть общий по всем действиям и персонажам.
+    нужно сквозную нумерацию ходов каждого персонажа иметь
+    """
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=True, null=True)
+    action = models.ForeignKey('Action', on_delete=models.CASCADE, blank=True, null=True)
+    move_number_begin = models.IntegerField(verbose_name='Номер хода - начало действия Персонажа')
+    move_number_end = models.IntegerField(verbose_name='Номер хода - конец действия Персонажа')
+    action_type = models.ManyToManyField('ActionType', blank=True, null=True, verbose_name='тип действия Персонажа')
+    points_old = models.JSONField(verbose_name='Прежние очки характеристик', blank=True, null=True)
+    points_new = models.JSONField(verbose_name='Новые очки характеристик', blank=True, null=True)
+    permissions_old = models.JSONField(verbose_name='Прежние навыки', blank=True, null=True)
+    permissions_new = models.JSONField(verbose_name='Новые навыки', blank=True, null=True)
+    resistances_old = models.JSONField(verbose_name='Прежние сопротивления', blank=True, null=True)
+    resistances_new = models.JSONField(verbose_name='Новые сопротивления', blank=True, null=True)
+    equipment_old = models.JSONField(verbose_name='Прежнее снаряжение', blank=True, null=True)
+    equipment_new = models.JSONField(verbose_name='Новое снаряжение', blank=True, null=True)
+    un_points_old = models.IntegerField(verbose_name='Прежние нераспределенные очки', blank=True, null=True)
+    un_points_new = models.IntegerField(verbose_name='Новые нераспределенные очки', blank=True, null=True)
+    un_permissions_old = models.IntegerField(verbose_name='Прежние нераспределенные навыки', blank=True, null=True)
+    un_permissions_new = models.IntegerField(verbose_name='Новые нераспределенные навыки', blank=True, null=True)
+    fov_old = models.IntegerField(verbose_name='Прежняя область обзора', blank=True, null=True)
+    fov_new = models.IntegerField(verbose_name='Новая область обзора', blank=True, null=True)
+    rov_old = models.IntegerField(verbose_name='Прежняя дальность обзора', blank=True, null=True)
+    rov_new = models.IntegerField(verbose_name='Новая дальность обзора', blank=True, null=True)
+    level_old = models.IntegerField(verbose_name='Прежний уровень', blank=True, null=True)
+    level_new = models.IntegerField(verbose_name='Новый уровень', blank=True, null=True)
+    last_update = models.TimeField(auto_now=True)
+
+    class Meta:
+        managed = True
+        db_table = 'history'
+        verbose_name = "History"
+
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s, %s, %s" % (self.person, self.action, self.last_update)
+
+    def get_absolute_url(self):
+        return reverse('poll:history-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(History, self).save(*args, **kwargs)

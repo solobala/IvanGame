@@ -44,7 +44,13 @@
         </tr>
         <tr>
             <td><h5>Слабости и особенности:</h5></td>
-            <td>{{ person_detail.race }}</td>
+            <td>
+                {% for feature in person_detail.f %}
+                <ul>
+                    <li> {{ feature }}</a></li>
+                </ul>
+                {% endfor %}
+            </td>
         </tr>
         <tr>
             <td><h5>Основная характеристика:</h5></td>
@@ -208,8 +214,14 @@
             <td><h5>Нераспределенные умения: </h5></td>
             <td>{{ unallocated_permissions}}</td>
         </tr>
-
-
+        <tr>
+            <td><h5>Дальность обзора: </h5></td>
+            <td>{{ rov }}</td>
+        </tr>
+        <tr>
+            <td><h5>Область обзора: </h5></td>
+            <td>{{ fov }}</td>
+        </tr>
         </tbody>
     </table>
 </div>

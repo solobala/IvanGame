@@ -196,7 +196,6 @@ class OwnerUpdateView(LoginRequiredMixin, PermissionRequiredMixin, JsonableRespo
     login_url = 'poll:login'
     permission_required = 'poll.can_edit_owners'  # new
 
-
     def form_valid(self, form):
         """
         Сведения о том, кем был изменен игрок
@@ -225,7 +224,7 @@ class OwnerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         return context
 
 
-class OwnerDetailView(LoginRequiredMixin,  PermissionRequiredMixin, JsonableResponseMixin, DetailView):
+class OwnerDetailView(LoginRequiredMixin, PermissionRequiredMixin, JsonableResponseMixin, DetailView):
     """
     Просмотр детальной информации по игроку
     """
@@ -328,7 +327,7 @@ class OwnerCreate(OwnerInline, CreateView):
             person = Person.objects.get(id=pk)
         except Person.DoesNotExist:
             messages.success(request, 'Object Does not Exist')
-            return redirect('owner: update_owner', pk=person.owner.id) #  Уточнить update_owner или owner-update
+            return redirect('owner: update_owner', pk=person.owner.id)  # Уточнить update_owner или owner-update
         person.delete()
         messages.success(request, 'Персонаж успешно удален')
         return redirect('poll: owner-update', pk=person.owner.id)
@@ -350,7 +349,7 @@ class PersonCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     model = Person
     fields = ['person_name', 'person_img', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
-              'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
+              'feature', 'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
     login_url = 'poll:login'
 
     def form_valid(self, form):
@@ -374,7 +373,7 @@ class PersonUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     model = Person
     fields = ['person_name', 'person_img', 'owner', 'link', 'biography', 'character', 'interests', 'phobias', 'race',
-              'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
+              'feature', 'location_birth', 'birth_date', 'location_death', 'death_date', 'status']
     template_name_suffix = '_update'
     login_url = 'poll:login'
 
@@ -440,7 +439,7 @@ class PersonsListView(LoginRequiredMixin, ListView):
 
 class PersonDetailView(LoginRequiredMixin, DetailView):
     """
-    Просмотр информации по персонажу
+    Просмотр стартовой информации по персонажу
     """
     template_name = 'poll/person/person_detail.html'
     context_object_name = 'person_detail'
@@ -452,21 +451,298 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['status_'] = ['Свободен' if context['person_detail'].status == 1
                               else 'Занят' if context['person_detail'].status == 2 else 'Заморозка'][0]
-        person_group = Person.objects.get(
-            id=context['person_detail'].pk).group_set.all()  # Это Queryset - список групп из 1 группы
+        points = dict()
+        permissions = dict()
+        resistances = dict()
+        equipment = dict()
+        fov = 0
+        rov = 0
+        level = 0
+        result = dict()
+        f = []
+        sp = 0
+        mp = 0
+        ip = 0
+        ap = 0
+        pp = 0
+        cp = 0
+        lp = 0
+        bp = 0
+        fp = 0
+
+        Fire_access = 0
+        Water_access = 0
+        Wind_access = 0
+        Dirt_access = 0
+        Lightning_access = 0
+        Holy_access = 0
+        Curse_access = 0
+        Bleed_access = 0
+        Nature_access = 0
+        Mental_access = 0
+        Twohanded_access = 0
+        Polearm_access = 0
+        Onehanded_access = 0
+        Stabbing_access = 0
+        Cutting_access = 0
+        Crushing_access = 0
+        Small_arms_access = 0
+        Shields_access = 0
+
+        fire_res = 0
+        water_res = 0
+        wind_res = 0
+        dirt_res = 0
+        lightning_res = 0
+        holy_res = 0
+        curse_res = 0
+        crush_res = 0
+        cut_res = 0
+        stab_res = 0
+
+        helmet_status = 0
+        chest_status = 0
+        shoes_status = 0
+        gloves_status = 0
+        item_status = 0
+        unallocated_points = 0
+        unallocated_permissions = 0
+
+        # Проверяем, есть ли записи в PersonBar
+        pe = Person.objects.get(id=context['person_detail'].pk)
+        n = pe.personbar_set.all().count()
+        if n == 0:
+            # записей  в Personbar нет - нужно добавить первую запись из рас и слабостей
+
+            # берем инфу из расы и добавляем к особенностям
+            info = pe.race
+
+            result.clear()
+            for key, value in info.start_points.items():
+                result[slovar.dict_points_start.get(key)] = value
+            for key, value in slovar.dict_points.items():
+                points[slovar.dict_points.get(key)] = result[slovar.dict_points.get(key)]
+
+            result.clear()
+            for key, value in info.start_permissions.items():
+                result[slovar.dict_permissions_start.get(key)] = value
+            for key, value in slovar.dict_permissions.items():
+                permissions[slovar.dict_permissions.get(key)] = result[slovar.dict_permissions.get(key)]
+
+            result.clear()
+            for key, value in info.start_resistances.items():
+                result[slovar.dict_resistances_start.get(key)] = value
+            for key, value in slovar.dict_resistances.items():
+                resistances[slovar.dict_resistances.get(key)] = result[slovar.dict_resistances.get(key)]
+
+            result.clear()
+            for key, value in info.equipment.items():
+                result[slovar.dict_equipment_start.get(key)] = value
+            for key, value in slovar.dict_equipment.items():
+                equipment[slovar.dict_equipment.get(key)] = result[slovar.dict_equipment.get(key)]
+
+            fov = info.fov
+            rov = info.rov
+
+            person_features = pe.features.all()  # получим Список фич
+            features_amount = person_features.count()  # это к-во фич у персонажа
+
+            if features_amount == 0:  # Особенностей нет. Первая запись в PersonBar - только из расы
+                context['f'] = ['без особенностей']
+
+            else:
+                # Считаем добавки по всем статистикам из-за особенностей
+                points_feature = dict()
+                permissions_feature = dict()
+                resistances_feature = dict()
+                equipment_feature = dict()
+
+                for feature in person_features:
+                    f.append(feature.feature_name)
+                    sp += feature.points['SP']
+                    mp += feature.points['MP']
+                    ip += feature.points['IP']
+                    pp += feature.points['PP']
+                    ap += feature.points['AP']
+                    fp += feature.points['FP']
+                    lp += feature.points['LP']
+                    cp += feature.points['CP']
+                    bp += feature.points['BP']
+
+                    result['SP'] = sp
+                    result['MP'] = mp
+                    result['IP'] = ip
+                    result['PP'] = pp
+                    result['AP'] = ap
+                    result['FP'] = fp
+                    result['LP'] = lp
+                    result['CP'] = cp
+                    result['BP'] = bp
+
+                    for key, value in slovar.dict_points.items():
+                        points_feature[slovar.dict_points.get(key)] = result[key]
+
+                    Fire_access += feature.permissions['Fire_access']
+                    Water_access += feature.permissions['Water_access']
+                    Wind_access += feature.permissions['Wind_access']
+                    Dirt_access += feature.permissions['Dirt_access']
+                    Lightning_access += feature.permissions['Lightning_access']
+                    Holy_access += feature.permissions['Holy_access']
+                    Curse_access += feature.permissions['Curse_access']
+                    Bleed_access += feature.permissions['Bleed_access']
+                    Nature_access += feature.permissions['Nature_access']
+                    Mental_access += feature.permissions['Mental_access']
+                    Twohanded_access += feature.permissions['Twohanded_access']
+                    Polearm_access += feature.permissions['Polearm_access']
+                    Onehanded_access += feature.permissions['Onehanded_access']
+                    Stabbing_access += feature.permissions['Stabbing_access']
+                    Cutting_access += feature.permissions['Cutting_access']
+                    Crushing_access += feature.permissions['Crushing_access']
+                    Small_arms_access += feature.permissions['Small_arms_access']
+                    Shields_access += feature.permissions['Shields_access']
+
+                    result.clear()
+                    result['Fire_access'] = Fire_access
+                    result['Water_access'] = Water_access
+                    result['Wind_access'] = Wind_access
+                    result['Dirt_access'] = Dirt_access
+                    result['Lightning_access'] = Lightning_access
+                    result['Holy_access'] = Holy_access
+                    result['Curse_access'] = Curse_access
+                    result['Bleed_access'] = Bleed_access
+                    result['Nature_access'] = Nature_access
+                    result['Mental_access'] = Mental_access
+                    result['Twohanded_access'] = Twohanded_access
+                    result['Polearm_access'] = Polearm_access
+                    result['Onehanded_access'] = Onehanded_access
+                    result['Stabbing_access'] = Stabbing_access
+                    result['Cutting_access'] = Cutting_access
+                    result['Crushing_access'] = Crushing_access
+                    result['Small_arms_access'] = Small_arms_access
+                    result['Shields_access'] = Shields_access
+
+                    for key, value in slovar.dict_permissions.items():
+                        permissions_feature[slovar.dict_permissions.get(key)] = result[key]
+
+                    fire_res += feature.resistances['fire_res']
+                    water_res += feature.resistances['water_res']
+                    wind_res += feature.resistances['wind_res']
+                    dirt_res += feature.resistances['dirt_res']
+                    lightning_res += feature.resistances['lightning_res']
+                    holy_res += feature.resistances['holy_res']
+                    curse_res += feature.resistances['curse_res']
+                    crush_res += feature.resistances['crush_res']
+                    cut_res += feature.resistances['cut_res']
+                    stab_res += feature.resistances['stab_res']
+
+                    result.clear()
+                    result['fire_res'] = fire_res
+                    result['water_res'] = water_res
+                    result['wind_res'] = wind_res
+                    result['dirt_res'] = dirt_res
+                    result['lightning_res'] = lightning_res
+                    result['holy_res'] = holy_res
+                    result['curse_res'] = curse_res
+                    result['crush_res'] = crush_res
+                    result['cut_res'] = cut_res
+                    result['stab_res'] = stab_res
+
+                    for key, value in slovar.dict_resistances.items():
+                        resistances_feature[slovar.dict_resistances.get(key)] = result[key]
+
+                    helmet_status += feature.equipment['helmet_status']
+                    chest_status += feature.equipment['chest_status']
+                    shoes_status += feature.equipment['shoes_status']
+                    gloves_status += feature.equipment['gloves_status']
+                    item_status += feature.equipment['item_status']
+
+                    result.clear()
+                    result['helmet_status'] = helmet_status
+                    result['chest_status'] = chest_status
+                    result['shoes_status'] = shoes_status
+                    result['gloves_status'] = gloves_status
+                    result['item_status'] = item_status
+
+                    for key, value in slovar.dict_equipment.items():
+                        equipment_feature[slovar.dict_equipment.get(key)] = result[key]
+
+                    # Теперь надо сложить статистики за расу и статистики за особенности
+                    for key, value in slovar.dict_points.items():
+                        points[slovar.dict_points.get(key)] = points[slovar.dict_points.get(key)] + points_feature[slovar.dict_points.get(key)]
+                    for key, value in slovar.dict_permissions.items():
+                        permissions[slovar.dict_permissions.get(key)] = permissions[slovar.dict_permissions.get(key)] + permissions_feature[slovar.dict_permissions.get(key)]
+                    for key, value in slovar.dict_resistances.items():
+                        resistances[slovar.dict_resistances.get(key)] = resistances[slovar.dict_resistances.get(key)] + resistances_feature[slovar.dict_resistances.get(key)]
+                    for key, value in slovar.dict_equipment.items():
+                        equipment[slovar.dict_equipment.get(key)] = equipment[slovar.dict_equipment.get(key)] + equipment_feature[slovar.dict_equipment.get(key)]
+                    fov += feature.fov
+                    rov += feature.rov
+
+                # Запишем 1 запись по Персонажу в PersonBar. для этого сконвертируем в sp,mp вместо стамины
+                summary_points = dict()
+                for key, value in slovar.dict_points.items():
+                    summary_points[key] = points[slovar.dict_points.get(key)]
+                summary_permissions = dict()
+                for key, value in slovar.dict_permissions.items():
+                    summary_permissions[key] = permissions[slovar.dict_permissions.get(key)]
+                summary_resistances = dict()
+                for key, value in slovar.dict_resistances.items():
+                    summary_resistances[key] = resistances[slovar.dict_resistances.get(key)]
+                summary_equipment = dict()
+                for key, value in slovar.dict_equipment.items():
+                    summary_equipment[key] = equipment[slovar.dict_equipment.get(key)]
+                try:
+                    obj = PersonBar.objects.get(person=pe)
+                except PersonBar.DoesNotExist:
+                    obj = PersonBar(person=pe, race=pe.race, summary_points=summary_points,
+                                    summary_permissions=summary_permissions, summary_resistances=summary_resistances,
+                                    summary_equipment=summary_equipment, unallocated_points=6, unallocated_permissions=3,
+                                    fov=fov, rov=rov, level=0)
+                    obj.save()
+            unallocated_points = 6
+            unallocated_permissions = 3
+        else:
+            #  Записи есть. Значит, не нужно лазать в слабости и особенности
+            # Для расчета текущих статистик берем информацию из PersonBar. Там только 1 запись, остальное в логе
+            info = pe.personbar_set.all()[0]
+            for key, value in info.summary_points.items():
+                points[slovar.dict_points.get(key)] = value
+
+            for key, value in info.summary_permissions.items():
+                permissions[slovar.dict_permissions.get(key)] = value
+
+            for key, value in info.summary_resistances.items():
+                resistances[slovar.dict_resistances.get(key)] = value
+
+            for key, value in info.summary_equipment.items():
+                equipment[slovar.dict_equipment.get(key)] = value
+            fov = info.fov
+            rov = info.rov
+            level = info.level
+            unallocated_points = info.unallocated_points
+            unallocated_permissions = info.unallocated_permissions
+        context['summary_points'] = points
+        context['summary_permissions'] = permissions
+        context['summary_resistances'] = resistances
+        context['summary_equipment'] = equipment
+        context['unallocated_points'] = unallocated_points
+        context['unallocated_permissions'] = unallocated_permissions
+        context['f'] = f
+
+        # про членство в группе
+        person_group = pe.group_set.all()  # Это Queryset - список групп из 1 группы
         amount = person_group.count()  # это к-во групп с нашим персонажем - или 0, или 1
-        members = Membership.objects.filter(
-            inviter=Person.objects.get(id=context['person_detail'].pk))  # Membership с участием нашего Person
+        members = Membership.objects.filter(inviter=pe)  # Membership с участием нашего Person
         amount1 = members.count()
 
         # Person может быть inviter, участник группы или никто
         # Если amount=0 и amount1>1 - наш person - это inviter
         # Если не inviter, но участник группы - >= 1 (число людей в группе), иначе 0
+
         if amount >= 1:
             context['group_status'] = 'в группе'
             context['inviter_person'] = Membership.objects.filter(group_id=person_group[0].id)[0].inviter
-            context['participants'] = person_group[
-                0].members.all()  # Queryset список Person - членов гРуппы, без inviter
+            context['participants'] = person_group[0].members.all()  # список Person - членов гРуппы, без inviter
 
             # Если не inviter или не состоит в группе - получится 0
         elif amount == 0 and amount1 == 0:
@@ -479,31 +755,8 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                 participants.append(member.person)
             context['inviter_person'] = members[0].inviter
             context['participants'] = participants
-        # Берем информацию из PersonBar
-        info = Person.objects.get(id=context['person_detail'].pk).personbar_set.all()[0]
 
-        points = dict()
-        for key, value in info.summary_points.items():
-            points[slovar.dict_points_start.get(key)] = value
-
-        permissions = dict()
-        for key, value in info.summary_permissions.items():
-            permissions[slovar.dict_permissions_start.get(key)] = value
-
-        resistances = dict()
-        for key, value in info.summary_resistances.items():
-            resistances[slovar.dict_resistances_start.get(key)] = value
-
-        equipment = dict()
-        for key, value in info.summary_equipment.items():
-            equipment[slovar.dict_equipment_start.get(key)] = value
-
-        context['summary_points'] = points
-        context['summary_permissions'] = permissions
-        context['summary_resistances'] = resistances
-        context['summary_equipment'] = equipment
-        context['unallocated_points'] = info.unallocated_points
-        context['unallocated_permissions'] = info.unallocated_permissions
+        # Посчитали стартовые характеристики персонажа с учетом Расы м features
 
         health = round(25 * (points['Стамина'] * 0.2
                              + points['Интеллект'] * 0.2
@@ -572,8 +825,8 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                                                   resistances.get('Устойчивость к порезам') +
                                                   resistances.get('Устойчивость к протыканию')
                                                   ) / 3, 0)
-        # context['rov'] = rov
-        # context['fov'] = fov
+        context['rov'] = rov
+        context['fov'] = fov
         # context['person_img'] = person_img
         return context
 
@@ -1609,6 +1862,7 @@ class RegionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         """
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
 
 #  REST API
 

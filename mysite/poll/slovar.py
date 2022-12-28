@@ -114,4 +114,4 @@ dict_equipment_start = {
 }
 mypoints = dict()
 for key in dict_points.keys():
-    mypoints[key]= 0
+    mypoints[key] = 0
