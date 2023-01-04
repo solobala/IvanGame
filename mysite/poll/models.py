@@ -923,3 +923,60 @@ class History(models.Model):
 
     def save(self, *args, **kwargs):
         super(History, self).save(*args, **kwargs)
+
+
+class Inventory(models.Model):
+    """
+      Инвентарь (рюкзак)
+      """
+    inventory_name = models.CharField(max_length=128, blank=True, null=True)
+    inventory_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    inventory_max_weight = models.IntegerField(verbose_name='Уровень', default=0)
+    consumables_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
+    thing_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'inventory'
+        verbose_name = "Inventory"
+        verbose_name_plural = "Inventories"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.inventory_name
+
+    def get_absolute_url(self):
+        return reverse('poll:inventory-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Inventory, self).save(*args, **kwargs)
+
+
+class Safe(models.Model):
+    """
+      Сейф
+      """
+    safe_name = models.CharField(max_length=128, blank=True, null=True)
+    safe_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    rental_price = models.IntegerField(verbose_name='Уровень', default=0)
+    consumables_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
+    thing_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'safe'
+        verbose_name = "Safe"
+        verbose_name_plural = "Safes"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.safe_name
+
+    def get_absolute_url(self):
+        return reverse('poll:safe-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Safe, self).save(*args, **kwargs)

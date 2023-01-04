@@ -1,0 +1,12 @@
+<!-- templates/poll/inventory_delete.html -->
+{% extends "poll/header.html"  %}
+
+{% block content %}
+    <h1>Удаление рюкзака</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+      <p>Are you sure you want to delete {{ inventory_update.inventory_name }}?</p>
+      <input type="submit" value="Confirm" />
+    </form>
+{% endblock content %}

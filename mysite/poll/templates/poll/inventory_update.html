@@ -1,0 +1,17 @@
+<!-- templates/poll/inventory_update.html -->
+{% extends "poll/header.html" %}
+{% block content %}
+    <h4>Изменение Рюкзака</h4>
+ <div style="width:350px; margin-left:20px;margin-top:20px">
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.media }}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+{% if user.username == 'gameadmin' %}
+<p><a href="{% url 'poll:inventory-delete' inventory_update.pk %}"> Удалить Рюкзак {{ inventory_update.inventory_name }}? </a></p>
+{% endif %}
+ </div>
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ inventory_detail.inventory_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+    <p><h4>Название: </h4> {{ inventory_detail.inventory_name }}</p>
+    <p><h4>Описание: </h4> {{ inventory_detail.inventory_description|safe }}</p>
+    <p><h4>Персонаж: </h4> {{ inventory_detail.person.person_name }}</p>
+    <p><h4>Стоимость аренды: </h4> {{ inventory_detail.inventory_max_weight }}</p>
+    <p><h4>Стоимость расходников: </h4> {{ inventory_detail.consumables_sum_value }}</p>
+    <p><h4>Стоимость артефактов: </h4> {{ inventory_detail.thing_sum_value }}</p>
+
+  </div>
+
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:inventory-update' inventory_detail.pk %}">+ Изменить Рюкзак {{ inventory_detail.safe_name }}?</a></p>
+<p align="left"><a href="{% url 'poll:inventory-delete' inventory_detail.pk %}">- Удалить Рюкзак {{ inventory_detail.safe_name }}?</a></p>
+
+{% endif %}
+
+{% endblock %}

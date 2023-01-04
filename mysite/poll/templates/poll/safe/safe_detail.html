@@ -1,0 +1,22 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ safe_detail.safe_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+    <p><h4>Название: </h4> {{ safe_detail.safe_name }}</p>
+    <p><h4>Описание: </h4> {{ safe_detail.safe_description|safe }}</p>
+    <p><h4>Персонаж: </h4> {{ safe_detail.person.person_name }}</p>
+    <p><h4>Стоимость аренды: </h4> {{ safe_detail.rental_price }}</p>
+    <p><h4>Стоимость расходников: </h4> {{ safe_detail.consumables_sum_value }}</p>
+    <p><h4>Стоимость артефактов: </h4> {{ safe_detail.thing_sum_value }}</p>
+    <p><h4>Локация: </h4> {{ safe_detail.location.location_name }}</p>
+  </div>
+
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:safe-update' safe_detail.pk %}">+ Изменить Сейф {{ safe_detail.safe_name }}?</a></p>
+<p align="left"><a href="{% url 'poll:safe-delete' safe_detail.pk %}">- Удалить Сейф {{ safe_detail.safe_name }}?</a></p>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "poll/header.html" %}
+{% block content %}
+<div style="margin-left:20px;margin-top:65px">
+    <div class="container">
+        <div class="row">
+            <h1>Сейфы</h1>
+           <ul class="list-group">
+            {% for item in safes_list %}
+                <li class="list-group-item" aria-current="true"><a href="/poll/safes/{{ safe.id }}/">{{ safe.safe_name }}</a></li>
+            {% endfor %}
+            </ul>
+            {% if user.username == 'gameadmin' %}
+            <p><a href="{% url 'poll:safe-add' %}">+ Добавить Сейф?</a></p>
+            {% endif %}
+         </div>
+    </div>
+</div>
+{% endblock content %}
+
+
