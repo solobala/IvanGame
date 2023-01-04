@@ -35,6 +35,8 @@ router.register(r'zone', views.ZoneViewSet)
 router.register(r'action', views.ActionViewSet)
 router.register(r'fraction', views.FractionViewSet)
 router.register(r'feature', views.FeatureViewSet)
+router.register(r'history', views.HistoryViewSet)
+router.register(r'personbar', views.PersonBarViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -65,21 +67,21 @@ urlpatterns = [
     path('<status>/persons/', StatusPersonsListView.as_view(), name='status_persons_list_<status>'),
 
 
-    path('persons/add', PersonCreateView.as_view(), name='person-add'),  # new
+    path('persons/add/', PersonCreateView.as_view(), name='person-add'),  # new
     path('persons/<int:pk>/', PersonDetailView.as_view(), name='person-detail'),  # просмотр карточки персонажа
     path('personsother/<int:pk>/', PersonDetailView.as_view(), name='other-person-detail'),  # чужого персонажа
     path('persons/<int:pk>/personbar/', PersonBarDetailView.as_view(), name='person-bar-detail'),    # персонажа
     path('persons/<int:pk>/update/', PersonUpdateView.as_view(), name='person-update'),  # обновление
     path('persons/<int:pk>/delete/', PersonDeleteView.as_view(), name='person-delete'),  # удаление
 
-    path('persons/<int:pk>/group/add/', GroupCreateView.as_view(), name='new_group'),  # new group
+    path('groups/add/', GroupCreateView.as_view(), name='group-add'),  # создание группы
     path('groups/<int:pk>/', GroupDetailView.as_view(), name='group-detail'),  # просмотр карточки группы
     path('groups/<int:pk>/update/', GroupUpdateView.as_view(), name='group-update'),  # редактирование имени группы
     path('groups/<int:pk>/delete/', GroupDeleteView.as_view(), name='group-delete'),
     path('groups/', GroupsListView.as_view(), name='groups-list'),
 
     path('persons/<int:pk>/membership-delete/', MembershipDeleteView.as_view(), name='membership-delete'),
-    path('persons/<int:pk>/group-add/', GroupCreateView.as_view(), name='group-add'),  # создание группы
+
     path('persons/<int:pk>/membership-update/', MembershipUpdateView.as_view(), name='membership-update'),
     path('persons/<int:pk>/membership/', MembershipListView.as_view(), name='membership-list'),
 

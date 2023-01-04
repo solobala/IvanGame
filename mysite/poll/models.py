@@ -28,7 +28,7 @@ class Owner(models.Model):
 
     owner_name = models.CharField('Игрок', max_length=45, blank=True, null=True)
     owner_description = RichTextField('Описание', max_length=200, blank=True, null=True)
-    link = models.CharField('Ссылка', max_length=9, blank=True, null=True)
+    link = models.URLField('Ссылка', max_length=9, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     owner_status = models.CharField(
         max_length=1,
@@ -37,8 +37,7 @@ class Owner(models.Model):
     owner_img = models.ImageField('Изображение', upload_to='media/euploads')
 
     def __str__(self):
-        # return self
-        # return "%s, %s, %s, %s" % (self.owner_name, self.owner_description, self.link, self.owner_status)
+
         return "%s" % self.owner_name
 
     def get_absolute_url(self):
@@ -53,15 +52,16 @@ class Owner(models.Model):
                 self.owner_status = self.Status.BUSY
             else:
                 self.owner_status = self.Status.FREE
-        except:
+        except self.DoesNotExist:
             self.owner_status = self.Status.FREE
         finally:
             super().save(*args, **kwargs)
 
     @property
-    def full_name(self):
-        """Возвращает имя игрока"""
-        return "%s" % self.owner_name
+    def full_link(self):
+        """Возвращает ссылку"""
+        self.link ='https://vk.com/id'+self.link
+        return "%s" % self.link
 
     class Meta:
         managed = True
@@ -412,9 +412,8 @@ class Region(models.Model):
     y = models.IntegerField('Y', blank=True, null=True)
     row = models.IntegerField('row', blank=True, null=True)
     column = models.IntegerField('column', blank=True, null=True)
-    # fraction = models.IntegerField('Фракция', blank=True, null=True)
-    # zone = models.IntegerField('Зона', blank=True, null=True)
-    location = models.IntegerField('Локация', blank=True, null=True)
+    # location = models.IntegerField('Локация', blank=True, null=True)
+    location = models.ForeignKey(Location, verbose_name='Локация', on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.CASCADE)
     fraction = models.ForeignKey('Fraction', verbose_name='Фракция', on_delete=models.CASCADE)
 
@@ -479,7 +478,7 @@ class Group(models.Model):
                 for member in self.members.through.objects.filter(group__id=self.id):
                     self.group_name = self.group_name + '; ' + member.person.person_name
 
-        except:
+        except self.DoesNotExist:
             pass
         finally:
             return "%s" % self.group_name
@@ -503,7 +502,7 @@ class Group(models.Model):
                     group__id=self.pk).inviter.person_name
                 for member in self.members.through.objects.filter(group__id=self.pk):
                     self.group_name = self.group_name + '; ' + member.person.person_name
-        except:
+        except self.members.count() == 0:
             pass
         finally:
             super().save(*args, **kwargs)
@@ -740,6 +739,7 @@ class PersonBar(models.Model):
     fov = models.IntegerField(verbose_name='Область обзора', default=0)
     rov = models.IntegerField(verbose_name='Дальность обзора', default=0)
     level = models.IntegerField(verbose_name='Уровень', default=0)
+    conditions = models.JSONField(verbose_name='Кондиции', blank=True, null=True)
 
     def __str__(self):
         return "%s" % self.person.person_name
@@ -905,6 +905,8 @@ class History(models.Model):
     level_old = models.IntegerField(verbose_name='Прежний уровень', blank=True, null=True)
     level_new = models.IntegerField(verbose_name='Новый уровень', blank=True, null=True)
     last_update = models.TimeField(auto_now=True)
+    conditions_old = models.JSONField(verbose_name='Прежние кондиции', blank=True, null=True)
+    conditions_new = models.JSONField(verbose_name='Новые кондиции', blank=True, null=True)
 
     class Meta:
         managed = True

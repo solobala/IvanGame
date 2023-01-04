@@ -1,51 +1,37 @@
 {% extends "poll/header.html" %}
-
 {% block content %}
+ <div style="margin-left:20px;margin-top:65px">
+     <div class="row">
+        {% include "poll/owner/owner_detail_min.html" %}
+         <table>
+             <thead>
+                 <tr>
+                     <th>
+                         <h4>Персонажи игрока:  </h4>
+                     </th>
+                 </tr>
+             </thead>
+             <tbody>
+                {% for selected_person in owner_detail.person_set.all %}
+                    {% if owner_detail.created_by.username == user.username and selected_person.created_by.username == user.username and owner_detail.id == selected_person.owner.id %}
+                     <tr>
+                         <td colspan="1"><h6><a href="/poll/persons/{{ selected_person.id }}/">{{ selected_person.person_name }}</a></h6></td>
+                    </tr>
+                     {% elif owner_detail.id != selected_person.owner.id %}
+                    <tr>
+                         <td colspan="1"><h6>{{ selected_person.person_name }}</h6></td>
+                    </tr>
+                     {% endif %}
+                {% endfor %}
+              </tbody>
+         </table>
 
-  <div style="margin-left:20px;margin-top:20px">
-      <h2>{{ owner_detail.owner_name }}</h2>
-   <table class="editorDemoTable" width="350" border="1">
-      <tbody>
-      <tr>
-          <td rowspan="4"><img src="{{ object.owner_img.url }}"></td>
-          <td rowspan="4">{{ owner_detail.person_set.all|first}}</td>
-           <td >{{ owner_detail.link }}
-           <p>{{owner_status_}}</p>
-            <p> {{owner_detail.created_by.user.date_joined|date:"SHORT_DATE_FORMAT"}}</p>
-               <p> {{owner_detail.created_by.user.last_login|date:"SHORT_DATE_FORMAT"}}</p>
-           </td>
-          <td colspan="6">{{ owner_detail.description|safe }}</td>
-      </tr>
-      </tbody>
-   </table>
-
-
-  <p><h4>Текущий статус:</h4>  </p>
-  <table class="editorDemoTable" width="350" border="1">
-      <tbody>
-            <tr>
-                 <td colspan="1"><h4>Персонажи игрока:  </h4></td>
-            </tr>
-        {% for selected_person in owner_detail.person_set.all %}
-            {% if owner_detail.created_by.username == user.username and selected_person.created_by.username == user.username and owner_detail.id == selected_person.owner.id %}
-             <tr>
-                 <td colspan="1"><h4><a href="/poll/persons/{{ selected_person.id }}/">{{ selected_person.person_name }}</a></h4></td>
-            </tr>
-             {% elif owner_detail.id != selected_person.owner.id %}
-            <tr>
-                 <td colspan="1"><h4>{{ selected_person.person_name }}</h4></td>
-            </tr>
-             {% endif %}
-        {% endfor %}
-      </tbody>
-  </table>
-
-
-{% if owner_detail.created_by.username == user.username %}
-<p></p>
-<p><a href="{% url 'poll:owner-update' owner_detail.pk %}">+ Изменить данные игрока</a></p>
-<p><a href="{% url 'poll:owner-delete' owner_detail.pk %}">- Удалить игрока?</a></p>
-<p><a href="{% url 'poll:person-add'%}">+ Добавить персонаж?</a></p>
-{% endif %}
+         {% if owner_detail.created_by.username == user.username %}
+            <p></p>
+            <p><a href="{% url 'poll:owner-update' owner_detail.pk %}">+ Изменить данные игрока</a></p>
+            <p><a href="{% url 'poll:owner-delete' owner_detail.pk %}">- Удалить игрока?</a></p>
+            <p><a href="{% url 'poll:person-add'%}">+ Добавить персонаж?</a></p>
+         {% endif %}
+     </div>
  </div>
 {% endblock %}

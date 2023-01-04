@@ -1,0 +1,111 @@
+
+             <table class="table table-bordered border-primary table-sm table-hover rounded" border="1">
+                <tbody>
+
+                    <tr>
+                        <td><h6> Владелец: </h6></td>
+                        <td><a href="/poll/owners/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
+                    </tr>
+                    {% if object.person_img.url %}
+                    <tr>
+                        <td><h6>Изображение:</h6></td>
+                        <td> <img src="{{ object.person_img.url }}" width="150" height="150"></td>
+                    </tr>
+                     {% endif %}
+                    {% if person_detail.description %}
+                    <tr>
+                        <td><h6>Краткое описание:</h6></td>
+                        <td> {{ person_detail.description|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.link %}
+                    <tr>
+                        <td><h6>Ссылка:</h6></td>
+                        <td>{{ person_detail.link }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.biography %}
+                    <tr>
+                        <td><h6>Биография:</h6></td>
+                        <td> {{ person_detail.biography|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.character %}
+                    <tr>
+                        <td><h6>Характер:</h6></td>
+                        <td> {{ person_detail.character|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.interests %}
+                    <tr>
+                        <td><h6>Интересы:</h6></td>
+                        <td> {{ person_detail.interests|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.phobias %}
+                    <tr>
+                        <td><h6>Фобии:</h6></td>
+                        <td> {{ person_detail.phobias|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td><h6>Раса:</h6></td>
+                        <td>{{ person_detail.race }}</td>
+                    </tr>
+
+                    {% if person_detail.location_birth %}
+                    <tr>
+                        <td><h6>Мeсто возрождения:</h6></td>
+                        <td>{{ person_detail.location_birth }}</td>
+                    </tr>
+                     {% endif %}
+                     {% if person_detail.birth_date %}
+                    <tr>
+                        <td><h6>Дата рождения:</h6></td>
+                        <td>{{ person_detail.birth_date }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.location_death %}
+                    <tr>
+                        <td><h6>Мeсто смерти:</h6></td>
+                        <td>{{ person_detail.location_death }}</td>
+                    </tr>
+                    {% endif %}
+                     {% if person_detail.death_date %}
+                    <tr>
+                        <td><h6>Дата смерти:</h6></td>
+                        <td>{{ person_detail.death_date }}</td>
+                    </tr>
+                     {% endif %}
+                    <tr>
+                        <td><h6>Текущий статус:</h6></td>
+                        <td>{% if person_detail.status  == '1' %}
+                            Свободен
+                            {% elif person_detail.status  == '2'%}
+                            Занят
+                            {% else %}
+                            Заморозка
+                            {% endif %}
+                        </td>
+                    </tr>
+                     {% if person_detail.features.all %}
+                    <tr>
+                        <td><h6>Слабости и особенности:</h6></td>
+                        <td>
+                            {% for feature in person_detail.features.all %}
+                            <ul>
+                                <li> {{ feature.feature_name }}</li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                 </tbody>
+            </table>
+
+
+
+
+
+
+

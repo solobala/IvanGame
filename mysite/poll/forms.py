@@ -279,10 +279,12 @@ class PersonForm(forms.ModelForm):
         'birth_date': forms.DateInput(attrs={'class': 'form-control'}),
         'location_death': forms.Select(attrs={'class': 'form-control'}),
         'death_date': forms.DateInput(attrs={'class': 'form-control'}),
+        'status': forms.Select(attrs={'class': 'form-control'}),
+        'features': forms.SelectMultiple(attrs={'class': 'form-control'}),
     }
 
 
 PersonFormSet = inlineformset_factory(
     Owner, Person, fields=('owner', 'person_name', 'person_img', 'link', 'biography', 'character', 'interests',
-                           'phobias', 'race', 'location_birth', 'birth_date', 'location_death', 'death_date',),
+                           'phobias', 'race', 'location_birth', 'birth_date', 'location_death', 'death_date', 'status', 'features'),
     form=PersonForm, extra=1, can_delete=True, can_delete_extra=True)

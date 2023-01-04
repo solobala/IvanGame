@@ -1,11 +1,15 @@
 {% extends "poll/header.html" %}
 {% block content %}
- <div style="width:300px; margin-left:20px;margin-top:20px">
+ <div style="margin-left:20px;margin-top:65px">
+    <div class="container">
+        <div class="row">
     <h1>Расы</h1>
     <ul>
     {% for race in races_list %}
         <li><a href="/poll/races/{{ race.id }}/">{{ race.get_race_name_display }}</a></li>
     {% endfor %}
     </ul>
+        </div>
+    </div>
  </div>
-{% endblock %}
+{% endblock content %}

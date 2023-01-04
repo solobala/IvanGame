@@ -1,0 +1,205 @@
+{% load poll_extras %}
+            <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                <tbody>
+                 {% for pos in selected_person.personbar_set.all %}
+                    <tr>
+                        <td>
+                            <h6>Уровень:</h6>
+                        </td>
+                        <td>
+                            {{ pos.level }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>Основная характеристика:</h6>
+                        </td>
+                        <td>
+                            {% get_label 'dict_points' pos.summary_points|get_max %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h6>Основной навык:</h6>
+                        </td>
+                        <td>
+                            {% get_label 'dict_permissions' pos.summary_permissions|get_max %}
+                        </td>
+                    </tr>
+                     <tr>
+                        <td><h6>Дальность обзора: </h6></td>
+                        <td align="right">{{ pos.rov }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Область обзора: </h6></td>
+                        <td align="right">{{ pos.fov }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Нераспределенные очки: </h6></td>
+                        <td align="right">{{ pos.unallocated_points }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Нераспределенные умения: </h6></td>
+                        <td align="right">{{ pos.unallocated_permissions }}</td>
+                    </tr>
+
+                     <tr>
+                        <td colspan="2">
+                            <div class="accordion" id="person_cond">
+                                 <div class="accordion-item">
+                                    <h2 class="accordion-header" id="header_cond{{key_cond}}">
+                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                              data-bs-target="#body_cond{{key_cond}}" aria-expanded="true"
+                                              aria-controls="body_cond{{key_cond}}">
+                                        <strong>Кондиции</strong>
+                                      </button>
+                                    </h2>
+                                    <div id="body_cond{{key_cond}}" class="accordion-collapse collapse"
+                                        aria-labelledby="header_cond{{key_cond}}" data-bs-parent="#person_cond">
+                                        <div class="accordion-body">
+                                            <table>
+                                                <tbody>
+                                                    {% for key_cond, value_cond in pos.conditions.items  %}
+                                                    <tr>
+                                                        <td>{% get_label 'dict_conditions' key_cond %}</td>
+                                                        <td align="right">{{ value_cond }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="accordion" id="person_points">
+                                 <div class="accordion-item">
+                                    <h2 class="accordion-header" id="header_poi{{key_point}}">
+                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                              data-bs-target="#body_poi{{key_point}}" aria-expanded="true"
+                                              aria-controls="body_poi{{key_point}}">
+                                        <strong>Характеристики</strong>
+                                      </button>
+                                    </h2>
+                                    <div id="body_poi{{key_point}}" class="accordion-collapse collapse"
+                                        aria-labelledby="header_poi{{key_point}}" data-bs-parent="#person_point">
+                                        <div class="accordion-body">
+                                            <table>
+                                                <tbody>
+                                                    {% for key_point, value_point in pos.summary_points.items  %}
+                                                    <tr>
+                                                        <td>{% get_label 'dict_points' key_point %}</td>
+                                                        <td align="right">{{ value_point }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                     <tr>
+                        <td colspan="2">
+                            <div class="accordion" id="person_resistances">
+                                 <div class="accordion-item">
+                                    <h2 class="accordion-header" id="header_res{{key_res}}">
+                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                              data-bs-target="#body_res{{key_res}}" aria-expanded="true"
+                                              aria-controls="body_res{{key_res}}">
+                                        <strong>Устойчивость</strong>
+                                      </button>
+                                    </h2>
+                                    <div id="body_res{{key_res}}" class="accordion-collapse collapse"
+                                        aria-labelledby="header_res{{key_res}}" data-bs-parent="#person_resistances">
+                                        <div class="accordion-body">
+                                            <table>
+                                                <tbody>
+                                                    {% for key_res, value_res in pos.summary_resistances.items  %}
+                                                    <tr>
+                                                        <td>{% get_label 'dict_resistances' key_res %}</td>
+                                                        <td align="right">{{ value_res }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="accordion" id="person_permissions">
+                                 <div class="accordion-item">
+                                    <h2 class="accordion-header" id="header_per{{key_per}}">
+                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                              data-bs-target="#body_per{{key_per}}" aria-expanded="true"
+                                              aria-controls="body_per{{key_per}}">
+                                        <strong>Навыки</strong>
+                                      </button>
+                                    </h2>
+                                    <div id="body_per{{key_per}}" class="accordion-collapse collapse"
+                                        aria-labelledby="header_per{{key_per}}" data-bs-parent="#person_permissions">
+                                        <div class="accordion-body">
+                                            <table>
+                                                <tbody>
+                                                    {% for key_per, value_per in pos.summary_permissions.items  %}
+                                                    <tr>
+                                                        <td>{% get_label 'dict_permissions' key_per %}</td>
+                                                        <td align="right">{{ value_per }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="accordion" id="person_equipment">
+                                 <div class="accordion-item">
+                                    <h2 class="accordion-header" id="header_eq{{key_eq}}">
+                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                              data-bs-target="#body_eq{{key_eq}}" aria-expanded="true"
+                                              aria-controls="body_eq{{key_eq}}">
+                                        <strong>Снаряжение</strong>
+                                      </button>
+                                    </h2>
+                                    <div id="body_eq{{key_eq}}" class="accordion-collapse collapse"
+                                        aria-labelledby="header_eq{{key_eq}}" data-bs-parent="#person_equipment">
+                                        <div class="accordion-body">
+                                            <table>
+                                                <tbody>
+                                                    {% for key_eq, value_eq in pos.summary_equipment.items  %}
+                                                    <tr>
+                                                        <td>{% get_label 'dict_equipment' key_eq %}</td>
+                                                        <td align="right">{{ value_eq }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+
+
+
+
+

@@ -1,0 +1,22 @@
+
+            <table class="editorDemoTable" border="1">
+                <tbody>
+                     {% if person_detail.features.all %}
+                    <tr>
+                        <td><h6>Слабости и особенности:</h6></td>
+                        <td>
+                            {% for feature in person_detail.features.all %}
+                            <ul>
+                                <li> {{ feature.feature_name }}</li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+
+
+
+

@@ -1,0 +1,34 @@
+                <table  class="table table-bordered border-primary"  border="1">
+                    <thead>
+                        <h2>{{ owner_detail.owner_name }}</h2>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Изображение: </td>
+                            <td> <img src="{{ owner_detail.owner_img.url }}" width="100"> </td>
+                        </tr>
+                        <tr>
+                            <td> Ссылка:</td>
+                            <td><a href="{{ owner_detail.full_link }}">{{ owner_detail.link }}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Статус игрока: </td>
+                            <td>{{owner_status_}}</td>
+                        </tr>
+                        <tr>
+                            <td>В игре с : </td>
+                            <td> {{owner_detail.created_by.date_joined|date:"d/m/Y"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Последний сеанс : </td>
+                            <td> {{owner_detail.created_by.last_login|date:"d/m/Y"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Сведения : </td>
+                            <td> {{ owner_detail.owner_description|safe }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+

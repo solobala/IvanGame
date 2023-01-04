@@ -1,9 +1,9 @@
 {% extends "poll/header.html" %}
 {% block content %}
-    <h1>Список участников группы</h1>
+    <h1>Список групп</h1>
         <ul>
-        {% for participant in group_list %}
-            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
+        {% for group in group_list %}
+            <li><a href="/poll/group/{{ group.id }}/">{{ group.group_name }}</a></li>
         {% endfor %}
         </ul>
 {% endblock %}

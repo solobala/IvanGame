@@ -5,7 +5,7 @@
 {% block content %}
 <form enctype="multipart/form-data" class="container" method="post" id="owner_form">
     {% csrf_token %}
-    <!-- main form start --- in our case product form -->
+    <!-- main form start --- in our case owner form -->
     <div class="card">
         <div class="card-header card-header-secondary">
             <h4 class="card-title">Добавить Игрока</h4>
@@ -27,10 +27,9 @@
             </div>
         {% endfor %}
     </div>
-    <!-- main form end --- in our case product form -->
+    <!-- main form end --- in our case owner form -->
 
-
-     <!-- inline form for Persom start -->
+     <!-- inline form for Person start -->
 
     <!-- EXPLAINING with named_formsets.persons as formset -->
     <!-- Note: named_formsets is used in get_context_data function in views.py -->
@@ -69,6 +68,7 @@
                     <tr>location_death <span style="color: red;" class="required">*</span></tr>
                      <tr>death_date <span style="color: red;" class="required">*</span></tr>
                      <tr>status <span style="color: red;" class="required">*</span></tr>
+                    <tr>features <span style="color: red;" class="required">*</span></tr>
                     <tr>Delete?</tr>
                     <tr>Custom Delete btn</tr>
                 </thead>
@@ -108,7 +108,7 @@
                                             </button>
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="{% url 'products:delete_person' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
+                                                <a href="{% url 'poll:person-delete' formss.instance.pk %}" type="button" class="btn btn-primary">Yes, Delete</a>
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>

@@ -101,10 +101,15 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     ]
 
-CORS_ORIGIN_WHITELIST = (
+# MIDDLEWARE_CLASSES = ( 'corsheaders.middleware.CorsMiddleware', 'django.middleware.common.CommonMiddleware', )
+
+CORS_ORIGIN_WHITELIST = [
 'http://localhost:3000',
 'http://localhost:8000',
-)
+]
+
+CORS_ORIGIN_ALLOW_ALL = False
+
 
 ROOT_URLCONF = "mysite.urls"
 
@@ -247,9 +252,9 @@ BOOTSTRAP5 = {
     },
 }
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend/build/static'),
+]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

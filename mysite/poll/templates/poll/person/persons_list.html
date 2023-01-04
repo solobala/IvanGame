@@ -1,39 +1,44 @@
 {% extends "poll/header.html" %}
 {% block content %}
-<div style="width:300px; margin-left:20px;margin-top:20px">
-    {% if status_persons_list_1 %}
-    <h1>Свободные Персонажи</h1>
-       <ul>
-        {% for person in status_persons_list_1 %}
-            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
-        {% endfor %}
-        </ul>
+<div style="margin-left:20px;margin-top:65px">
+    <div class="container">
+        <div class="row">
+            {% if status_persons_list_1 %}
+            <h1>Свободные Персонажи</h1>
+               <ul>
+                {% for person in status_persons_list_1 %}
+                    <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
+                {% endfor %}
+                </ul>
 
-    {% elif status_persons_list_2 %}
-    <h1>Занятые Персонажи</h1>
-       <ul>
-        {% for person in status_persons_list_2 %}
-            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
-        {% endfor %}
-        </ul>
+            {% elif status_persons_list_2 %}
+            <h1>Занятые Персонажи</h1>
+               <ul>
+                {% for person in status_persons_list_2 %}
+                    <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
+                {% endfor %}
+                </ul>
 
-    {% elif status_persons_list_0 %}
-    <h1>Заморозка</h1>
-       <ul>
-        {% for person in status_persons_list_0 %}
-            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
-        {% endfor %}
-        </ul>
+            {% elif status_persons_list_0 %}
+            <h1>Заморозка</h1>
+               <ul>
+                {% for person in status_persons_list_0 %}
+                    <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
+                {% endfor %}
+                </ul>
 
-    {% else %}
-     <h1>Персонажи</h1>
+            {% else %}
+             <h1>Персонажи</h1>
 
-         <ul>
-        {% for person in persons_list %}
-            <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
-        {% endfor %}
-        </ul>
-<p><a href="{% url 'poll:person-add' %}">+ Добавить Персонаж?</a></p>
-     {% endif %}
-   </div>
-{% endblock %}
+                 <ul>
+                {% for person in persons_list %}
+                    <li><a href="/poll/persons/{{ person.id }}/">{{ person.person_name }}</a></li>
+<!--                     <li><a href="{% url 'poll:person-detail' person.id %}">{{ person.person_name }}</a></li>-->
+                {% endfor %}
+                </ul>
+                <p><a href="{% url 'poll:person-add' %}">+ Добавить Персонаж?</a></p>
+             {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content%}

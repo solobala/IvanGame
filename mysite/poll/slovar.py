@@ -20,26 +20,26 @@ dict_permissions = {
     "Bleed_access": 'Гематомантия',
     "Nature_access": 'Ботаника',
     "Mental_access": 'Псифистика',
-    "Twohanded_access": 'Владение навыками Двуручного оружия',
-    "Polearm_access": 'Владение навыками Древкового оружия',
-    "Onehanded_access": 'Владение навыками Одноручного оружия',
-    "Stabbing_access": 'Владение навыками Колющего оружия',
-    "Cutting_access": 'Владение навыками Режущего оружия',
-    "Crushing_access": 'Владение навыками Дробящего оружия',
-    "Small_arms_access": 'Владение навыками Стрелкового оружия',
-    "Shields_access": 'Владение навыками Щитов'
+    "Twohanded_access": 'Двуручное оружие',
+    "Polearm_access": 'Древковое оружие',
+    "Onehanded_access": 'Одноручное оружие',
+    "Stabbing_access": 'Колющее оружие',
+    "Cutting_access": 'Режущее оружие',
+    "Crushing_access": 'Дробящее оружие',
+    "Small_arms_access": 'Стрелковое оружие',
+    "Shields_access": 'Щиты'
 }
 dict_resistances = {
-    "fire_res": 'Устойчивость к огню',
-    "water_res": 'Устойчивость к воде',
-    "wind_res": 'Устойчивость к воздуху',
-    "dirt_res": 'Устойчивость к земле',
-    "lightning_res": 'Устойчивость к молниям',
-    "holy_res": 'Устойчивость к свету',
-    "curse_res": 'Устойчивость ко тьме',
-    "crush_res": 'Устойчивость к дроблению',
-    "cut_res": 'Устойчивость к порезам',
-    "stab_res": 'Устойчивость к протыканию'
+    "fire_res": 'к огню',
+    "water_res": 'к воде',
+    "wind_res": 'к воздуху',
+    "dirt_res": 'к земле',
+    "lightning_res": 'к молниям',
+    "holy_res": 'к свету',
+    "curse_res": 'ко тьме',
+    "crush_res": 'к дроблению',
+    "cut_res": 'к порезам',
+    "stab_res": 'к протыканию'
 }
 
 dict_equipment = {
@@ -84,26 +84,26 @@ dict_permissions_start = {
     "Bleed_access_start": 'Гематомантия',
     "Nature_access_start": 'Ботаника',
     "Mental_access_start": 'Псифистика',
-    "Twohanded_access_start": 'Владение навыками Двуручного оружия',
-    "Polearm_access_start": 'Владение навыками Древкового оружия',
-    "Onehanded_access_start": 'Владение навыками Одноручного оружия',
-    "Stabbing_access_start": 'Владение навыками Колющего оружия',
-    "Cutting_access_start": 'Владение навыками Режущего оружия',
-    "Crushing_access_start": 'Владение навыками Дробящего оружия',
-    "Small_arms_access_start": 'Владение навыками Стрелкового оружия',
-    "Shields_access_start": 'Владение навыками Щитов'
+    "Twohanded_access_start": 'Двуручное оружие',
+    "Polearm_access_start": 'Древковое оружие',
+    "Onehanded_access_start": 'Одноручное оружие',
+    "Stabbing_access_start": 'Колющее оружие',
+    "Cutting_access_start": 'Режущее оружие',
+    "Crushing_access_start": 'Дробящее оружие',
+    "Small_arms_access_start": 'Стрелковое оружие',
+    "Shields_access_start": 'Щиты'
 }
 dict_resistances_start = {
-    "fire_res_start": 'Устойчивость к огню',
-    "water_res_start": 'Устойчивость к воде',
-    "wind_res_start": 'Устойчивость к воздуху',
-    "dirt_res_start": 'Устойчивость к земле',
-    "lightning_res_start": 'Устойчивость к молниям',
-    "holy_res_start": 'Устойчивость к свету',
-    "curse_res_start": 'Устойчивость ко тьме',
-    "crush_res_start": 'Устойчивость к дроблению',
-    "cut_res_start": 'Устойчивость к порезам',
-    "stab_res_start": 'Устойчивость к протыканию'
+    "fire_res_start": 'к огню',
+    "water_res_start": 'к воде',
+    "wind_res_start": 'к воздуху',
+    "dirt_res_start": 'к земле',
+    "lightning_res_start": 'к молниям',
+    "holy_res_start": 'к свету',
+    "curse_res_start": 'ко тьме',
+    "crush_res_start": 'к дроблению',
+    "cut_res_start": 'к порезам',
+    "stab_res_start": 'к протыканию'
 }
 dict_equipment_start = {
     "HELMET_STATUS_START": 'Шлем',
@@ -112,6 +112,19 @@ dict_equipment_start = {
     "GLOVES_STATUS_START": 'Наручи',
     "ITEM_SLOT_START": 'Прочее'
 }
+dict_conditions = {
+    "health": 'Здоровье',
+    "mental_health": 'Ментальное здоровье',
+    "endurance": 'Выносливость',
+    "mana": 'Мана',
+    "hungry": 'Голод',
+    "intoxication": 'Интоксикация',
+    "load_capacity": 'Переносимый вес',
+    "avg_magic_resistance": 'Устойчивость к маг. урону',
+    "avg_physic_resistance": 'Устойчивость к физ. урону'
+
+}
 mypoints = dict()
 for key in dict_points.keys():
     mypoints[key] = 0
+

@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
+from django.contrib import admin
+from django.template.defaulttags import url
+# from ..poll import views
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.conf import settings
@@ -27,11 +29,12 @@ admin.autodiscover()
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('', include('poll.urls')),
+                  # url(r'^api/customers/$', views.owners_list),
+                  # url(r'^api/customers/(?P<pk>[0-9]+)$', views.owner_detail),
 
                   path('poll/', include('poll.urls')),
 
                   path('accounts/', include('allauth.urls')),
-
 
                   path('password_reset/done/',
                        auth_views.PasswordResetDoneView.as_view(template_name='poll/password/password_reset_done.html'),

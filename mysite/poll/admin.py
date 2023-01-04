@@ -31,3 +31,4 @@ admin.site.register(Region)
 admin.site.register(District)
 admin.site.register(Zone)
 admin.site.register(ActionType)
+

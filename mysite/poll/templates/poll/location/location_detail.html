@@ -2,13 +2,22 @@
 {% block content %}
   <h2>{{ location_detail.location_name }}</h2>
   <div style="margin-left:20px;margin-top:20px">
-    <p><h4>Название: </h4> {{ location_detail.location_name }}</p>
-    <p><h4>Описание: </h4> {{ location_detail.location_description|safe }}</p>
-    <p><h4>Локация: </h4> {{ location_detail.zone }}</p>
-
-           <table class="editorDemoTable" width="350" border="1">
+    <p><h4>Описание</h4> {{ location_detail.location_description|safe }}</p>
+         <table class="editorDemoTable" width="350" border="1">
             <tbody>
+            <tr>
+                 <td colspan="1"><h4>Регионы локации</h4></td>
+                <td colspan="1"><h4>Зоны</h4></td>
+            </tr>
+            {% for selected_region in location_detail.region_set.all %}
 
+             <tr>
+                 <td colspan="1"><h4><a href="/poll/regions/{{ selected_region.id }}/">{{ selected_region.region_name }}</a></h4></td>
+                 <td colspan="1"><h4><a href="/poll/zones/{{ selected_region.zone.id }}/">{{ selected_region.zone.zone_name }}</a></h4></td>
+            </tr>
+
+
+        {% endfor %}
             </tbody>
         </table>
  </div>

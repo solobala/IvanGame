@@ -1,0 +1,284 @@
+
+
+           <main class="col-md-6">
+            <table class="editorDemoTable" border="1">
+                <tbody>
+                    <tr>
+                        <td><h6> Персонаж: </h6></td>
+                        <td><h6>{{ person_detail.person_name }}</h6></td>
+                    </tr>
+                    <tr>
+                        <td><h6> Владелец: </h6></td>
+                        <td><a href="/poll/owners/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
+                    </tr>
+                    {% if object.person_img.url %}
+                    <tr>
+                        <td><h6>Изображение:</h6></td>
+                        <td> <img src="{{ object.person_img.url }}" width="150" height="150"></td>
+                    </tr>
+                     {% endif %}
+                    {% if person_detail.description %}
+                    <tr>
+                        <td><h6>Краткое описание:</h6></td>
+                        <td> {{ person_detail.description }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.link %}
+                    <tr>
+                        <td><h6>Ссылка:</h6></td>
+                        <td>{{ person_detail.link }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.biography %}
+                    <tr>
+                        <td><h6>Биография:</h6></td>
+                        <td> {{ person_detail.biography }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.character %}
+                    <tr>
+                        <td><h6>Характер:</h6></td>
+                        <td> {{ person_detail.character }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.interests %}
+                    <tr>
+                        <td><h6>Интересы:</h6></td>
+                        <td> {{ person_detail.interests }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.phobias %}
+                    <tr>
+                        <td><h6>Фобии:</h6></td>
+                        <td> {{ person_detail.phobias|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td><h6>Раса:</h6></td>
+                        <td>{{ person_detail.race }}</td>
+                    </tr>
+                      {% if person_detail.features.all %}
+                    <tr>
+                        <td><h6>Слабости и особенности:</h6></td>
+                        <td>
+                            {% for feature in person_detail.features.all%}
+                            <ul>
+                                <li> {{ feature.feature_name }}</li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    {% if person_detail.location_birth %}
+                    <tr>
+                        <td><h6>Мeсто возрождения:</h6></td>
+                        <td>{{ person_detail.location_birth }}</td>
+                    </tr>
+                     {% endif %}
+                     {% if person_detail.birth_date %}
+                    <tr>
+                        <td><h6>Дата рождения:</h6></td>
+                        <td>{{ person_detail.birth_date }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if person_detail.location_death %}
+                    <tr>
+                        <td><h6>Мeсто смерти:</h6></td>
+                        <td>{{ person_detail.location_death }}</td>
+                    </tr>
+                    {% endif %}
+                     {% if person_detail.death_date %}
+                    <tr>
+                        <td><h6>Дата смерти:</h6></td>
+                        <td>{{ person_detail.death_date }}</td>
+                    </tr>
+                     {% endif %}
+                    <tr>
+                        <td><h6>Текущий статус:</h6></td>
+                        <td>{% if person_detail.status  == '1' %}
+                            Свободен
+                            {% elif person_detail.status  == '2'%}
+                            Занят
+                            {% else %}
+                            Заморозка
+                            {% endif %}
+                        </td>
+                    </tr>
+                     <tr>
+                        <td><h6>Основная характеристика:</h6></td>
+                        <td>{{ main_point }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Основное умение:</h6></td>
+                        <td>{{ main_permission }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Дальность обзора: </h6></td>
+                        <td>{{ rov }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Область обзора: </h6></td>
+                        <td>{{ fov }}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Нераспределенные очки: </h6></td>
+                        <td>{{ unallocated_points}}</td>
+                    </tr>
+                    <tr>
+                        <td><h6>Нераспределенные умения: </h6></td>
+                        <td>{{ unallocated_permissions}}</td>
+                    </tr>
+
+                    <tr>
+                        <td><h6>Членство в группе:</h6></td>
+                        <td>{{ group_status }}</td>
+                    </tr>
+                    {% if group_status != 'в группе' %}
+                    <tr>
+                        {% if person_detail.created_by.username == user.username %}
+                        <td colspan="2">
+                            <p><a href="{% url 'poll:group-add' %}"> + Организовать группу? </a></p>
+                            <p><a href="{% url 'poll:membership-update' person_detail.id %}"> + Вступить в группу? </a></p>
+                        </td>
+                        {% endif %}
+                    {% else %}
+                        <td><h6> Организатор группы : </h6></td>
+                        <td><a href="/poll/persons/{{inviter_person.id }}/"> {{inviter_person.person_name}}</a></td>
+                    </tr>
+                    <tr>
+                        <td><h6>Участники группы: </h6></td>
+                        <td>
+                            {% for participant in participants %}
+                            <ul>
+                                <li><a href="/poll/persons/{{ participant.id }}/"> {{ participant.person_name }}</a></li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if inviter_person.person_name == person_detail.person_name %}
+                            <p><a href="{% url 'poll:group-delete' person_detail.id %}"> + Пригласить в группу?</a></p>
+                            <p><a href="{% url 'poll:group-delete' person_detail.id %}"> + Удалить из группы?</a></p>
+                            {% else %}
+                            <p><a href="{% url 'poll:group-delete' person_detail.id %}"> + Выйти из группы?</a></p>
+                            {% endif %}
+                        </td>
+                        <td></td>
+                    </tr>
+                {% endif %}
+
+                </tbody>
+            </table>
+            </main>
+            <sidebar class="col-md-6">
+             <table class="editorDemoTable" border="3">
+                <tbody>
+
+                <tr>
+                        <td colspan="2"><h6>Кондиции: </h6></td>
+                    </tr>
+                    <tr>
+                        <td>Здоровье:</td>
+                        <td align="right">{{ health|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Ментальное здоровье:</td>
+                        <td align="right">{{ mental_health|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Выносливость:</td>
+                        <td align="right">{{ endurance|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Мана:</td>
+                        <td align="right">{{ mana|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Голод:</td>
+                        <td align="right">{{ hungry|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Интоксикация:</td>
+                        <td align="right">{{ intoxication|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Переносимый вес:</td>
+                        <td align="right">{{ load_capacity|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Устойчивость к физ. урону:</td>
+                        <td align="right">{{ avg_physic_resistance|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Устойчивость к маг. урону:</td>
+                        <td align="right">{{ avg_magic_resistance|floatformat:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><h6>Снаряжение: </h6></td>
+                     </tr>
+
+                    {% for key, value in summary_equipment.items %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td align="right">{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </sidebar>
+
+            <article class="col-md-6">
+             <table class="editorDemoTable" border="3">
+                <tbody>
+                    <tr>
+                        <td colspan="2"><h6>Х-ки: </h6></td>
+                    </tr>
+
+                    {% for key, value in summary_points.items %}
+                    <tr>
+                        <td>
+                            {{ key}}
+                        </td>
+                        <td align="right">{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2"><h6>Устойчивость: </h6></td>
+                    </tr>
+                    {% for key, value in summary_resistances.items %}
+                    <tr>
+                        <td>
+                            {{key }}
+                        </td>
+                        <td align="right">{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            </article>
+
+            <aside class="col-md-6 ">
+             <table class="editorDemoTable" border="3">
+                <tbody>
+                    <tr>
+                        <td colspan="2"><h6>Навыки: </h6></td>
+                    </tr>
+                    {% for key, value in summary_permissions.items %}
+                    <tr>
+                        <td>
+                            {{ key }}
+                        </td>
+                        <td align="right">{{ value }}</td>
+                    </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+            </aside>
+
+
+
+
+
