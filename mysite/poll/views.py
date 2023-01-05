@@ -15,11 +15,7 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
-from .models import Owner, Person, Group, Membership, Race, PersonBar
-from .models import Action, Location, Feature, Fraction, Zone, Region, History
-from .serializers import OwnerSerializer, PersonSerializer, GroupSerializer, MembershipSerializer, RaceSerializer
-from .serializers import FractionSerializer, LocationSerializer, ZoneSerializer, ActionSerializer, RegionSerializer
-from .serializers import FeatureSerializer, PersonBarSerializer, HistorySerializer
+from .models import *
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import NewUserForm, ActionUpdateForm, FeatureUpdateForm, OwnerForm
@@ -819,11 +815,11 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
                         info = PersonBar.objects.get(person=pe)
                     except PersonBar.DoesNotExist:
                         info = PersonBar(person=pe, race=pe.race, summary_points=summary_points,
-                                        summary_permissions=summary_permissions,
-                                        summary_resistances=summary_resistances,
-                                        summary_equipment=summary_equipment, unallocated_points=6,
-                                        unallocated_permissions=3,
-                                        fov=fov, rov=rov, level=0, conditions=conditions)
+                                         summary_permissions=summary_permissions,
+                                         summary_resistances=summary_resistances,
+                                         summary_equipment=summary_equipment, unallocated_points=6,
+                                         unallocated_permissions=3,
+                                         fov=fov, rov=rov, level=0, conditions=conditions)
                         info.save()  # записали в Personbar 1-ю запись
                 # unallocated_points = 6
                 # unallocated_permissions = 3
@@ -1968,78 +1964,384 @@ class RegionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         return super().form_valid(form)
 
 
+class SafesListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Сейфов
+    """
+    template_name = 'poll/safe/safes_list.html'
+    context_object_name = 'safes_list'
+    model = Safe
+    login_url = 'poll:login'
+
+
+class SafeDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Сейфу
+    """
+    template_name = 'poll/safe/safe_detail.html'
+    context_object_name = 'safe_detail'
+    model = Safe
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class SafeUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Сейфа
+    """
+    model = Safe
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен Сейф
+
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class SafeDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Сейфа
+    """
+    model = Safe
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:safes-list')
+    context_object_name = 'safe_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['safe_name'] = context['safe_detail'].safe_name
+        return context
+
+
+class SafeCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Сейфа
+    """
+    model = Safe
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан Сейф
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class InventoriesListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Рюкзаков
+    """
+    template_name = 'poll/inventory/inventories_list.html'
+    context_object_name = 'inventories_list'
+    model = Inventory
+    login_url = 'poll:login'
+
+
+class InventoryDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Рюкзаку
+    """
+    template_name = 'poll/inventory/inventory_detail.html'
+    context_object_name = 'inventory_detail'
+    model = Inventory
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class InventoryUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Рюкзака
+    """
+    model = Inventory
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен Сейф
+
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class InventoryDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Рюкзака
+    """
+    model = Inventory
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:inventories-list')
+    context_object_name = 'inventory_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['inventory_name'] = context['inventory_detail'].inventory_name
+        return context
+
+
+class InventoryCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового Сейфа
+    """
+    model = Inventory
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан Рюкзак
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class ThingsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Артефактов
+    """
+    template_name = 'poll/thing/things_list.html'
+    context_object_name = 'things_list'
+    model = Thing
+    login_url = 'poll:login'
+
+
+class ThingDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Артефакту
+    """
+    template_name = 'poll/thing/thing_detail.html'
+    context_object_name = 'thing_detail'
+    model = Thing
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class ThingUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Артефакта
+    """
+    model = Thing
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен Артефакт
+
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class ThingDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Артефакта
+    """
+    model = Thing
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll: things-list')
+    context_object_name = 'thing_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['thing_name'] = context['thing_detail'].thing_name
+        return context
+
+
+class ThingCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового артефакта
+    """
+    model = Thing
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан Артефакт
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class ThingsListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Артефактов
+    """
+    template_name = 'poll/thing/things_list.html'
+    context_object_name = 'things_list'
+    model = Thing
+    login_url = 'poll:login'
+
+class ThingDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Артефакту
+    """
+    template_name = 'poll/thing/thing_detail.html'
+    context_object_name = 'thing_detail'
+    model = Thing
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+class ThingUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Артефакта
+    """
+    model = Thing
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был изменен Артефакт
+
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+class ThingDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Артефакта
+    """
+    model = Thing
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll: things-list')
+    context_object_name = 'thing_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['thing_name'] = context['thing_detail'].thing_name
+        return context
+
+class ThingCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание нового артефакта
+    """
+    model = Thing
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем был создан Артефакт
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
 #  REST API
 
-nt = namedtuple("object", ["model", "serializers"])
-pattern = {
-    "owner": nt(Owner, OwnerSerializer),
-    "person": nt(Person, PersonSerializer),
-    "race": nt(Race, RaceSerializer),
-    "feature": nt(Feature, FeatureSerializer),
-    "region": nt(Region, RegionSerializer),
-    "zone": nt(Zone, ZoneSerializer),
-    "location": nt(Location, LocationSerializer),
-    "fraction": nt(Fraction, FractionSerializer),
-    "group": nt(Group, GroupSerializer),
-    "personbar": nt(PersonBar, PersonBarSerializer),
-    "action": nt(Action, ActionSerializer),
-    "history": nt(History, HistorySerializer),
-}
-
-
-@api_view(['GET', 'POST'])
-def ListView(request, api_name):
-    object = pattern.get(api_name, None)
-    if object == None:
-        return Response(
-            data="Invalid URL",
-            status=status.HTTP_404_NOT_FOUND,
-        )
-    if request.method == "GET":
-        object_list = object.model.objects.all()
-        serializers = object.serializers(object_list, many=True)
-        return Response(serializers.data)
-
-    if request.method == "POST":
-        data = request.data
-        serializers = object.serializers(data=data)
-
-        if not serializers.is_valid():
-            return Response(
-                data=serializers.error,
-                status=status.HTTP_404_NOT_FOUND
-            )
-        serializers.save()
-        return Response(
-            data=serializers.error,
-            status=status.HTTP_201_CREATED
-        )
-
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def owners_detail(request, pk):
-    """
- Retrieve, update or delete a customer by id/pk.
- """
-    try:
-        owner = Owner.objects.get(pk=pk)
-    except Owner.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = OwnerSerializer(owner, context={'request': request})
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = OwnerSerializer(owner, data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        owner.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# nt = namedtuple("object", ["model", "serializers"])
+# pattern = {
+#     "owner": nt(Owner, OwnerSerializer),
+#     "person": nt(Person, PersonSerializer),
+#     "race": nt(Race, RaceSerializer),
+#     "feature": nt(Feature, FeatureSerializer),
+#     "region": nt(Region, RegionSerializer),
+#     "zone": nt(Zone, ZoneSerializer),
+#     "location": nt(Location, LocationSerializer),
+#     "fraction": nt(Fraction, FractionSerializer),
+#     "group": nt(Group, GroupSerializer),
+#     "personbar": nt(PersonBar, PersonBarSerializer),
+#     "action": nt(Action, ActionSerializer),
+#     "history": nt(History, HistorySerializer),
+# }
+#
+#
+# @api_view(['GET', 'POST'])
+# def ListView(request, api_name):
+#     object = pattern.get(api_name, None)
+#     if object == None:
+#         return Response(
+#             data="Invalid URL",
+#             status=status.HTTP_404_NOT_FOUND,
+#         )
+#     if request.method == "GET":
+#         object_list = object.model.objects.all()
+#         serializers = object.serializers(object_list, many=True)
+#         return Response(serializers.data)
+#
+#     if request.method == "POST":
+#         data = request.data
+#         serializers = object.serializers(data=data)
+#
+#         if not serializers.is_valid():
+#             return Response(
+#                 data=serializers.error,
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         serializers.save()
+#         return Response(
+#             data=serializers.error,
+#             status=status.HTTP_201_CREATED
+#         )
+#
+#
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def owners_detail(request, pk):
+#     """
+#  Retrieve, update or delete a customer by id/pk.
+#  """
+#     try:
+#         owner = Owner.objects.get(pk=pk)
+#     except Owner.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#     if request.method == 'GET':
+#         serializer = OwnerSerializer(owner, context={'request': request})
+#         return Response(serializer.data)
+#
+#     elif request.method == 'PUT':
+#         serializer = OwnerSerializer(owner, data=request.data, context={'request': request})
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#     elif request.method == 'DELETE':
+#         owner.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OwnerViewSet(viewsets.ModelViewSet):
@@ -2105,3 +2407,23 @@ class PersonBarViewSet(viewsets.ModelViewSet):
 class HistoryViewSet(viewsets.ModelViewSet):
     queryset = History.objects.all()
     serializer_class = HistorySerializer
+
+
+class SafeViewSet(viewsets.ModelViewSet):
+    queryset = Safe.objects.all()
+    serializer_class = SafeSerializer
+
+
+class InventoryViewSet(viewsets.ModelViewSet):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+
+
+class ThingViewSet(viewsets.ModelViewSet):
+    queryset = Thing.objects.all()
+    serializer_class = ThingSerializer
+
+
+class ConsumableViewSet(viewsets.ModelViewSet):
+    queryset = Consumable.objects.all()
+    serializer_class = ConsumableSerializer

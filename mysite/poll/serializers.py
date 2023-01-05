@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Owner, Person, Group, Membership, Race, Fraction, Location, Zone, Region, Action, Feature
-from .models import PersonBar, History
+from .models import PersonBar, History, Inventory, Safe, Consumable, Thing
 
 
 class OwnerSerializer(serializers.ModelSerializer):
@@ -78,4 +78,28 @@ class PersonBarSerializer(serializers.ModelSerializer):
 class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
+        fields = "__all__"
+
+
+class InventorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inventory
+        fields = "__all__"
+
+
+class SafeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Safe
+        fields = "__all__"
+
+
+class ThingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Thing
+        fields = "__all__"
+
+
+class ConsumableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consumable
         fields = "__all__"

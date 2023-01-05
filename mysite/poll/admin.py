@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Owner, Person, Group, Membership, Race, Clan, Fraction, Location, Action, Region, District, Zone
-from .models import FractionFraction,  PersonFraction, PersonLocation, ActionType
+from .models import FractionFraction,  PersonFraction, PersonLocation, ActionType, Inventory, Safe, Consumable, Thing
 
 
 class PersonInline(admin.TabularInline):
@@ -31,4 +31,8 @@ admin.site.register(Region)
 admin.site.register(District)
 admin.site.register(Zone)
 admin.site.register(ActionType)
+admin.site.register(Thing)
+admin.site.register(Safe)
+admin.site.register(Inventory)
+admin.site.register(Consumable)
 
