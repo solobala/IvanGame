@@ -1,22 +1,52 @@
 {% extends "poll/header.html" %}
 {% block content %}
-  <h2>{{ inventory_detail.inventory_name }}</h2>
-  <div style="margin-left:20px;margin-top:20px">
-    <p><h4>Название: </h4> {{ inventory_detail.inventory_name }}</p>
-    <p><h4>Описание: </h4> {{ inventory_detail.inventory_description|safe }}</p>
-    <p><h4>Персонаж: </h4> {{ inventory_detail.person.person_name }}</p>
-    <p><h4>Стоимость аренды: </h4> {{ inventory_detail.inventory_max_weight }}</p>
-    <p><h4>Стоимость расходников: </h4> {{ inventory_detail.consumables_sum_value }}</p>
-    <p><h4>Стоимость артефактов: </h4> {{ inventory_detail.thing_sum_value }}</p>
-
-  </div>
-
-<hr>
-{% if user.username == 'gameadmin' %}
-
-<p align="left"> <a href="{% url 'poll:inventory-update' inventory_detail.pk %}">+ Изменить Рюкзак {{ inventory_detail.safe_name }}?</a></p>
-<p align="left"><a href="{% url 'poll:inventory-delete' inventory_detail.pk %}">- Удалить Рюкзак {{ inventory_detail.safe_name }}?</a></p>
-
-{% endif %}
-
+<div class="container-fluid" style="margin-left:20px;margin-top:65px">
+    <div class="row">
+        <!--      Здесь должен быть аккордеон - справка по рюкзаку-->
+        {% include "poll/inventory/inventory_detail_min.html" %}
+        <!--      Здесь должен быть аккордеон с прокруткой - список Артефактов-->
+        <div class="accordion" id="thing">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="header_thing_{{key_thing}}">
+                    <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#body_thing_{{key_thing}}" aria-expanded="true"
+                            aria-controls="body_thing_{{key_thing}}">
+                        <strong>Артефакты</strong>
+                    </button>
+                </h2>
+                <div id="body_thing_{{key_thing}}" class="accordion-collapse collapse"
+                     aria-labelledby="header_thing_{{key_thing}}" data-bs-parent="#thing">
+                    <div class="accordion-body">
+                        {% include "poll/inventory/inventory_detail_things.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--      Здесь должен быть аккордеон с прокруткой - список Расходников-->
+       <div class="accordion" id="cons">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="header_cons_{{key_cons}}">
+                    <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#body_cons_{{key_cons}}" aria-expanded="true"
+                            aria-controls="body_cons_{{key_cons}}">
+                        <strong>Расходники</strong>
+                    </button>
+                </h2>
+                <div id="body_cons_{{key_cons}}" class="accordion-collapse collapse"
+                     aria-labelledby="header_cons_{{key_cons}}" data-bs-parent="#cons">
+                    <div class="accordion-body">
+                        {% include "poll/inventory/inventory_detail_consumables.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    {% if user.username == 'gameadmin' %}
+    <p align="left"><a href="{% url 'poll:inventory-update' inventory_detail.pk %}">+ Изменить Рюкзак {{
+        inventory_detail.safe_name }}?</a></p>
+    <p align="left"><a href="{% url 'poll:inventory-delete' inventory_detail.pk %}">- Удалить Рюкзак {{
+        inventory_detail.safe_name }}?</a></p>
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,7 +1,18 @@
-
+<div class="accordion" id="person_portrait">
+    <div class="accordion-item">
+        <h6 class="accordion-header" id="header_por{{person_detail.id}}">
+            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                    style="--bs-accordion-btn-padding-y:0.25rem"
+                    data-bs-target="#body_por{{person_detail.id}}" aria-expanded="true"
+                    aria-controls="body_por{{person_detail.id}}">
+                <strong>Портрет</strong>
+            </button>
+        </h6>
+        <div id="body_por{{person_detail.id}}" class="accordion-collapse collapse"
+             aria-labelledby="header_por{{person_detail.id}}" data-bs-parent="#person_portrait">
+            <div class="accordion-body">
              <table class="table table-bordered border-primary table-sm table-hover rounded" border="1">
                 <tbody>
-
                     <tr>
                         <td><h6> Владелец: </h6></td>
                         <td><a href="/poll/owners/{{ person_detail.owner.id }}/">{{ person_detail.owner.owner_name }} </a></td>
@@ -102,7 +113,10 @@
                     {% endif %}
                  </tbody>
             </table>
-
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

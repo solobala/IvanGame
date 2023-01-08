@@ -143,7 +143,8 @@ def index(request):
         context['owner_detail'] = ow
         context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
         context['person_detail'] = ow.person_set.all()
-
+        context['owners'] = Owner.objects.all()
+        context['free_owners'] = Owner.objects.filter(person__status=1).distinct('owner_name')
     return render(request, 'poll/index.html', context=context)
 
     # # Генерация "количеств" некоторых главных объектов
@@ -354,7 +355,7 @@ class OwnersFreeListView(LoginRequiredMixin, ListView):
     """
     Просмотр списка свободных игроков
     """
-    template_name = 'poll/free_owners/free_owners_list.html'
+    template_name = 'poll/free_owner/free_owners_list.html'
     context_object_name = 'free_owners_list'
     queryset = Owner.objects.filter(person__status=1).distinct('owner_name')
     login_url = 'poll:login'
@@ -472,9 +473,6 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         resistances = dict()
         equipment = dict()
         result = dict()
-        conditions = dict()
-        fov = 0
-        rov = 0
         level = 0
 
         features = []
@@ -607,67 +605,67 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
 
                     for feature in person_features:
                         features.append(feature.feature_name)
-                        sp += feature.points['SP']
-                        mp += feature.points['MP']
-                        ip += feature.points['IP']
-                        pp += feature.points['PP']
-                        ap += feature.points['AP']
-                        fp += feature.points['FP']
-                        lp += feature.points['LP']
-                        cp += feature.points['CP']
-                        bp += feature.points['BP']
+                        sp += feature.points['sp']
+                        mp += feature.points['mp']
+                        ip += feature.points['ip']
+                        pp += feature.points['pp']
+                        ap += feature.points['ap']
+                        fp += feature.points['fp']
+                        lp += feature.points['lp']
+                        cp += feature.points['cp']
+                        bp += feature.points['bp']
 
-                        result['SP'] = sp
-                        result['MP'] = mp
-                        result['IP'] = ip
-                        result['PP'] = pp
-                        result['AP'] = ap
-                        result['FP'] = fp
-                        result['LP'] = lp
-                        result['CP'] = cp
-                        result['BP'] = bp
+                        result['sp'] = sp
+                        result['mp'] = mp
+                        result['ip'] = ip
+                        result['pp'] = pp
+                        result['ap'] = ap
+                        result['fp'] = fp
+                        result['lp'] = lp
+                        result['cp'] = cp
+                        result['bp'] = bp
 
                         for key, value in slovar.dict_points.items():
                             points_feature[slovar.dict_points.get(key)] = result[key]
 
-                        Fire_access += feature.permissions['Fire_access']
-                        Water_access += feature.permissions['Water_access']
-                        Wind_access += feature.permissions['Wind_access']
-                        Dirt_access += feature.permissions['Dirt_access']
-                        Lightning_access += feature.permissions['Lightning_access']
-                        Holy_access += feature.permissions['Holy_access']
-                        Curse_access += feature.permissions['Curse_access']
-                        Bleed_access += feature.permissions['Bleed_access']
-                        Nature_access += feature.permissions['Nature_access']
-                        Mental_access += feature.permissions['Mental_access']
-                        Twohanded_access += feature.permissions['Twohanded_access']
-                        Polearm_access += feature.permissions['Polearm_access']
+                        Fire_access += feature.permissions['fire_access']
+                        Water_access += feature.permissions['water_access']
+                        Wind_access += feature.permissions['wind_access']
+                        Dirt_access += feature.permissions['dirt_access']
+                        Lightning_access += feature.permissions['lightning_access']
+                        Holy_access += feature.permissions['holy_access']
+                        Curse_access += feature.permissions['curse_access']
+                        Bleed_access += feature.permissions['bleed_access']
+                        Nature_access += feature.permissions['nature_access']
+                        Mental_access += feature.permissions['mental_access']
+                        Twohanded_access += feature.permissions['twohanded_access']
+                        Polearm_access += feature.permissions['polearm_access']
                         Onehanded_access += feature.permissions['Onehanded_access']
-                        Stabbing_access += feature.permissions['Stabbing_access']
-                        Cutting_access += feature.permissions['Cutting_access']
-                        Crushing_access += feature.permissions['Crushing_access']
-                        Small_arms_access += feature.permissions['Small_arms_access']
-                        Shields_access += feature.permissions['Shields_access']
+                        Stabbing_access += feature.permissions['stabbing_access']
+                        Cutting_access += feature.permissions['cutting_access']
+                        Crushing_access += feature.permissions['crushing_access']
+                        Small_arms_access += feature.permissions['small_arms_access']
+                        Shields_access += feature.permissions['shields_access']
 
                         result.clear()
-                        result['Fire_access'] = Fire_access
-                        result['Water_access'] = Water_access
-                        result['Wind_access'] = Wind_access
-                        result['Dirt_access'] = Dirt_access
-                        result['Lightning_access'] = Lightning_access
-                        result['Holy_access'] = Holy_access
-                        result['Curse_access'] = Curse_access
-                        result['Bleed_access'] = Bleed_access
-                        result['Nature_access'] = Nature_access
-                        result['Mental_access'] = Mental_access
-                        result['Twohanded_access'] = Twohanded_access
-                        result['Polearm_access'] = Polearm_access
+                        result['fire_access'] = Fire_access
+                        result['water_access'] = Water_access
+                        result['wind_access'] = Wind_access
+                        result['dirt_access'] = Dirt_access
+                        result['lightning_access'] = Lightning_access
+                        result['holy_access'] = Holy_access
+                        result['curse_access'] = Curse_access
+                        result['bleed_access'] = Bleed_access
+                        result['nature_access'] = Nature_access
+                        result['mental_access'] = Mental_access
+                        result['twohanded_access'] = Twohanded_access
+                        result['polearm_access'] = Polearm_access
                         result['Onehanded_access'] = Onehanded_access
-                        result['Stabbing_access'] = Stabbing_access
-                        result['Cutting_access'] = Cutting_access
-                        result['Crushing_access'] = Crushing_access
-                        result['Small_arms_access'] = Small_arms_access
-                        result['Shields_access'] = Shields_access
+                        result['stabbing_access'] = Stabbing_access
+                        result['cutting_access'] = Cutting_access
+                        result['crushing_access'] = Crushing_access
+                        result['small_arms_access'] = Small_arms_access
+                        result['shields_access'] = Shields_access
 
                         for key, value in slovar.dict_permissions.items():
                             permissions_feature[slovar.dict_permissions.get(key)] = result[key]
@@ -914,6 +912,221 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context['features'] = features
 
         # context['person_img'] = person_img
+        return context
+
+
+class PersonBarDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр текущей информации - кондиций, характеристик, навыков, сопротивлений, снаряжения по Персонажу
+    Текущие статистики - сумма по race, feature, consumable, thing, spell, а также с учетом level (из Person)
+    После какого-либо action их значение изменится и будет помещено в PersonBar
+    Старое значение будет перемещено в history
+    """
+    template_name = 'poll/personbar/personbar_detail.html'
+    context_object_name = 'personbar_detail'
+    # queryset = Person.objects.all()
+    model = PersonBar
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['person'] = self.kwargs['person']
+        points = {i: 0 for i in slovar.dict_points}
+        permissions = {i: 0 for i in slovar.dict_permissions}
+        resistances = {i: 0 for i in slovar.dict_resistances}
+        equipment = {i: 0 for i in slovar.dict_equipment}
+        conditions = {i: 0 for i in slovar.dict_conditions}
+        unallocated_points = 0
+        unallocated_permissions = 0
+        # Проверяем, есть ли записи в PersonBar по данному персонажу
+        try:
+            pb = PersonBar.objects.get(person=self.kwargs['person'])
+            #  Записи есть. Значит, не нужно лазать в слабости и особенности
+            # Для расчета текущих статистик берем информацию из PersonBar. Там только 1 запись, остальное в логе
+
+            for key, value in pb.summary_points.items():
+                points[key] = value
+
+            for key, value in pb.summary_permissions.items():
+                permissions[key] = value
+
+            for key, value in pb.summary_resistances.items():
+                resistances[key] = value
+
+            for key, value in pb.summary_equipment.items():
+                equipment[key] = value
+
+            for key, value in pb.conditions.items():
+                conditions[key] = value
+
+            fov = pb.fov
+            rov = pb.rov
+            level = pb.level
+            unallocated_points = pb.unallocated_points
+            unallocated_permissions = pb.unallocated_permissions
+
+        except PersonBar.objects.get(person=self.kwargs['person']).DoesNotExist:
+            # записей  в Personbar нет - нужно проверить, есть ли записи в History
+            try:
+                if History.objects.filter(person=self.kwargs['person']).exists():
+                    history_persons = History.objects.filter(person=self.kwargs['person'])
+                    # если есть - нужно взять последнюю и скопировать в person_bar
+                    last = history_persons.latest('last_update')
+                    race = last.person.race
+                    points = last.points_new
+                    permissions = last.permissions_new
+                    resistances = last.resistances_new
+                    equipment = last.equipment_new
+                    unallocated_points = last.un_points_new
+                    unallocated_permissions = last.un_permissions_new
+                    fov = last.fov_new
+                    rov = last.rov_new
+                    level = last.level_new
+                    conditions = last.conditions_new
+
+                    obj = PersonBar(person=self.kwargs['person'], race=race, summary_points=points,
+                                summary_permissions=permissions, summary_resistances=resistances,
+                                summary_equipment=equipment, unallocated_points=unallocated_points,
+                                unallocated_permissions=unallocated_permissions,
+                                fov=fov, rov=rov, level=level, conditions=conditions)
+                    obj.save()  # скопировали
+            except History.objects.filter(person=self.kwargs['person']).DoesNotExist:
+                # -----------------------------------------------------------------------------------------------------
+                # считаем кондиций на базе features,race
+                # consumables, things, spells не учитываем, т.к это будет уже после action.
+                # У нас - либо самая первая запись, до действий, либо запис уже есть, и там все учтено
+                # Если в personbar Ничего нет- это будут значения для personbar. Если есть - отсюда возьмем
+                # -----------------------------------------------------------------------------------------------------
+                pe = Person.objects.get(id=self.kwargs['person'])
+                race = pe.race
+
+                for key, value in race.start_points.items():
+                    points[key] = race.start_points.value
+
+                for key, value in race.start_permissions.items():
+                    permissions[key] = race.start_permissions.value
+
+                for key, value in race.start_resistances.items():
+                    resistances[key] = race.start_resistances.value
+
+                for key, value in race.equipment.items():
+                    equipment[key] = race.equipment.value
+                fov = race.fov
+                rov = race.rov
+                level = 0  # т.к самая 1 запись, то и уровень 0
+
+                person_features = pe.features.all()  # получим Список фич
+                # features_amount = person_features.count()  # это к-во фич у персонажа
+                # Особенностей нет. Первая запись в PersonBar - только из расы
+                if person_features.count() == 0:
+                    context['features'] = ['без особенностей']
+                else:
+                    # добавляем к расовым суммарные характеристики по всем особенностям
+                    for feature in person_features:
+
+                        for key in points.keys():
+                            points[key] += feature.points[key]
+
+                        for key in permissions.keys():
+                            permissions[key] += feature.permissions[key]
+
+                        for key in resistances.keys():
+                            resistances[key] = feature.resistances[key]
+
+                        for key in equipment.keys():
+                            equipment[key] = feature.equipment[key]
+
+                    # На основании расовых характеристик и особенностей считаем кондиции. Это будут максимально возможные
+                    # кондиции для персонажа на старте
+                    conditions["health"] = round(25 * (points['sp'] * 0.2
+                                                       + points['ip'] * 0.2
+                                                       + points['pp'] * 0.5
+                                                       + points['ap'] * 0.4
+                                                       + points['bp'] * 0.4
+                                                       + (permissions['bleed_access'] * 0.1
+                                                          + permissions['nature_access'] * 0.1
+                                                          + permissions['mental_access'] * 0.1)) ** 1.5, 0)
+
+                    conditions["mental_health"] = round(10 * (points['ip'] * 0.4
+                                                              + points['fp'] * 0.3
+                                                              + points['bp'] * 0.5
+                                                              + (permissions['mental_access'] * 0.1
+                                                                 - abs(permissions['holy_access']
+                                                                       - permissions['curse_access']) * 0.1)) ** 1.2, 0)
+
+                    conditions["endurance"] = round(15 * (points['sp'] * 0.5
+                                                          + points['mp'] * 0.4
+                                                          + points['pp'] * 0.2
+                                                          + points['ap'] * 0.4
+                                                          + (permissions['bleed_access'] * 0.1
+                                                             )) ** 1.2, 0)
+
+                    conditions["mana"] = round(15 * (points['mp'] * 0.5
+                                                     + points['ip'] * 0.4
+                                                     + points['fp'] * 0.2
+                                                     + permissions['mental_access'] * 0.1
+                                                     + abs(permissions['holy_access']
+                                                           - permissions['curse_access'])) ** 1.2, 0)
+
+                    conditions["hungry"] = round(5 * (points['pp'] * 0.3
+                                                      + points['ap'] * 0.3
+                                                      + points['sp'] * 0.3
+                                                      ) ** 1.05, 0)
+
+                    conditions["intoxication"] = round(5 * (points['pp'] * 0.7
+                                              + points['ap'] * 0.1
+                                              + points['sp'] * 0.1
+                                              + permissions['bleed_access'] * 0.1
+                                              ) ** 1.05, 0)
+
+                    conditions["load_capacity"] = round(5 * (points['sp'] * 0.4
+                                                             + points['pp'] * 0.5
+                                                             + points['ap'] * 0.2
+                                                             ) ** 1.05, 0)
+                    conditions["avg_magic_resistance"] = round((resistances.get('fire_res') +
+                                                                resistances.get('water_res') +
+                                                                resistances.get('wind_res') +
+                                                                resistances.get('dirt_res') +
+                                                                resistances.get('lightning_res') +
+                                                                resistances.get('holy_res') +
+                                                                resistances.get('curse_res')
+                                                                ) / 7, 0)
+                    conditions["avg_physic_resistance"] = round((resistances.get('crush_res') +
+                                                                resistances.get('cut_res') +
+                                                                resistances.get('stab_res')
+                                                                 ) / 3, 0)
+
+            # Запишем самую первую запись по Персонажу в PersonBar.
+
+            try:
+                info = PersonBar.objects.get(person=pe)
+            except info.DoesNotExist:
+                conditions = conditions
+                info = PersonBar(person=pe, race=pe.race, summary_points=points,
+                                 summary_permissions=permissions,
+                                 summary_resistances=resistances,
+                                 summary_equipment=equipment, unallocated_points=6,
+                                 unallocated_permissions=3,
+                                 fov=fov, rov=rov, level=0, conditions=conditions)
+                info.save()  # записали в Personbar 1-ю запись
+
+        context['level'] = level
+        context['rov'] = rov
+        context['fov'] = fov
+        context['conditions'] = conditions
+        context['summary_points'] = points
+        context['summary_permissions'] = permissions
+        context['summary_resistances'] = resistances
+        context['summary_equipment'] = equipment
+        context['unallocated_points'] = unallocated_points
+        context['unallocated_permissions'] = unallocated_permissions
+        for key, value in conditions.items():
+            context[key] = value
+        # context['color'] = {"health": 'bg-danger', "mental_health": 'bg-info', "endurance": 'bg_success',
+        #                     "mana": 'bg-primary', "hungry": 'bg-secondary', "intoxication": 'bg-warning',
+        #                     "load_capacity": 'bg-dark', "avg_magic_resistance": 'bg-success bg-opacity-25',
+        #                     "avg_physic_resistance":'bg-primary bg-opacity-25'}
+        # context['colors'] = 'bg_success'
         return context
 
 
@@ -1174,23 +1387,23 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         start_points = dict()
         for key, value in context['race_detail'].start_points.items():
-            start_points[slovar.dict_points_start.get(key)] = value
+            start_points[slovar.dict_points.get(key)] = value
 
         finish_points = dict()
         for key, value in context['race_detail'].finish_points.items():
-            finish_points[slovar.dict_points_max.get(key)] = value
+            finish_points[slovar.dict_points.get(key)] = value
 
         start_permissions = dict()
         for key, value in context['race_detail'].start_permissions.items():
-            start_permissions[slovar.dict_permissions_start.get(key)] = value
+            start_permissions[slovar.dict_permissions.get(key)] = value
 
         start_resistances = dict()
         for key, value in context['race_detail'].start_resistances.items():
-            start_resistances[slovar.dict_resistances_start.get(key)] = value
+            start_resistances[slovar.dict_resistances.get(key)] = value
 
         equipment = dict()
         for key, value in context['race_detail'].equipment.items():
-            equipment[slovar.dict_equipment_start.get(key)] = value
+            equipment[slovar.dict_equipment.get(key)] = value
 
         context['start_points'] = start_points
         context['finish_points'] = finish_points
@@ -1317,13 +1530,13 @@ class ActionCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     login_url = 'poll:login'
     fields = '__all__'
 
-    # fields = ['action_name', 'action_alias', 'action_description', 'points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
-    #           'LP', 'CP', 'BP', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
-    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'Fire_access',
-    #           'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
-    #           'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
-    #           'Onehanded_access',
-    #           'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access', 'Shields_access',
+    # fields = ['action_name', 'action_alias', 'action_description', 'points', 'sp', 'mp', 'ip', 'pp', 'ap', 'fp',
+    #           'lp', 'cp', 'bp', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
+    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'fire_access',
+    #           'water_access', 'wind_access', 'dirt_access', 'lightning_access', 'holy_access', 'curse_access',
+    #           'bleed_access', 'nature_access', 'mental_access', 'twohanded_access', 'polearm_access',
+    #           'onehanded_access',
+    #           'stabbing_access', 'cutting_access', 'crushing_access', 'small_arms_access', 'shields_access',
     #           'equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status', 'item_status']
 
     def get_context_data(self, **kwargs):
@@ -1626,13 +1839,13 @@ class FeatureCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     login_url = 'poll:login'
     fields = '__all__'
 
-    # fields = ['feature_name', 'feature_description', 'points', 'SP', 'MP', 'IP', 'PP', 'AP', 'FP',
-    #           'LP', 'CP', 'BP', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
-    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'Fire_access',
-    #           'Water_access', 'Wind_access', 'Dirt_access', 'Lightning_access', 'Holy_access', 'Curse_access',
-    #           'Bleed_access', 'Nature_access', 'Mental_access', 'Twohanded_access', 'Polearm_access',
-    #           'Onehanded_access', 'Stabbing_access', 'Cutting_access', 'Crushing_access', 'Small_arms_access',
-    #           'Shields_access', 'equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status',
+    # fields = ['feature_name', 'feature_description', 'points', 'sp', 'mp', 'ip', 'pp', 'ap', 'fp',
+    #           'lp', 'cp', 'bp', 'resistances', 'fire_res', 'water_res', 'wind_res', 'dirt_res', 'lightning_res',
+    #           'holy_res', 'curse_res', 'crush_res', 'cut_res', 'stab_res', 'permissions', 'fire_access',
+    #           'water_access', 'wind_access', 'dirt_access', 'lightning_access', 'holy_access', 'curse_access',
+    #           'bleed_access', 'nature_access', 'mental_access', 'twohanded_access', 'polearm_access',
+    #           'onehanded_access', 'stabbing_access', 'cutting_access', 'crushing_access', 'small_arms_access',
+    #           'shields_access', 'equipment', 'helmet_status', 'chest_status', 'shoes_status', 'gloves_status',
     #           'item_status', rov, fov]
 
     def get_context_data(self, **kwargs):
@@ -2063,7 +2276,25 @@ class InventoryDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        my_items = Inventory.objects.get(id=context['inventory_detail'].pk)
+        my_things = my_items.things.all()
+        my_consumables = my_items.consumables.all()
+        consumables_sum_weight = 0
+        thing_sum_weight = 0
+        consumables_sum_value = 0
+        thing_sum_value = 0
+        for item in my_things:
+            thing_sum_weight += item.weight
+            thing_sum_value += item.sale_price
+        for item in my_consumables:
+            consumables_sum_weight += item.weight
+            consumables_sum_value += item.sale_price
+        context['thing_sum_weight'] = thing_sum_weight
+        context['thing_sum_value'] = thing_sum_value
+        context['consumables_sum_weight'] = consumables_sum_weight
+        context['consumables_sum_value'] = consumables_sum_value
+        context['things'] = my_things
+        context['consumables'] = my_consumables
         return context
 
 
@@ -2197,22 +2428,24 @@ class ThingCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-class ThingsListView(LoginRequiredMixin, ListView):
+
+class ConsumablesListView(LoginRequiredMixin, ListView):
     """
     Просмотр полного списка Артефактов
     """
-    template_name = 'poll/thing/things_list.html'
-    context_object_name = 'things_list'
+    template_name = 'poll/consumable/consumables_list.html'
+    context_object_name = 'consumables_list'
     model = Thing
     login_url = 'poll:login'
 
-class ThingDetailView(LoginRequiredMixin, DetailView):
+
+class ConsumableDetailView(LoginRequiredMixin, DetailView):
     """
     Просмотр детальной информации по Артефакту
     """
-    template_name = 'poll/thing/thing_detail.html'
-    context_object_name = 'thing_detail'
-    model = Thing
+    template_name = 'poll/consumable/consumable_detail.html'
+    context_object_name = 'consumable_detail'
+    model = Consumable
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
@@ -2220,11 +2453,12 @@ class ThingDetailView(LoginRequiredMixin, DetailView):
 
         return context
 
-class ThingUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+
+class ConsumableUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     """
     Редактирование Артефакта
     """
-    model = Thing
+    model = Consumable
 
     fields = '__all__'
     template_name_suffix = '_update'
@@ -2238,37 +2472,38 @@ class ThingUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
         form.instance.updated_by = self.request.user
         return super().form_valid(form)
 
-class ThingDeleteView(LoginRequiredMixin, DeleteView):
+
+class ConsumableDeleteView(LoginRequiredMixin, DeleteView):
     """
-    Удаление Артефакта
+    Удаление Расходника
     """
-    model = Thing
+    model = Consumable
     template_name_suffix = '_delete'
-    success_url = reverse_lazy('poll: things-list')
-    context_object_name = 'thing_detail'
+    success_url = reverse_lazy('poll: consumables-list')
+    context_object_name = 'consumable_detail'
     login_url = 'poll:login'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['thing_name'] = context['thing_detail'].thing_name
+        context['consumable_name'] = context['consumable_detail'].consumable_name
         return context
 
-class ThingCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+
+class ConsumableCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
-    Создание нового артефакта
+    Создание нового Расходника
     """
-    model = Thing
+    model = Consumable
     fields = '__all__'
     login_url = 'poll:login'
 
     def form_valid(self, form):
         """
-        Сведения о том, кем был создан Артефакт
-        :param form:
-        :return:
-        """
+        Сведения о том, кем был создан Расходник
+         """
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
 
 #  REST API
 

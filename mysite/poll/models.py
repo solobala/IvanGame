@@ -74,18 +74,86 @@ class Owner(models.Model):
         ]
 
 
+class Consumable(models.Model):
+    """
+    Расходники
+    """
+    consumable_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
+    consumable_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
+    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
+    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
+    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
+    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
+    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
+    weight = models.IntegerField(verbose_name='Вес', default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'consumable'
+        verbose_name = "Consumable"
+        verbose_name_plural = "Consumable"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.consumable_name
+
+    def get_absolute_url(self):
+        return reverse('poll:consumable-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Consumable, self).save(*args, **kwargs)
+
+
+class Thing(models.Model):
+    """
+    артефекты
+    """
+    thing_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
+    thing_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
+    points_to_use = models.JSONField(verbose_name='очки характеристик для применения', blank=True, null=True)
+    equipment_to_use = models.JSONField(verbose_name='слоты для применения', blank=True, null=True)
+    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
+    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
+    permissions_from_use = models.JSONField(verbose_name='очки навыков от применения', blank=True, null=True)
+    equipment_from_use = models.JSONField(verbose_name='расширение слотов от применения', blank=True, null=True)
+    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
+    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
+    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
+    weight = models.IntegerField(verbose_name='Вес', default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'thing'
+        verbose_name = "Thing"
+        verbose_name_plural = "Things"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.thing_name
+
+    def get_absolute_url(self):
+        return reverse('poll:thing-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Thing, self).save(*args, **kwargs)
+
+
 class Info(models.Model):
     agg_points = models.IntegerField(verbose_name='Характеристики', default=0)
     points = models.JSONField(verbose_name='Характеристики', blank=True, null=True)
-    SP = models.IntegerField(verbose_name="Стамина", default=0)
-    MP = models.IntegerField(verbose_name="Колдовство", default=0)
-    IP = models.IntegerField(verbose_name="Интеллект", default=0)
-    PP = models.IntegerField(verbose_name="Сила", default=0)
-    AP = models.IntegerField(verbose_name="Ловкость", default=0)
-    FP = models.IntegerField(verbose_name="Вера", default=0)
-    LP = models.IntegerField(verbose_name="Удача", default=0)
-    CP = models.IntegerField(verbose_name="Харизма", default=0)
-    BP = models.IntegerField(verbose_name="Рассудок", default=0)
+    sp = models.IntegerField(verbose_name="Стамина", default=0)
+    mp = models.IntegerField(verbose_name="Колдовство", default=0)
+    ip = models.IntegerField(verbose_name="Интеллект", default=0)
+    pp = models.IntegerField(verbose_name="Сила", default=0)
+    ap = models.IntegerField(verbose_name="Ловкость", default=0)
+    fp = models.IntegerField(verbose_name="Вера", default=0)
+    lp = models.IntegerField(verbose_name="Удача", default=0)
+    cp = models.IntegerField(verbose_name="Харизма", default=0)
+    bp = models.IntegerField(verbose_name="Рассудок", default=0)
 
     resistances = models.JSONField(verbose_name='Устойчивость', blank=True, null=True)
     fire_res = models.IntegerField(verbose_name="к огню", default=0)
@@ -100,24 +168,24 @@ class Info(models.Model):
     stab_res = models.IntegerField(verbose_name="к протыканию", default=0)
 
     permissions = models.JSONField(verbose_name='Навыки', blank=True, null=True)
-    Fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
-    Water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
-    Wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
-    Dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
-    Lightning_access = models.IntegerField(verbose_name="Киловактика", default=0)
-    Holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
-    Curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
-    Bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
-    Nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
-    Mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
-    Twohanded_access = models.IntegerField(verbose_name="Двуручное оружие", default=0)
-    Polearm_access = models.IntegerField(verbose_name="Древковое оружие", default=0)
-    Onehanded_access = models.IntegerField(verbose_name="Одноручное оружие", default=0)
-    Stabbing_access = models.IntegerField(verbose_name="Колющее оружие", default=0)
-    Cutting_access = models.IntegerField(verbose_name="Режущее оружие", default=0)
-    Crushing_access = models.IntegerField(verbose_name="Дробящее оружие", default=0)
-    Small_arms_access = models.IntegerField(verbose_name="Стрелковое оружие", default=0)
-    Shields_access = models.IntegerField(verbose_name="Щиты", default=0)
+    fire_access = models.IntegerField(verbose_name="Пирокинектика", default=0)
+    water_access = models.IntegerField(verbose_name="Гидрософистика", default=0)
+    wind_access = models.IntegerField(verbose_name="Аэрософистика", default=0)
+    dirt_access = models.IntegerField(verbose_name="Геомантия", default=0)
+    lightning_access = models.IntegerField(verbose_name="Киловактика", default=0)
+    holy_access = models.IntegerField(verbose_name="Элафристика", default=0)
+    curse_access = models.IntegerField(verbose_name="Катифристика", default=0)
+    bleed_access = models.IntegerField(verbose_name="Гематомантия", default=0)
+    nature_access = models.IntegerField(verbose_name="Ботаника", default=0)
+    mental_access = models.IntegerField(verbose_name="Псифистика", default=0)
+    twohanded_access = models.IntegerField(verbose_name="Двуручное оружие", default=0)
+    polearm_access = models.IntegerField(verbose_name="Древковое оружие", default=0)
+    onehanded_access = models.IntegerField(verbose_name="Одноручное оружие", default=0)
+    stabbing_access = models.IntegerField(verbose_name="Колющее оружие", default=0)
+    cutting_access = models.IntegerField(verbose_name="Режущее оружие", default=0)
+    crushing_access = models.IntegerField(verbose_name="Дробящее оружие", default=0)
+    small_arms_access = models.IntegerField(verbose_name="Стрелковое оружие", default=0)
+    shields_access = models.IntegerField(verbose_name="Щиты", default=0)
 
     equipment = models.JSONField(verbose_name='Снаряжение', blank=True, null=True)
     helmet_status = models.IntegerField(verbose_name='Шлем', default=0)
@@ -243,59 +311,7 @@ class Race(models.Model):
             self.get_race_name_display())
 
     def save(self, *args, **kwargs):
-        # keys = ["SP_START", "MP_START", "IP_START", "PP_START", "AP_START", "FP_START", "LP_START", "CP_START",
-        #         "BP_START"]
-        # labels = 'Стамина, Колдовство, Интеллект, Сила, Ловкость, Вера, Удача, Харизма, Рассудок'
-        # my_dict = dict(zip(keys, labels.split(', ')))
-        # sp = dict()
-        # for key in keys:
-        #     value = json.loads(self.start_points).get(key)
-        #     sp[my_dict.get(key)] = 1
-        # self.start_points = json.dumps(sp)
-        #
-        # keys = ["SP_MAX", "MP_MAX", "IP_MAX", "PP_MAX", "AP_MAX", "FP_MAX", "LP_MAX", "CP_MAX",
-        #         "BP_MAX"]
-        # fp = dict()
-        # my_dict = dict(zip(keys, labels.split(', ')))
-        # for key in keys:
-        #     fp[my_dict.get(key)] = json.loads(self.finish_points).get(key)
-        # self.finish_points = json.dumps(fp)
-        #
-        # sr = dict()
-        # keys = ["fire_res_start", "water_res_start", "wind_res_start", "dirt_res_start", "lightning_res_start",
-        #         "curse_res_start", "crush_res_start", "cut_res_start", "stab_res_start"]
-        # labels = 'Огонь, Вода, Воздух, Земля, Молнии, Свет, Тьма, Дробление, Порезы, Протыкание'
-        #
-        # my_dict = dict(zip(keys, labels.split(', ')))
-        # for key in keys:
-        #     sr[my_dict.get(key)] = json.loads(self.start_resistances).get(key)
-        # self.start_resistances = json.dumps(sr)
-        #
-        # stp = dict()
-        # keys = ["Fire_access_start", "Water_access_start", "Wind_access_start", "Dirt_access_start",
-        #         "Lightning_access_start", "Holy_access_start", "Curse_access_start", "Bleed_access_start",
-        #         "Nature_access_start", "Mental_access_start", "Twohanded_access_start", "Polearm_access_start",
-        #         "Onehanded_access_start", "Stabbing_access_start", "Cutting_access_start", "Crushing_access_start",
-        #         "Small_arms_access_start", "Shields_access_start"]
-        # labels = 'Пирокинектика, Гидрософистика, Аэрософистика, Геомантия, Киловактика, Элафристика, Катифристика,\
-        #        Гематомантия, Ботаника, Психистика, Владение навыками Двуручного оружия, Владение навыками
-        #        Древкового оружия,\
-        #        Владение навыками Одноручного оружия, Владение навыками Колющего оружия, Владение навыками
-        #        Режущего оружия,\
-        #        Владение навыками Дробящего оружия, Владение навыками Стрелкового оружия, Владение навыками
-        #        Стрелкового оружия'
-        # my_dict = dict(zip(keys, labels.split(', ')))
-        # for key in keys:
-        #     stp[my_dict.get(key)] = json.loads(self.start_permissions).get(key)
-        # self.start_permissions = json.dumps(stp)
-        #
-        # eq = dict()
-        # keys = []
-        # labels = 'Шлем, Нагрудник, Сапоги, Наручи, Прочее'
-        # my_dict = dict(zip(keys, labels.split(', ')))
-        # for key in keys:
-        #     eq[my_dict.get(key)] = json.loads(self.equipment).get(key)
-        # self.equipment = json.dumps(eq)
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -340,6 +356,7 @@ class Person(models.Model):
     status = models.IntegerField('Статус', choices=Status.choices, default=Status.FREE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     features = models.ManyToManyField(Feature, blank=True, null=True)
+
     # free = FreePersonManager()
     # busy = BusyPersonManager()
     # freezed = FreezedPersonManager()
@@ -809,72 +826,6 @@ class Action(Info):
         super(Action, self).save(*args, **kwargs)
 
 
-class Consumable(models.Model):
-    """
-    Расходники
-    """
-    consumable_name = models.CharField(max_length=128, blank=True, null=True)
-    consumable_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
-    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
-    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
-    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
-    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
-    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
-    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
-
-    class Meta:
-        managed = True
-        db_table = 'consumable'
-        verbose_name = "Consumable"
-        verbose_name_plural = "Consumable"
-        # app_label = 'poll'
-
-    def __str__(self):
-        return "%s" % self.consumable_name
-
-    def get_absolute_url(self):
-        return reverse('poll:consumable-detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super(Consumable, self).save(*args, **kwargs)
-
-
-class Thing(models.Model):
-    """
-    артефекты
-    """
-    thing_name = models.CharField(max_length=128, blank=True, null=True)
-    thing_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    points_to_make = models.JSONField(verbose_name='очки характеристик для создания', blank=True, null=True)
-    points_to_use = models.JSONField(verbose_name='очки характеристик для применения', blank=True, null=True)
-    equipment_to_use = models.JSONField(verbose_name='слоты для применения', blank=True, null=True)
-    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
-    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
-    permissions_from_use = models.JSONField(verbose_name='очки навыков от применения', blank=True, null=True)
-    equipment_from_use = models.JSONField(verbose_name='расширение слотов от применения', blank=True, null=True)
-    conditions = models.JSONField(verbose_name='очки кондиций', blank=True, null=True)
-    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
-    sale_price = models.IntegerField(verbose_name='Цена продажи', default=100)
-    buy_price = models.IntegerField(verbose_name='Цена покупки', default=100)
-
-    class Meta:
-        managed = True
-        db_table = 'thing'
-        verbose_name = "Thing"
-        verbose_name_plural = "Things"
-        # app_label = 'poll'
-
-    def __str__(self):
-        return "%s" % self.thing_name
-
-    def get_absolute_url(self):
-        return reverse('poll:thing-detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        super(Thing, self).save(*args, **kwargs)
-
-
 class History(models.Model):
     """
     Журнал действий персонажей
@@ -929,12 +880,12 @@ class Inventory(models.Model):
     """
       Инвентарь (рюкзак)
       """
-    inventory_name = models.CharField(max_length=128, blank=True, null=True)
+    inventory_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     inventory_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    person = models.ForeignKey('Person', on_delete=models.CASCADE)
-    inventory_max_weight = models.IntegerField(verbose_name='Уровень', default=0)
-    consumables_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
-    thing_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name='Персонаж')
+    inventory_max_weight = models.IntegerField(verbose_name='Максимальный вес', default=0)
+    consumables = models.ManyToManyField(Consumable, blank=True, null=True, verbose_name='Расходники')
+    things = models.ManyToManyField(Thing, blank=True, null=True, verbose_name='Артефакты')
 
     class Meta:
         managed = True
@@ -957,13 +908,14 @@ class Safe(models.Model):
     """
       Сейф
       """
-    safe_name = models.CharField(max_length=128, blank=True, null=True)
+    safe_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     safe_description = RichTextField(verbose_name='Описание', blank=True, null=True)
-    person = models.ForeignKey('Person', on_delete=models.CASCADE)
-    rental_price = models.IntegerField(verbose_name='Уровень', default=0)
-    consumables_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
-    thing_sum_value = models.IntegerField(verbose_name='Уровень', default=0)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name='Персонаж')
+    rental_price = models.IntegerField(verbose_name='Стоимость аренды', default=0)
+    max_value = models.IntegerField(verbose_name='Максимальная стоимость', default=0)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE, verbose_name='Локация')
+    consumables = models.ManyToManyField(Consumable, blank=True, null=True, verbose_name='Расходники')
+    things = models.ManyToManyField(Thing, blank=True, null=True, verbose_name='Артефакты')
 
     class Meta:
         managed = True
@@ -971,6 +923,10 @@ class Safe(models.Model):
         verbose_name = "Safe"
         verbose_name_plural = "Safes"
         # app_label = 'poll'
+
+    @property
+    def safe_name_default(self):
+        return self.person.person_name+"'s Safe"
 
     def __str__(self):
         return "%s" % self.safe_name

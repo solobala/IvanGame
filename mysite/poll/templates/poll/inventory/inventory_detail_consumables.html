@@ -1,0 +1,23 @@
+<!--Список расходников  в рюкзаке-->
+<table class="table table-bordered border-primary table-sm table-hover" border="1" xmlns="http://www.w3.org/1999/html">
+      <tbody>
+        <thead>
+            <tr>
+                <th colspan="3"> <h1>Расходники</h1></th>
+            </tr>
+            <tr>
+                <th>Название</th><th>Вес</th><th>Цена</th>
+            </tr>
+        </thead>
+       {% for item in inventory_detail.consumables %}
+        <tr>
+            <td><a href="/poll/consumables/{{ consumable.id }}/">{{ item.consumable_name }}</a></td>
+            <td>{{ item.weight }}</td>
+            <td>{{ item.sale_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+
+
+

@@ -3,9 +3,42 @@
 <div style="margin-left:20px;margin-top:65px">
     <div class="container">
         <div class="row  justify-content-end">
-            {% include "poll/person/person_detail_all.html" %}
+                <script type="text/javascript">
+        $(document).ready(function(){
+            $("[id^='pers_selected_']").hide()
+            $("[id^='pers_selected_1_']").hide()
+            $("[id^='pers_selected_2_']").hide()
+            $("[id^='pers_selected_3_']").hide()
+            $("#sel li").click(function(){
+                $("[id^='pers_selected_']").hide()
+                $("[id^='pers_selected_1_']").hide()
+                $("[id^='pers_selected_2_']").hide()
+                 $("[id^='pers_selected_3_']").hide()
+                 //$("#pers").text($(this).text());  // На кнопке пишем имя выбранного персонажа
+                const myId = $(this).attr('id');
+                $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
+                $("#pers_selected_"+myId).show();
+                $("#pers_selected_1_"+myId).show();
+                $("#pers_selected_2_"+myId).show();
+                $("#pers_selected_3_"+myId).show();
+            });
+        });
+
+    </script>
+<!--            {% include "poll/person/person_detail_all.html" %}-->
+            <div class="row">
+                <h5>{{person_detail.person_name}}</h5>
+            </div>
+            <div class="row">
+            <div class="col">
+               {% include "poll/person/person_detail_min.html" %}
+            </div>
+          <div class="col">
+              {% include "poll/person/person_detail_other.html" %}
+              </div>
         </div>
     </div>
+        </div>
 </div>
 {% if person_detail.created_by.username == user.username %}
 <p><a href="{% url 'poll:person-update' person_detail.id %}">+ Редактировать Персонаж </a></p>

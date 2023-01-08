@@ -1,0 +1,11 @@
+<!-- templates/zone/zone_form.html -->
+{% extends "poll/header.html" %}
+{% block content %}
+    <h1>Добавление Артефакта</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.media }}
+   {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+{% endblock content %}

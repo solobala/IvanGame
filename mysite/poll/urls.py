@@ -1,21 +1,21 @@
 from django.template.defaulttags import url
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-
+from .views import *
 from . import views
-from .views import OwnerCreateView, OwnerDeleteView, OwnersListView, \
-    OwnersFreeListView, PersonBarDetailView, ActionDetailView, \
-    ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView, FeatureCreateView, FeatureUpdateView, \
-    FeatureDeleteView, FractionDetailView, FractionUpdateView, FractionDeleteView, FractionsListView,  \
-    FractionCreateView, ZonesListView, ZoneDetailView, ZoneCreateView, ZoneDeleteView, ZoneUpdateView
+# from .views import OwnerCreateView, OwnerDeleteView, OwnersListView, \
+#     OwnersFreeListView, PersonBarDetailView, ActionDetailView, \
+#     ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView, FeatureCreateView, FeatureUpdateView, \
+#     FeatureDeleteView, FractionDetailView, FractionUpdateView, FractionDeleteView, FractionsListView,  \
+#     FractionCreateView, ZonesListView, ZoneDetailView, ZoneCreateView, ZoneDeleteView, ZoneUpdateView
 
-from .views import PersonDetailView, PersonCreateView, PersonUpdateView, PersonDeleteView
-from .views import PersonsListView,  StatusPersonsListView, FeaturesListView, FeatureDetailView
-from .views import MembershipListView, MembershipDeleteView, MembershipUpdateView
-from .views import GroupsListView, GroupCreateView, GroupUpdateView, GroupDeleteView, GroupDetailView
-from .views import RaceCreateView, RaceUpdateView, RaceDeleteView, RaceDetailView, RacesListView
-from .views import LocationsListView, LocationCreateView, LocationUpdateView, LocationDeleteView, LocationDetailView
-from .views import RegionsListView, RegionCreateView, RegionUpdateView, RegionDeleteView, RegionDetailView
+# from .views import PersonDetailView, PersonCreateView, PersonUpdateView, PersonDeleteView
+# from .views import PersonsListView,  StatusPersonsListView, FeaturesListView, FeatureDetailView
+# from .views import MembershipListView, MembershipDeleteView, MembershipUpdateView
+# from .views import GroupsListView, GroupCreateView, GroupUpdateView, GroupDeleteView, GroupDetailView
+# from .views import RaceCreateView, RaceUpdateView, RaceDeleteView, RaceDetailView, RacesListView
+# from .views import LocationsListView, LocationCreateView, LocationUpdateView, LocationDeleteView, LocationDetailView
+# from .views import RegionsListView, RegionCreateView, RegionUpdateView, RegionDeleteView, RegionDetailView
 from rest_framework import routers
 app_name = 'poll'
 
@@ -37,6 +37,10 @@ router.register(r'fraction', views.FractionViewSet)
 router.register(r'feature', views.FeatureViewSet)
 router.register(r'history', views.HistoryViewSet)
 router.register(r'personbar', views.PersonBarViewSet)
+router.register(r'thing', views.ThingViewSet)
+router.register(r'consumable', views.ConsumableViewSet)
+router.register(r'inventory', views.InventoryViewSet)
+router.register(r'safe', views.SafeViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -126,6 +130,33 @@ urlpatterns = [
     path('regions/<int:pk>/update/', RegionUpdateView.as_view(), name='region-update'),  # обновление карточки региона
     path('regions/<int:pk>/delete/', RegionDeleteView.as_view(), name='region-delete'),  # удаление
     path('regions/add/', RegionCreateView.as_view(), name='region-add'),  # добавить региона
+
+    path('inventories/', InventoriesListView.as_view(), name='inventories-list'),  # список рюкзаков
+    path('inventories/<int:pk>/', InventoryDetailView.as_view(), name='inventory-detail'),  # просмотр карточки рюкзака
+    path('inventories/<int:pk>/update/', InventoryUpdateView.as_view(), name='inventory-update'),  # обновление карточки рюкзака
+    path('inventories/<int:pk>/delete/', InventoryDeleteView.as_view(), name='inventory-delete'),  # удаление
+    path('inventories/add/', InventoryCreateView.as_view(), name='inventory-add'),  # добавить рюкзак
+
+    path('safes/', SafesListView.as_view(), name='safes-list'),  # список сейфов
+    path('safes/<int:pk>/', SafeDetailView.as_view(), name='safe-detail'),  # просмотр карточки сейфа
+    path('safes/<int:pk>/update/', SafeUpdateView.as_view(), name='safe-update'),
+    # обновление карточки сейфа
+    path('safes/<int:pk>/delete/', SafeDeleteView.as_view(), name='safe-delete'),  # удаление
+    path('safes/add/', SafeCreateView.as_view(), name='safe-add'),  # добавить сейф
+
+    path('things/', ThingsListView.as_view(), name='things-list'),  # список артефактов
+    path('things/<int:pk>/', ThingDetailView.as_view(), name='thing-detail'),  # просмотр карточки артефакта
+    path('things/<int:pk>/update/', ThingUpdateView.as_view(), name='thing-update'),
+    # обновление карточки артефакта
+    path('things/<int:pk>/delete/', ThingDeleteView.as_view(), name='thing-delete'),  # удаление
+    path('things/add/', ThingCreateView.as_view(), name='thing-add'),  # добавить артефакт
+
+    path('consumables/', ConsumablesListView.as_view(), name='consumables-list'),  # список расходников
+    path('consumables/<int:pk>/', ConsumableDetailView.as_view(), name='consumable-detail'),  # просмотр карточки расходников
+    path('consumables/<int:pk>/update/', ConsumableUpdateView.as_view(), name='consumable-update'),
+    # обновление карточки расходников
+    path('consumables/<int:pk>/delete/', ConsumableDeleteView.as_view(), name='consumable-delete'),  # удаление
+    path('consumables/add/', ConsumableCreateView.as_view(), name='consumable-add'),  # добавить расходников
 
     path('owners/', views.OwnerList.as_view()),
     path('owners/<int:pk>/', views.OwnerDetail.as_view()),

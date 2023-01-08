@@ -1,0 +1,66 @@
+<div class="accordion" id="inv">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="header_inv{{key_inv}}">
+            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#body_inv{{key_inv}}" aria-expanded="true"
+                    aria-controls="body_inv{{key_inv}}">
+                <strong>Инвентарь-справка</strong>
+            </button>
+        </h2>
+        <div id="body_inv{{key_inv}}" class="accordion-collapse collapse"
+             aria-labelledby="header_inv{{key_inv}}" data-bs-parent="#inv">
+            <div class="accordion-body">
+                <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                    <tbody>
+                    {% if inventory_detail.inventory_name %}
+                    <tr>
+                        <td>Название</td>
+                        <td> {{ inventory_detail.inventory_name }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if inventory_detail.inventory_name %}
+                    <tr>
+                        <td>Описание</td>
+                        <td>{{ inventory_detail.inventory_description|safe }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>Персонаж</td>
+                        <td>{{ inventory_detail.person.person_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Максимальный вес</td>
+                        <td>{{ inventory_detail.inventory_max_weight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Вес, в т.ч.</td>
+                        <td>{{ inventory_detail.consumables_sum_weight|add:inventory_detail.thing_sum_weight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Вес расходников</td>
+                        <td>{{ inventory_detail.consumables_sum_weight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Вес артефактов</td>
+                        <td>{{ inventory_detail.thing_sum_weight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Стоимость, в т.ч.</td>
+                        <td>{{ inventory_detail.consumables_sum_value|add:inventory_detail.thing_sum_value}}</td>
+                    </tr>
+                    <tr>
+                        <td>Стоимость расходников</td>
+                        <td>{{ inventory_detail.consumables_sum_value }}</td>
+                    </tr>
+                    <tr>
+                        <td>Стоимость артефактов</td>
+                        <td>{{ inventory_detail.thing_sum_value }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

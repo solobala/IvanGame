@@ -1,22 +1,55 @@
 {% extends "poll/header.html" %}
 {% block content %}
-  <h2>{{ safe_detail.safe_name }}</h2>
-  <div style="margin-left:20px;margin-top:20px">
-    <p><h4>Название: </h4> {{ safe_detail.safe_name }}</p>
-    <p><h4>Описание: </h4> {{ safe_detail.safe_description|safe }}</p>
-    <p><h4>Персонаж: </h4> {{ safe_detail.person.person_name }}</p>
-    <p><h4>Стоимость аренды: </h4> {{ safe_detail.rental_price }}</p>
-    <p><h4>Стоимость расходников: </h4> {{ safe_detail.consumables_sum_value }}</p>
-    <p><h4>Стоимость артефактов: </h4> {{ safe_detail.thing_sum_value }}</p>
-    <p><h4>Локация: </h4> {{ safe_detail.location.location_name }}</p>
-  </div>
-
+<div class="container-fluid" style="margin-left:20px;margin-top:65px">
+    <div class="row">
+        <!--      Здесь должен быть аккордеон - справка по сейфу-->
+        <table class="table table-bordered border-primary table-sm table-hover" border="1">
+            <tbody>
+            <tr>
+              <td>Название</td><td> {{ safe_detail.inventory_name }}</td>
+            </tr>
+            <tr>
+              <td>Описание</td><td>{{ safe_detail.inventory_description|safe }}</td>
+            </tr>
+            <tr>
+              <td>Персонаж</td><td>{{ safe_detail.person.person_name }}</td>
+            </tr>
+            <tr>
+              <td>Локация</td><td> {{ safe_detail.location.location_name }}</td>
+            </tr>
+            <tr>
+              <td>Стоимость аренды</td><td>{{ safe_detail.rental_price }}</td><!--Здесь должен быть прайс по аренде сейфов в зависимости от стоимости-->
+            </tr>
+            <tr>
+              <td>Максимальный вес</td><td>{{ safe_detail.max_weight }}</td>
+            </tr>
+            <tr>
+              <td>Стоимость предметов, в т.ч. </td><td>{{ safe_detail.sum_value }}</td>
+            </tr>
+            <tr>
+              <td>Стоимость расходников</td><td>{{ safe_detail.consumables_sum_value }}</td>
+            </tr>
+            <tr>
+              <td>Стоимость артефактов</td><td>{{ safe_detail.thing_sum_value }}</td>
+            </tr>
+            <tr>
+              <td>Вес предметов, в т.ч. </td><td>{{ safe_detail.sum_weight }}</td>
+            </tr>
+            <tr>
+              <td>Вес расходников</td><td>{{ safe_detail.consumables_sum_value }}</td>
+            </tr>
+            <tr>
+              <td>Вес артефактов</td><td>{{ safe_detail.thing_sum_value }}</td>
+            </tr>
+           </tbody>
+        </table>
+<!--      Здесь должен быть аккордеон с прокруткой - список Артефактов-->
+<!--      Здесь должен быть аккордеон с прокруткой - список Расходников-->
+    </div>
 <hr>
 {% if user.username == 'gameadmin' %}
-
-<p align="left"> <a href="{% url 'poll:safe-update' safe_detail.pk %}">+ Изменить Сейф {{ safe_detail.safe_name }}?</a></p>
-<p align="left"><a href="{% url 'poll:safe-delete' safe_detail.pk %}">- Удалить Сейф {{ safe_detail.safe_name }}?</a></p>
-
+  <p align="left"> <a href="{% url 'poll:safe-update' safe_detail.pk %}">+ Изменить Сейф {{ safe_detail.safe_name }}?</a></p>
+  <p align="left"><a href="{% url 'poll:safe-delete' safe_detail.pk %}">- Удалить Сейф {{ safe_detail.safe_name }}?</a></p>
 {% endif %}
-
+</div>
 {% endblock %}

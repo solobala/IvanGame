@@ -28,9 +28,14 @@
 <body>
 <div class="top">
     <!--Это навигационная панель сверху-->
-    <div class="container-fluid">
+    <div class="container-fluid"  style="margin-left:0px;margin-top:40px">
         <div class="row">
-                <nav class="navbar fixed-top navbar-expand-lg bg-dark">
+            <nav class="navbar fixed-top navbar-expand-lg navbar-dark">
+                <!-- Желтая кнопочка сворачивает и разворачивает левый сайдбар-->
+                      <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
+                       <details><summary></summary></details>
+                    </button>
                     <a class="navbar-brand" href="#">Ivan's Game</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarSupportedContent"
@@ -38,10 +43,31 @@
                             <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                         {% if user.username != 'gameadmin' %}
+                        <!--Навигационная панель для Окно игрока-->
+                        <!--Скрытое поле чтобы запомнить выбранный персонаж-->
+                        <input class="form-control" id="selid" type="hidden">
+                        <!--панель вкладок для выбора персонажа-->
+                        <ul class="nav nav-tabs" id="sel">
+                            {% for selected_person in owner_detail.person_set.all %}
+                            <li class="nav-item" id="tab_{{selected_person.id}}">
+                                <a class="nav-link " aria-current="page" href="#p_{{selected_person.id}}">{{ selected_person.person_name }}</a>
+                            </li>
+                            {% endfor %}
+<!--                            <li class="nav-item" id="tab_{{other_owner.id}}">-->
+<!--                                <a class="nav-link " aria-current="page" href="#">Другой игрок</a>-->
+<!--                            </li>-->
+<!--                            <li class="nav-item" id="tab_{{other_person.id}}">-->
+<!--                                <a class="nav-link" aria-current="page" href="#">Другой персонаж</a>-->
+<!--                            </li>-->
+<!--                             <li class="nav-item">-->
+<!--                                <a class="nav-link" href="{% url 'poll:logout' %}">Выход</a>-->
+<!--                            </li>-->
+                        </ul>
+                         {% else %} <!--Back-end for gameadmin'-->
                         <ul class="navbar-nav ">
-                            {% if user.username == 'gameadmin' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:races-list' %}">Расы</a>
+                                <a class="nav-link active" aria-current="page" href="{% url 'poll:races-list' %}">Расы</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:locations-list' %}">Локации</a>
@@ -52,38 +78,41 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:fractions-list' %}">Фракции</a>
                             </li>
-
-                              <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:groups-list' %}">Кланы</a>
                             </li>
-                              <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:groups-list' %}">Квесты</a>
                             </li>
-                              <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:groups-list' %}">Beasts</a>
                             </li>
-                              <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:groups-list' %}">Hostiles</a>
                             </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:groups-list' %}">Рюкзаки</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'poll:inventories-list' %}">Рюкзаки</a>
                             </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:groups-list' %}">Сейфы</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'poll:safes-list' %}">Сейфы</a>
                             </li>
-                              <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:groups-list' %}">Предметы</a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'poll:things-list' %}">Артефакты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'poll:consumables-list' %}">Расходники</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:zones-list' %}">Зоны</a>
                             </li>
-                            {% endif %}
-                           <li class="nav-item">
+
+                            <li class="nav-item">
                                 <a class="nav-link " aria-current="page" href="{% url 'poll:owners-list' %}">Игроки</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:groups-list' %}">Группы</a>
                             </li>
+                            {% endif %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:persons-list' %}">Персонажи</a>
                             </li>
@@ -96,19 +125,11 @@
                                     <li><a class="dropdown-item" href="/poll/0/persons/">Заморозка</a></li>
                                 </ul>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:actions-list' %}">Действия</a>
-                            </li>
 
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:logout' %}">Выход</a>
                             </li>
-
                         </ul>
-                        <form class="d-flex" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form>
                     </div>
                 </nav>
         </div>
@@ -116,38 +137,80 @@
 </div>
 <main>
 <!--Это общий контейнер - все, что не нав панель-->
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-left:0px;" >
         <div class="row" >
-            <!-- NAV #2 -->
-            <nav class="col-xl-1">
+            <!-- Это левая панель, которая сворачивается по желтой конпке"-->
+            <div class="collapse collapse-horizontal col-md-2" id="collapseWidthExample" style="margin-left:0px;">
+                <!-- Это аккордеон с данными игрока"-->
+                <div class="accordion" id="owner_selector">
+                    <div class="accordion-item" id="owner_selector_{{owner_detail.id}}">
+                        <h6 class="accordion-header" id="header_{{owner_detail.id}}">
+                            <button class="accordion-button  collapsed  bg-success text-white" style="--bs-accordion-btn-padding-y:0.25rem" type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#body_{{owner_detail.id}}" aria-expanded="false"
+                                            aria-controls="body_{{owner_detail.id}}">
+                                Игрок
+                            </button>
+                        </h6>
+                        <div id="body_{{owner_detail.id}}" class="accordion-collapse collapse show"
+                                     aria-labelledby="header_{{owner_detail.id}}" data-bs-parent="#owner_selector">
+                                    <div class="accordion-body">
+                                        {% include "poll\owner\owner_detail_min.html" with owner_detail=owner_detail %}
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Это дропдаун со списком игроков"-->
+                <div class="dropdown" >
+                          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:100%;">
+                            Все Игроки
+                          </button>
+                          <ul class="dropdown-menu" style="overflow-y:auto; max-height:80vh">
+                              {% for other_owner in owners %}
+                            <li><a class="dropdown-item" href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></li>
+                              {% endfor %}
+                          </ul>
+                        </div>
+                <!-- Это дропдаун со списком свободных игроков"-->
+                <div class="dropdown" >
+                          <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:100%;">
+                            Свободные Игроки
+                          </button>
+                          <ul class="dropdown-menu">
+                              {% for item in free_owners %}
+                            <li><a class="dropdown-item" href="/poll/free_owners/{{ item.id }}/">{{ item.owner_name }}</a></li>
+                              {% endfor %}
+                          </ul>
+                </div>
 
-                <ul class="nav flex-column" style="margin-left:20px;margin-top:65px">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Профиль</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Карта</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">ЛОР</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Фракции</a>
-                  </li>
-                </ul>
+                <!-- Это ссылки на зоны, локации и др"-->
+                <ul class="nav flex-column" >
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Карта</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">ЛОР</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Фракции</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Локации</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Зоны</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Помощь</a>
+                          </li>
+                        </ul>
+            </div>
 
-            </nav>
-            <!-- ARTICLE -->
-            <article class="col-md-10 col-xl-10">
-             {% block content %}
-            {% endblock content%}
+            <!-- ARTICLE основное окно, куда грузится index.html и все остальное-->
+            <article class="col-md-10 col-xl-10" style="margin-left:0px;">
+                     {% block content %}
+                    {% endblock content%}
             </article>
-            <!-- ASIDE -->
-            <aside class="col-md-2 col-xl-1">
-             {% block aside %}
-            {% endblock aside%}
-            </aside>
-
         </div>
     </div>
 </main>

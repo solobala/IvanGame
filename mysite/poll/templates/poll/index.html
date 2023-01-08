@@ -1,152 +1,82 @@
 {% extends "poll/header.html" %}
 {% block content %}
-<div class="container-fluid" style="margin-left:20px;margin-top:65px">
-    <div class="row">
-        <div class="col">
-            {% include "poll/owner/owner_detail_min.html" %}
-            {% if owner_detail.created_by.username == user.username %}
-            <div class="input-group">
-                <!--            <input class="form-control" id="datebox" type="TextBox">-->
-                <input class="form-control" id="selid" type="hidden">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="pers" type="button">
-                        Персонаж
-                    </button>
-                    <ul class="dropdown-menu" id="sel">
-                        {% for selected_person in owner_detail.person_set.all %}
-                        <li id="{{ selected_person.id }}"><a class="dropdown-item" href="#body{{selected_person.id}}">{{ selected_person.person_name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <p></p>
-            <p><a href="{% url 'poll:owner-update' owner_detail.pk %}">+ Изменить данные игрока</a></p>
-            <p><a href="{% url 'poll:owner-delete' owner_detail.pk %}">- Удалить игрока?</a></p>
-            <p><a href="{% url 'poll:person-add'%}">+ Добавить персонаж?</a></p>
-            {% endif %}
-        </div>
-
-        <div class="col">
-            <div class="accordion" id="pers_selector">
-                {% for selected_person in owner_detail.person_set.all %}
-                <div class="accordion-item" id="pers_selected_{{selected_person.id}}">
-                    <h2 class="accordion-header" id="header{{selected_person.id}}">
-                        <button class="accordion-button collapsed  bg-success text-white table-sm" type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#body{{selected_person.id}}" aria-expanded="false"
-                                aria-controls="body{{selected_person.id}}">
-                            <h5>{{selected_person.person_name}}</h5>
-                        </button>
-                    </h2>
-                    <div id="body{{selected_person.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header{{selected_person.id}}" data-bs-parent="#pers_selector">
-                        <div class="accordion-body">
-                            {% include "poll\person\person_detail_min.html" with person_detail=selected_person status=selected_person.status %}
-                            {% include "poll\person\person_detail_other.html" with person_detail=selected_person %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="accordion" id="pers_selector1">
-                {% for selected_person in owner_detail.person_set.all %}
-                <div class="accordion-item" id="pers_selected_1_{{selected_person.id}}">
-                    <h2 class="accordion-header" id="header1_{{selected_person.id}}">
-                        <button class="accordion-button collapsed  bg-info text-white table-sm" type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#body1_{{selected_person.id}}" aria-expanded="false"
-                                aria-controls="body1_{{selected_person.id}}">
-                            <h5>Инвентарь</h5>
-                        </button>
-                    </h2>
-                    <div id="body1_{{selected_person.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header1_{{selected_person.id}}" data-bs-parent="#pers_selector1">
-                        <div class="accordion-body">
-                            {% include "poll\person\person_detail_min.html" with person_detail=selected_person status=selected_person.status %}
-                            {% include "poll\person\person_detail_other.html" with person_detail=selected_person %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="accordion" id="pers_selector2">
-                {% for selected_person in owner_detail.person_set.all %}
-                <div class="accordion-item" id="pers_selected_2_{{selected_person.id}}">
-                    <h2 class="accordion-header" id="header2_{{selected_person.id}}">
-                        <button class="accordion-button collapsed  bg-warning text-white table-sm" type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#body2_{{selected_person.id}}" aria-expanded="false"
-                                aria-controls="body2_{{selected_person.id}}">
-                            <h5>Сейф</h5>
-                        </button>
-                    </h2>
-                    <div id="body2_{{selected_person.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header2_{{selected_person.id}}" data-bs-parent="#pers_selector2">
-                        <div class="accordion-body">
-                            {% include "poll\person\person_detail_min.html" with person_detail=selected_person status=selected_person.status %}
-                            {% include "poll\person\person_detail_other.html" with person_detail=selected_person %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-             <div class="accordion" id="pers_selector3">
-                {% for selected_person in owner_detail.person_set.all %}
-                <div class="accordion-item" id="pers_selected_3_{{selected_person.id}}">
-                    <h2 class="accordion-header" id="header3_{{selected_person.id}}">
-                        <button class="accordion-button collapsed  bg-secondary text-white table-sm" type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#body3_{{selected_person.id}}" aria-expanded="false"
-                                aria-controls="body3_{{selected_person.id}}">
-                            <h5>Заклинания</h5>
-                        </button>
-                    </h2>
-                    <div id="body3_{{selected_person.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header3_{{selected_person.id}}" data-bs-parent="#pers_selector3">
-                        <div class="accordion-body">
-                            {% include "poll\person\person_detail_min.html" with person_detail=selected_person status=selected_person.status %}
-                            {% include "poll\person\person_detail_other.html" with person_detail=selected_person %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-         <div class="col">
-         </div>
+{% if user.username != "gameadmin" %}
+{% for person_detail in owner_detail.person_set.all %}
+<div class="row" id="p_{{person_detail.id}}">
+    <!-- Это все персонажи и  их характеристики-->
+    <!-- Видимым будет тот, у которого id = id вкладки-->
+    <div class ="row">
+    {% for personbar_detail in person_detail.personbar_set.all %}
+        <!-- Это прогрессбары по каждому из персонажей тоже нужно прятать-->
+        {% include "poll/personbar/personbar_detail.html" %}
+    {% endfor %}
     </div>
+    <div class="row">
+    <div class="col-md-3 col-xl-3" style="margin-left:0px;">
+        <div class="accordion" id="pers_selector_{{person_detail.id}}">
+             <div class="accordion-item" id="pers_selected_{{person_detail.id}}">
+                <h6 class="accordion-header" id="header_{{person_detail.id}}">
+                    <button class="accordion-button collapsed  bg-success text-white table-sm "  style="--bs-accordion-btn-padding-y:0.25rem" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#body_{{person_detail.id}}" aria-expanded="false"
+                            aria-controls="body_{{person_detail.id}}">
+                        <h6>{{person_detail.person_name}}</h6>
+                    </button>
+                </h6>
+                <div id="body_{{person_detail.id}}" class="accordion-collapse collapse show"
+                     aria-labelledby="header_{{person_detail.id}}" data-bs-parent="#pers_selector_{{person_detail.id}}">
+                    <div class="accordion-body">
+                           <!-- Краткие сведения о персонаже (портрет)-->
+                        {% include "poll\person\person_detail_min.html"%}
+                            <!-- Очки, навыки, устойчивочть и др.-->
+                        {% include "poll\person\person_detail_other.html" with person_detail=person_detail %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Это инвентарь и сейфы-->
+    <div class="col-md-3 col-xl-3">
+        Инвентарь и сейфы
+    </div>
+    <!-- Это Группы, партии, локации-->
+    <div class="col-md-4 col-xl-4">
+        Группы, партии, локации
+    </div>
+</div>
+</div>
 
-    <!-- Это попытка выбрать персонаж через кнопочный дропдаун -->
-    <script type="text/javascript">
+{% endfor %}
+<!-- Это попытка выбрать персонаж через кнопочный дропдаун -->
+<script type="text/javascript">
         $(document).ready(function(){
-            $("[id^='pers_selected_']").hide()
-            $("[id^='pers_selected_1_']").hide()
-            $("[id^='pers_selected_2_']").hide()
-            $("[id^='pers_selected_3_']").hide()
+         $("[id^='p_']").hide(); //все персонажи в содержимом вкладок скрыты
+          //$("[id^='pers_selected_']").hide(); //все персонажи в аккордеоне скрыты
+            const keys=['sp', 'mp','ip','pp','ap','lp', 'bp', 'cp','fp'];
             $("#sel li").click(function(){
-                $("[id^='pers_selected_']").hide()
-                $("[id^='pers_selected_1_']").hide()
-                $("[id^='pers_selected_2_']").hide()
-                 $("[id^='pers_selected_3_']").hide()
+               // $("[id^='pers_selected_']").hide();
+                $("[id^='p_']").hide();
                  //$("#pers").text($(this).text());  // На кнопке пишем имя выбранного персонажа
-                const myId = $(this).attr('id');
+                const personId = $(this).attr('id').split('_')[1];
+                //console.log(personId);
                 $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
-                $("#pers_selected_"+myId).show();
-                $("#pers_selected_1_"+myId).show();
-                $("#pers_selected_2_"+myId).show();
-                $("#pers_selected_3_"+myId).show();
+                $("#p_"+personId).show();
+
+                let un_points =Number($("#unallocated_points_"+personId).val()); // Получаем нераспределенные очки
+
+                let points=un_points;
+                for (var i=0; i<=keys.length-1;i++) {
+                    points+=Number($("#"+keys[i]+'_'+personId).val()); // сумма очков с учетом нераспределенных
+                }
+                const sum_points = points;
+                //console.log(sum_points);
             });
+
         });
 
-    </script>
-</div>
+ </script>
+
+{% endif %}
 {% endblock content %}
 
 

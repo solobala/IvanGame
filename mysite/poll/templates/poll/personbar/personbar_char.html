@@ -1,0 +1,17 @@
+<div class="accordion-item" id="pers_selected_{{person_detail.id}}">
+    <h2 class="accordion-header" id="header{{person_detail.id}}">
+        <button class="accordion-button collapsed  bg-success text-white table-sm" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#body{{person_detail.id}}" aria-expanded="false"
+                            aria-controls="body{{person_detail.id}}">
+            <h5>{{person_detail.person_name}}</h5>
+        </button>
+    </h2>
+    <div id="body{{person_detail.id}}" class="accordion-collapse collapse show"
+                     aria-labelledby="header{{person_detail.id}}" data-bs-parent="#pers_selector">
+        <div class="accordion-body">
+                        {% include "poll\person\person_detail_min.html" with person_detail=person_detail status=person_detail.status %}
+                        {% include "poll\person\person_detail_other.html" with person_detail=person_detail %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<!--Список артефактов в рюкзаке-->
+<table class="table table-bordered border-primary table-sm table-hover" border="1" xmlns="http://www.w3.org/1999/html">
+      <tbody>
+        <thead>
+             <tr>
+                <th>Название</th><th>Вес</th><th>Цена</th>
+            </tr>
+        </thead>
+       {% for item in inventory_detail.things %}
+        <tr>
+            <td><a href="/poll/things/{{ things.id }}/">{{ item.thing_name }}</a></td>
+            <td>{{ item.weight }}</td>
+            <td>{{ item.sale_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+
+
+
+
