@@ -1,6 +1,6 @@
 {% extends "poll/header.html" %}
 {% block content %}
- <div style="margin-left:20px;margin-top:65px">
+ <div class="col-md-3" style="margin-left:20px;margin-top:65px">
      <div class="row">
         {% include "poll/owner/owner_detail_min.html" %}
          <table>
@@ -13,8 +13,9 @@
              </thead>
              <tbody>
                 {% for selected_person in owner_detail.person_set.all %}
-                    {% if owner_detail.created_by.username == user.username and selected_person.created_by.username == user.username and owner_detail.id == selected_person.owner.id %}
-                     <tr>
+
+                {% if user.username in "owner_detail.created_by.username gameadmin selected_person.created_by.username"   and owner_detail.id == selected_person.owner.id %}
+                    <tr>
                          <td colspan="1"><h6><a href="/poll/persons/{{ selected_person.id }}/">{{ selected_person.person_name }}</a></h6></td>
                     </tr>
                      {% elif owner_detail.id != selected_person.owner.id %}
@@ -25,13 +26,10 @@
                 {% endfor %}
               </tbody>
          </table>
-
-         {% if owner_detail.created_by.username == user.username %}
+{% if user.username in " owner_detail.created_by.username gameadmin" %}
             <p></p>
-            <p><a href="{% url 'poll:owner-update' owner_detail.pk %}">+ Изменить данные игрока</a></p>
-            <p><a href="{% url 'poll:owner-delete' owner_detail.pk %}">- Удалить игрока?</a></p>
             <p><a href="{% url 'poll:person-add'%}">+ Добавить персонаж?</a></p>
-         {% endif %}
+{% endif %}
      </div>
  </div>
 {% endblock %}

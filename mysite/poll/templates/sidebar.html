@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+                 {% if user.username != 'gameadmin' %}
+                <div class="accordion" id="owner_selector">
+                    <div class="accordion-item" id="owner_selector_{{owner_detail.id}}">
+                        <h6 class="accordion-header" id="header_{{owner_detail.id}}">
+                            <button class="accordion-button  collapsed  bg-success text-white" style="--bs-accordion-btn-padding-y:0.25rem" type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#body_{{owner_detail.id}}" aria-expanded="false"
+                                            aria-controls="body_{{owner_detail.id}}">
+                                Игрок
+                            </button>
+                        </h6>
+                        <div id="body_{{owner_detail.id}}" class="accordion-collapse collapse show"
+                                     aria-labelledby="header_{{owner_detail.id}}" data-bs-parent="#owner_selector">
+                                    <div class="accordion-body">
+                                        {% include "poll\owner\owner_detail_min.html" with owner_detail=owner_detail %}
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Это дропдаун со списком игроков"-->
+                <input type="text" name="Owners" id="Owners" list="myOwner" style="width:100%;" placeholder="Игроки"/>
+                <datalist id="myOwner">
+                     {% for other_owner in owners %}
+                    <option><a  href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></option>
+                     {% endfor %}
+                </datalist>
+<!--                <div class="dropdown" >-->
+<!--                          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:100%;">-->
+<!--                            Все Игроки-->
+<!--                          </button>-->
+<!--                          <ul class="dropdown-menu" style="overflow-y:auto; max-height:80vh">-->
+<!--                              {% for other_owner in owners %}-->
+<!--                            <li><a class="dropdown-item" href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></li>-->
+<!--                              {% endfor %}-->
+<!--                          </ul>-->
+<!--                </div>-->
+                <!-- Это дропдаун со списком свободных игроков"-->
+<!--                <div class="dropdown" >-->
+<!--                          <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:100%;">-->
+<!--                            Свободные Игроки-->
+<!--                          </button>-->
+<!--                          <ul class="dropdown-menu">-->
+<!--                              {% for item in free_owners %}-->
+<!--                            <li><a class="dropdown-item" href="/poll/free_owners/{{ item.id }}/">{{ item.owner_name }}</a></li>-->
+<!--                              {% endfor %}-->
+<!--                          </ul>-->
+<!--                </div>-->
+              <input type="text" name="Owners" id="FreeOwners" list="myFreeOwner" style="width:100%;" placeholder="Свободные Игроки"/>
+                <datalist id="myFreeOwner">
+                     {% for item in free_owners %}
+                    <option><a  href="/poll/free_owners/{{ item.id }}/">{{ item.owner_name }}</a></option>
+                     {% endfor %}
+                </datalist>
+                <!-- Это ссылки на зоны, локации и др"-->
+                <ul class="nav flex-column" >
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Карта</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">ЛОР</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Фракции</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Локации</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Зоны</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Помощь</a>
+                          </li>
+                        </ul>
+</body>
+</html>

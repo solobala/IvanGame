@@ -1,0 +1,15 @@
+{% extends "poll/header.html" %}
+{% block content %}
+ <div style="margin-left:20px;margin-top:65px">
+    <div class="container">
+        <div class="row">
+    <h1>Информация по характеристикам, устойчивости, навыкам</h1>
+    <ul>
+    {% for item in personbars_list %}
+        <li><a href="/personbars/{{ item.id }}">{{ item.person.person_name }}</a></li>
+    {% endfor %}
+    </ul>
+        </div>
+    </div>
+ </div>
+{% endblock content %}

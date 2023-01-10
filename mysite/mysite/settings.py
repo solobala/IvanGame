@@ -186,7 +186,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-
 MESSAGE_TAGS = {
         messages.DEBUG: 'alert-secondary',
         messages.INFO: 'alert-info',
@@ -277,17 +276,17 @@ CKEDITOR_CONFIGS = {
             ['RemoveFormat', 'Source']
         ],
         'height': 200,
-        'width': 360,
+        'width': 320,
     },
     'custom': {
         'toolbar': 'default',
         'height': 200,
-        'width': 360,
+        'width': 320,
     },
     'default': {
 
         'height': 100,
-        'width': 360,
+        'width': 320,
     },
 }
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #для DEBUG

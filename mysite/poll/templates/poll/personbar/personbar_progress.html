@@ -1,0 +1,92 @@
+
+{% block progressbar %}
+<div class="row">
+    <!-- Это прогресс-бары-->
+    <div class="col"><small>Здоровье</small></div>
+    <div class="col"><small>Мент. здоровье</small></div>
+    <div class="col" ><small>Выносливость</small></div>
+    <div class="col" ><small>Мана</small></div>
+    <div class="col" ><small>Голод</small></div>
+    <div class="col" ><small>Интоксикация</small></div>
+    <div class="col" ><small>Вес</small></div>
+    <div class="col" ><small>Физ. урон</small></div>
+     <div class="col" ><small>Маг. урон</small></div>
+        <div class="col"><small>Уровень</small></div>
+</div>
+<div class="row align-items-center">
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-danger" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ health|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.health|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-info" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ mental_health|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.mental_health|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-success bg-opacity-75 " role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ endurance|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.endurance|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-primary" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ mana|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.mana|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-secondary" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ hungry|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.hungry|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-warning text-dark" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ intoxication|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.intoxication|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-dark text-white" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ load_capacity|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.load_capacity|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-success bg-opacity-25 text-dark" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ avg_physic_resistance|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.avg_physic_resistance|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-primary bg-opacity-25 text-dark" role="progressbar"
+                 style="width: 100%;" aria-valuenow="{{ avg_magic_resistance|floatformat:'0' }}" aria-valuemin="0" aria-valuemax="100">
+                {{ personbar_detail.conditions.avg_magic_resistance|floatformat:'0' }}
+            </div>
+        </div>
+    </div>
+    <div class="col"><span style="height: 10px;"><small>{{ personbar_detail.level }}</small></span></div>
+
+</div>
+{% endblock progressbar %}

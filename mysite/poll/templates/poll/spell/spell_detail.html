@@ -2,14 +2,14 @@
 {% block content %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
-        <!--      Здесь должен быть аккордеон - справка по сейфу-->
+        <!--      Здесь должен быть аккордеон - справка по заклинаниям-->
         <table class="table table-bordered border-primary table-sm table-hover" border="1">
             <tbody>
             <tr>
-              <td>Название</td><td> {{ safe_detail.safe_name }}</td>
+              <td>Название</td><td> {{ safe_detail.inventory_name }}</td>
             </tr>
             <tr>
-              <td>Описание</td><td>{{ safe_detail.safe_description|safe }}</td>
+              <td>Описание</td><td>{{ safe_detail.inventory_description|safe }}</td>
             </tr>
             <tr>
               <td>Персонаж</td><td>{{ safe_detail.person.person_name }}</td>
@@ -30,16 +30,16 @@
               <td>Стоимость расходников</td><td>{{ safe_detail.consumables_sum_value }}</td>
             </tr>
             <tr>
-              <td>Стоимость артефактов</td><td>{{ safe_detail.things_sum_value }}</td>
+              <td>Стоимость артефактов</td><td>{{ safe_detail.thing_sum_value }}</td>
             </tr>
             <tr>
               <td>Вес предметов, в т.ч. </td><td>{{ safe_detail.sum_weight }}</td>
             </tr>
             <tr>
-              <td>Вес расходников</td><td>{{ safe_detail.consumables_sum_weight }}</td>
+              <td>Вес расходников</td><td>{{ safe_detail.consumables_sum_value }}</td>
             </tr>
             <tr>
-              <td>Вес артефактов</td><td>{{ safe_detail.things_sum_weight }}</td>
+              <td>Вес артефактов</td><td>{{ safe_detail.thing_sum_value }}</td>
             </tr>
            </tbody>
         </table>

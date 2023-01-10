@@ -1,43 +1,47 @@
-<div class="accordion" id="inv_about">
+<div class="accordion" id="saf_about">
     <div class="accordion-item">
-        <h2 class="accordion-header" id="header_inv{{key_inv}}">
+        <h2 class="accordion-header" id="header_saf{{key_saf}}">
             <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#body_inv{{key_inv}}" aria-expanded="true"
-                    aria-controls="body_inv{{key_inv}}">
-                <strong>Инвентарь-справка</strong>
+                    data-bs-target="#body_saf{{key_saf}}" aria-expanded="true"
+                    aria-controls="body_saf{{key_saf}}">
+                <strong>Сейф-справка</strong>
             </button>
         </h2>
-        <div id="body_inv{{key_inv}}" class="accordion-collapse collapse"
-             aria-labelledby="header_inv{{key_inv}}" data-bs-parent="#inv_about">
+        <div id="body_saf{{key_saf}}" class="accordion-collapse collapse"
+             aria-labelledby="header_saf{{key_saf}}" data-bs-parent="#saf_about">
             <div class="accordion-body">
                 <table class="table table-bordered border-primary table-sm table-hover" border="1">
                     <tbody>
-                    {% for inventory_detail in person_detail.inventory_set.all %}
-                    {% if inventory_detail.inventory_name %}
+                    {% for safe_detail in person_detail.safe_set.all %}
+                    {% if safe_detail.safe_name %}
                     <tr>
                         <td>Название</td>
-                        <td> {{ inventory_detail.inventory_name }}</td>
+                        <td> {{ safe_detail.safe_name }}</td>
                     </tr>
                     {% endif %}
-                    {% if inventory_detail.inventory_description %}
+                    {% if safe_detail.safe_description %}
                     <tr>
                         <td>Описание</td>
-                        <td>{{ inventory_detail.inventory_description|safe }}</td>
+                        <td>{{ safe_detail.safe_description|safe }}</td>
                     </tr>
                     {% endif %}
 
                     <tr>
-                        <td>Максимальный вес</td>
-                        <td>{{ inventory_detail.inventory_max_weight }}</td>
+                        <td>Стоимость аренды</td>
+                        <td>{{ safe_detail.rental_price }}</td>
+                    </tr>
+                    <tr>
+                        <td>Макс. стоимость</td>
+                        <td>{{ safe_detail.max_value }}</td>
                     </tr>
                     <tr>
                         <td>Текущий вес, в т.ч.</td>
 
-                        <td>{{ inventory_detail.consumables_sum_weight|add:inventory_detail.things_sum_weight }}</td>
+                        <td>{{ safe_detail.consumables_sum_weight|add:inventory_detail.things_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_weight }}</td>
+                        <td>{{ safe_detail.consumables_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес артефактов</td>
@@ -45,15 +49,15 @@
                     </tr>
                     <tr>
                         <td>Стоимость, в т.ч.</td>
-                        <td>{{ inventory_detail.consumables_sum_value|add:inventory_detail.things_sum_value}}</td>
+                        <td>{{ safe_detail.consumables_sum_value|add:inventory_detail.things_sum_value}}</td>
                     </tr>
                     <tr>
                         <td>Стоимость расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_value }}</td>
+                        <td>{{ safe_detail.consumables_sum_value }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость артефактов</td>
-                        <td>{{ inventory_detail.things_sum_value }}</td>
+                        <td>{{ safe_detail.things_sum_value }}</td>
                     </tr>
                     {% endfor %}
                     </tbody>

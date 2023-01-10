@@ -1,8 +1,11 @@
 from django.template.defaulttags import url
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
+
+from . import views, views1
 from .views import *
-from . import views
+from .views1 import *
+
 # from .views import OwnerCreateView, OwnerDeleteView, OwnersListView, \
 #     OwnersFreeListView, PersonBarDetailView, ActionDetailView, \
 #     ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView, FeatureCreateView, FeatureUpdateView, \
@@ -46,10 +49,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     # path('poll/', views.index, name='index'),
 
-    # path('poll/groups/', views.group, name='group'),
-
-
-
     path('owners/', OwnersListView.as_view(), name='owners-list'),  # список игроков
 
     path('free_owners/', OwnersFreeListView.as_view(), name='free-owners-list'),
@@ -70,11 +69,13 @@ urlpatterns = [
     path('persons/', PersonsListView.as_view(), name='persons-list'),
     path('<status>/persons/', StatusPersonsListView.as_view(), name='status_persons_list_<status>'),
 
+    path('personbars/', PersonBarsListView.as_view(), name='personbars-list'),
+    path('personbars/<int:pk>/', PersonBarDetailView.as_view(), name='person-bar-detail'),    # персонажа
 
     path('persons/add/', PersonCreateView.as_view(), name='person-add'),  # new
     path('persons/<int:pk>/', PersonDetailView.as_view(), name='person-detail'),  # просмотр карточки персонажа
     path('personsother/<int:pk>/', PersonDetailView.as_view(), name='other-person-detail'),  # чужого персонажа
-    path('persons/<int:pk>/personbar/', PersonBarDetailView.as_view(), name='person-bar-detail'),    # персонажа
+    # path('persons/<int:pk>/personbar/', PersonBarDetailView.as_view(), name='person-bar-detail'),    # персонажа
     path('persons/<int:pk>/update/', PersonUpdateView.as_view(), name='person-update'),  # обновление
     path('persons/<int:pk>/delete/', PersonDeleteView.as_view(), name='person-delete'),  # удаление
 

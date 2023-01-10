@@ -1,0 +1,20 @@
+{% extends "poll/header.html" %}
+{% block content %}
+<div style="margin-left:20px;margin-top:65px">
+    <div class="container">
+        <div class="row">
+            <h1>Ценности</h1>
+           <ul class="list-group">
+            {% for item in money_list %}
+                <li class="list-group-item" aria-current="true"><a href="/poll/money/{{ money.id }}/">{{ money.money_type }}</a></li>
+            {% endfor %}
+            </ul>
+            {% if user.username == 'gameadmin' %}
+            <p><a href="{% url 'poll:safe-add' %}">+ Добавить Ценность?</a></p>
+            {% endif %}
+         </div>
+    </div>
+</div>
+{% endblock content %}
+
+

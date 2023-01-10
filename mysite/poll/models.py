@@ -47,20 +47,16 @@ class Owner(models.Model):
     def save(self, *args, **kwargs):
         # возвращает объект Owner с добавленным owner_status
 
-        try:
-            if self.filter(person__status=1).count() == 0:
-                self.owner_status = self.Status.BUSY
-            else:
-                self.owner_status = self.Status.FREE
-        except self.DoesNotExist:
+        if not self.person_set.all().filter(status=1).exist():
+            self.owner_status = self.Status.BUSY
+        else:
             self.owner_status = self.Status.FREE
-        finally:
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def full_link(self):
         """Возвращает ссылку"""
-        self.link ='https://vk.com/id'+self.link
+        self.link = 'https://vk.com/id' + str(self.link)
         return "%s" % self.link
 
     class Meta:
@@ -204,7 +200,7 @@ class Info(models.Model):
 
 class Feature(Info):
 
-    feature_name = models.CharField(max_length=128, blank=True, null=True)
+    feature_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
     feature_description = RichTextField(verbose_name='Описание', blank=True, null=True)
 
     class Meta:
@@ -290,7 +286,7 @@ class Race(models.Model):
             self.Races.ATHLANT,
             self.Races.GOBLIN,
             self.Races.ORK,
-            self.other
+            self.Races.OTHER
         }
 
     race_name = models.CharField('Раса', max_length=20, choices=Races.choices, default=Races.HUMAN)
@@ -308,7 +304,8 @@ class Race(models.Model):
 
     def __str__(self):
         return "%s" % (
-            self.get_race_name_display())
+            self.get_race_name_display()
+        )
 
     def save(self, *args, **kwargs):
 
@@ -466,7 +463,7 @@ class District(models.Model):
         ordering = ['district_name']
 
     def __str__(self):
-        return "%s" % self.distrtict_name
+        return "%s" % self.district_name
 
     def get_absolute_url(self):
         return reverse('poll:district-detail', kwargs={'pk': self.pk})
@@ -489,16 +486,11 @@ class Group(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        self.group_name = self.members.through.objects.filter(group__id=self.id)[0].inviter.person_name
-        try:
-            if self.members.count() >= 1:
-                for member in self.members.through.objects.filter(group__id=self.id):
-                    self.group_name = self.group_name + '; ' + member.person.person_name
-
-        except self.DoesNotExist:
-            pass
-        finally:
-            return "%s" % self.group_name
+        self.group_name = self.members.through.objects.filter(group__id=self.pk)[0].inviter.person_name
+        if self.members.count() >= 1:
+            for member in self.members.through.objects.filter(group__id=self.pk):
+                self.group_name = self.group_name + '; ' + member.person.person_name
+        return "%s" % self.group_name
 
     def get_absolute_url(self):
         #  return reverse('poll:person_detail', args=[str(self.id)])
@@ -789,7 +781,7 @@ class ActionType(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.action_type_name)
+        return "%s" % self.action_type_name
 
     def get_absolute_url(self):
         return reverse('poll:action_type-detail', kwargs={'pk': self.pk})
@@ -817,7 +809,7 @@ class Action(Info):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % (self.action_name)
+        return "%s" % self.action_name
 
     def get_absolute_url(self):
         return reverse('poll:action-detail', kwargs={'pk': self.pk})
@@ -876,6 +868,50 @@ class History(models.Model):
         super(History, self).save(*args, **kwargs)
 
 
+class Money(models.Model):
+    """
+    Заклинания
+    """
+
+    class MoneyType(models.TextChoices):
+        COPPER = '0', 'Медь',
+        SILVER = '1', 'Серебро',
+        GOLD = '2', 'Золото',
+        OTHER = '3', 'Прочее'
+
+    def is_upperclass(self):
+        return self.money_type in {
+            self.MoneyType.COPPER,
+            self.MoneyType.SILVER,
+            self.MoneyType.GOLD,
+            self.MoneyType.OTHER
+        }
+
+    money_type = models.CharField(
+        verbose_name='Название',
+        max_length=1,
+        choices=MoneyType.choices,
+        default=MoneyType.COPPER)
+    weight = models.IntegerField(verbose_name='Вес', default=1)
+    rate = models.IntegerField(verbose_name='Номинал', default=1)
+
+    class Meta:
+        managed = True
+        db_table = 'money'
+        verbose_name = "Money"
+        verbose_name_plural = "Money"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.get_money_type_display()
+
+    def get_absolute_url(self):
+        return reverse('poll:money-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Money, self).save(*args, **kwargs)
+
+
 class Inventory(models.Model):
     """
       Инвентарь (рюкзак)
@@ -886,6 +922,7 @@ class Inventory(models.Model):
     inventory_max_weight = models.IntegerField(verbose_name='Максимальный вес', default=0)
     consumables = models.ManyToManyField(Consumable, blank=True, null=True, verbose_name='Расходники')
     things = models.ManyToManyField(Thing, blank=True, null=True, verbose_name='Артефакты')
+    money = models.ManyToManyField(Money, blank=True, null=True, verbose_name='Ценности')
 
     class Meta:
         managed = True
@@ -916,6 +953,7 @@ class Safe(models.Model):
     location = models.ForeignKey('Location', on_delete=models.CASCADE, verbose_name='Локация')
     consumables = models.ManyToManyField(Consumable, blank=True, null=True, verbose_name='Расходники')
     things = models.ManyToManyField(Thing, blank=True, null=True, verbose_name='Артефакты')
+    money = models.ManyToManyField(Money, blank=True, null=True, verbose_name='Ценности')
 
     class Meta:
         managed = True
@@ -936,3 +974,36 @@ class Safe(models.Model):
 
     def save(self, *args, **kwargs):
         super(Safe, self).save(*args, **kwargs)
+
+
+class Spell(models.Model):
+    """
+    Заклинания
+    """
+    spell_name = models.CharField(verbose_name='Название', max_length=128, blank=True, null=True)
+    spell_description = RichTextField(verbose_name='Описание', blank=True, null=True)
+    points_to_use = models.JSONField(verbose_name='очки характеристик для применения', blank=True, null=True)
+    permissions_from_use = models.JSONField(verbose_name='очки навыков от применения', blank=True, null=True)
+    resistances_from_use = models.JSONField(verbose_name='очки сопротивлений от применения', blank=True, null=True)
+    equipment_to_use = models.JSONField(verbose_name='слоты для применения', blank=True, null=True)
+    points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
+    equipment_from_use = models.JSONField(verbose_name='расширение слотов от применения', blank=True, null=True)
+    damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'spell'
+        verbose_name = "Spell"
+        verbose_name_plural = "Spells"
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s" % self.spell_name
+
+    def get_absolute_url(self):
+        return reverse('poll:spell-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super(Spell, self).save(*args, **kwargs)
+
+

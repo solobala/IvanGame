@@ -31,11 +31,11 @@
     </tr>
     </tbody>
 </table>
-{% if owner_detail.created_by.username == user.username %}
+{% if user.username in " owner_detail.created_by.username gameadmin" %}
             <p></p>
             <p><a href="{% url 'poll:owner-update' owner_detail.pk %}">+ Изменить данные игрока</a></p>
             <p><a href="{% url 'poll:owner-delete' owner_detail.pk %}">- Удалить игрока?</a></p>
-            <p><a href="{% url 'poll:person-add'%}">+ Добавить персонаж?</a></p>
+
 {% endif %}
 
 
