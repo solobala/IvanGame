@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
-        <!--      Здесь должен быть аккордеон - справка по сейфу-->
+        <!--      Здесь  аккордеон - справка по сейфу-->
         <table class="table table-bordered border-primary table-sm table-hover" border="1">
             <tbody>
             <tr>
@@ -33,6 +33,9 @@
               <td>Стоимость артефактов</td><td>{{ safe_detail.things_sum_value }}</td>
             </tr>
             <tr>
+              <td>Стоимость ценностей</td><td>{{ safe_detail.money_sum_value }}</td>
+            </tr>
+            <tr>
               <td>Вес предметов, в т.ч. </td><td>{{ safe_detail.sum_weight }}</td>
             </tr>
             <tr>
@@ -41,10 +44,14 @@
             <tr>
               <td>Вес артефактов</td><td>{{ safe_detail.things_sum_weight }}</td>
             </tr>
+            <tr>
+              <td>Вес ценностей</td><td>{{ safe_detail.money_sum_weight }}</td>
+            </tr>
            </tbody>
         </table>
 <!--      Здесь должен быть аккордеон с прокруткой - список Артефактов-->
 <!--      Здесь должен быть аккордеон с прокруткой - список Расходников-->
+<!--      Здесь должен быть аккордеон с прокруткой - список Ценностей-->
     </div>
 <hr>
 {% if user.username == 'gameadmin' %}

@@ -1,8 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.fields import RichTextField
+from django.db.models import Sum
 
 # Create your models here.
 
@@ -46,8 +48,7 @@ class Owner(models.Model):
 
     def save(self, *args, **kwargs):
         # возвращает объект Owner с добавленным owner_status
-
-        if not self.person_set.all().filter(status=1).exist():
+        if not self.person_set.all().filter(status=1).exists():
             self.owner_status = self.Status.BUSY
         else:
             self.owner_status = self.Status.FREE
@@ -304,7 +305,8 @@ class Race(models.Model):
 
     def __str__(self):
         return "%s" % (
-            self.get_race_name_display()
+            self.get_race_name_display(),
+
         )
 
     def save(self, *args, **kwargs):
@@ -345,10 +347,11 @@ class Person(models.Model):
     character = RichTextField('Характер', blank=True, null=True)
     interests = RichTextField('Интересы', blank=True, null=True)
     phobias = RichTextField('Фобии', blank=True, null=True)
-    race = models.ForeignKey(Race, verbose_name='Раса', on_delete=models.CASCADE, null=True)
-    location_birth = models.IntegerField('Место возрождения', blank=True, null=True)
+    race = models.ForeignKey('Race', verbose_name='Раса', on_delete=models.CASCADE, null=True)
+    location_birth = models.ForeignKey('Location', verbose_name='Место возрождения', related_name='location_birth',
+                                       on_delete=models.CASCADE, blank=True, null=True)
     birth_date = models.DateTimeField('Дата рождения', blank=True, null=True)
-    location_death = models.IntegerField('Место гибели', blank=True, null=True)
+    location_death = models.ForeignKey('Location', verbose_name='Место гибели', related_name='location_death', on_delete=models.CASCADE, blank=True, null=True)
     death_date = models.DateTimeField('Дата гибели', blank=True, null=True)
     status = models.IntegerField('Статус', choices=Status.choices, default=Status.FREE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -364,6 +367,69 @@ class Person(models.Model):
     def get_absolute_url(self):
         return f"/persons/{self.pk}/"
         #  return reverse('poll:person-detail', kwargs={'pk': self.pk})
+
+    # @property
+    # def get_location(self):
+    #     """
+    #     Возвращает номер текущей локации
+    #     Нужно для:
+    #     - определения репутации персонажа
+    #     - получения списка квестов
+    #     - генерации хостайла локации
+    #     - генерации нпс локации
+    #     - просмотра укрупненной карты локаций, где каждая локации отмечена цветом,
+    #         для определения репутационных потерь при перемещении за пределы локации
+    #     """
+    #     try:
+    #         if self.personlocation_set.all().exists():
+    #             return self.personlocation_set.all()[0].location.id
+    #     except ObjectDoesNotExist:
+    #         return None
+    #
+    # @property
+    # def get_region(self):
+    #     """
+    #       Возвращает номер текущего региона.
+    #       Нужно для:
+    #       - генерации и вывода карты региона (из шестиугольников)
+    #        для дальнейшего перемещения Персонажей
+    #       - расчета стоимости предполагаемого перемещения между соседними шестиугольниками
+    #
+    #     """
+    #     try:
+    #         if self.personregion_set.all().exists():
+    #             return self.personregion_set.all()[0].region.id
+    #     except ObjectDoesNotExist:
+    #         return None
+    #
+    # @property
+    # def get_district(self):
+    #     """
+    #       Возвращает номер текущего дистрикта.
+    #       Нужно для:
+    #       - вывода карты дистрикта
+    #       - определения текущего местоположения персонажа (координаты центра дистрикта)
+    #       - Расчета зоны видимости по углу обзора и дальности видимости
+    #       - Определения Персонажей, хостайлов, бестов в зоне видимости
+    #       """
+    #     try:
+    #         if self.personregion_set.all().exists():
+    #             return self.personregion_set.all()[0].district.id
+    #     except ObjectDoesNotExist:
+    #         return None
+    #
+    # @property
+    # def get_zone(self):
+    #     """
+    #       Возвращает номер текущей зоны.
+    #       Нужно для:
+    #       - генерации событий зоны и специфичных для зоны бестов
+    #       """
+    #     try:
+    #         if self.personregion_set.all().exists():
+    #             return self.personregion_set.all()[0].zone.id
+    #     except ObjectDoesNotExist:
+    #         return None
 
     class Meta:
         managed = True
@@ -426,7 +492,6 @@ class Region(models.Model):
     y = models.IntegerField('Y', blank=True, null=True)
     row = models.IntegerField('row', blank=True, null=True)
     column = models.IntegerField('column', blank=True, null=True)
-    # location = models.IntegerField('Локация', blank=True, null=True)
     location = models.ForeignKey(Location, verbose_name='Локация', on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone, verbose_name='Зона', on_delete=models.CASCADE)
     fraction = models.ForeignKey('Fraction', verbose_name='Фракция', on_delete=models.CASCADE)
@@ -506,12 +571,16 @@ class Group(models.Model):
         # ПОиск участников группы по  person -  mo.Group.objects.get(id=2).members.through.objects.
         # filter(inviter_id=mo.Person.objects.get(person_name='Люцифер Вераз').id)
         try:
-            if self.members.count() >= 1:
-                self.group_name = self.members.through.objects.filter(
-                    group__id=self.pk).inviter.person_name
-                for member in self.members.through.objects.filter(group__id=self.pk):
-                    self.group_name = self.group_name + '; ' + member.person.person_name
-        except self.members.count() == 0:
+            # if self.members.count() >= 1:
+            #     self.group_name = self.members.through.objects.filter(
+            #         group__id=self.pk).inviter.person_name
+            #     for member in self.members.through.objects.filter(group__id=self.pk):
+            #         self.group_name = self.group_name + '; ' + member.person.person_name
+            self.group_name = self.members.through.objects.filter(group__id=self.pk).inviter.person_name
+            for member in self.members.through.objects.filter(group__id=self.pk):
+                self.group_name = self.group_name + '; ' + member.person.person_name
+        except ObjectDoesNotExist:
+        #except self.members.count() == 0:
             pass
         finally:
             super().save(*args, **kwargs)
@@ -714,10 +783,11 @@ class PersonLocation(models.Model):
     person - персонаж
     location -  локация
     reputation - поправка на репутацию персонажа в текущей локации
-    Текущее местонахождение персонажа
+    Для подсчета репутации персонажа. Только одна запись. Все предыдущие уходят в History
     """
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', related_name='current_location',
+                                 verbose_name="Текущая Локация", on_delete=models.CASCADE)
     reputation = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -730,6 +800,38 @@ class PersonLocation(models.Model):
 
     def get_absolute_url(self):
         return reverse('poll:person-location-detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+
+class PersonRegion(models.Model):
+    """
+    person - персонаж
+    region -  Регион
+    district - Дистрикт
+    Регион м Дмстрикт Определяются по координатам их центров (квадрата и шестиугольника).
+    Это текущее местоположение в терминах регионов и терминах дистриктов.
+    Нумерация регионов сквозная по всей карте.
+    Нумерация дистриктов сквозная внутри регионов
+    Только одна запись для каждого Персонажа. Все предыдущие записи уходят в History
+    """
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    region = models.ForeignKey('Region', related_name='current_region',
+                               verbose_name="Текущий Регион", on_delete=models.CASCADE)
+    district = models.ForeignKey('District', related_name='current_district',
+                                 verbose_name="Текущий Дистрикт", on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'person_region'
+        # app_label = 'poll'
+
+    def __str__(self):
+        return "%s, %s, %s" % (self.person, self.region, self.district)
+
+    def get_absolute_url(self):
+        return reverse('poll:person-region-detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -850,6 +952,10 @@ class History(models.Model):
     last_update = models.TimeField(auto_now=True)
     conditions_old = models.JSONField(verbose_name='Прежние кондиции', blank=True, null=True)
     conditions_new = models.JSONField(verbose_name='Новые кондиции', blank=True, null=True)
+    location_old = models.ForeignKey('Location', related_name="location_old", verbose_name='Прежняя локация',
+                                     on_delete=models.CASCADE, blank=True, null=True)
+    location_new = models.ForeignKey('Location', related_name="location_new", verbose_name='Новая локация',
+                                     on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -903,7 +1009,7 @@ class Money(models.Model):
         # app_label = 'poll'
 
     def __str__(self):
-        return "%s" % self.get_money_type_display()
+        return "%s, %s, %s" % (self.get_money_type_display(), self.weight, self.rate)
 
     def get_absolute_url(self):
         return reverse('poll:money-detail', kwargs={'pk': self.pk})
@@ -940,6 +1046,26 @@ class Inventory(models.Model):
     def save(self, *args, **kwargs):
         super(Inventory, self).save(*args, **kwargs)
 
+    # @property
+    # def get_inventory_stat(self):
+    #     inventory_things = self.things.all()
+    #     inventory_consumables = self.consumables.all()
+    #     inventory_money = self.money.all()
+    #     inventory_things_sum_weight, inventory_things_sum_value = inventory_things.aggregate(Sum('weight'), Sum('sale_price'))
+    #     inventory_consumables_sum_weight, inventory_consumables_sum_value = inventory_consumables.aggregate(Sum('weight'),
+    #                                                                                          Sum('sale_price'))
+    #     inventory_money_sum_weight, inventory_money_sum_value = inventory_money.aggregate(Sum('weight'), Sum('rate'))
+    #     inventory_sum_weight = inventory_things_sum_weight + inventory_consumables_sum_weight + inventory_money_sum_weight
+    #     inventory_sum_value = inventory_things_sum_value + inventory_consumables_sum_value + inventory_money_sum_value
+    #     inventory_stat = dict(inventory_things_sum_weight=inventory_things_sum_weight,
+    #                           inventory_things_sum_value=inventory_things_sum_value,
+    #                           inventory_consumables_sum_weight=inventory_consumables_sum_weight,
+    #                           inventory_consumables_sum_value=inventory_consumables_sum_value,
+    #                           inventory_money_sum_weight=inventory_money_sum_weight,
+    #                           inventory_money_sum_value=inventory_money_sum_value, inventory_sum_weight=inventory_sum_weight,
+    #                           inventory_sum_value=inventory_sum_value)
+    #     return "%s" % self.inventory_stat
+
 
 class Safe(models.Model):
     """
@@ -964,7 +1090,28 @@ class Safe(models.Model):
 
     @property
     def safe_name_default(self):
-        return self.person.person_name+"'s Safe"
+        self.safe_name = self.person.person_name+"'s Safe"
+        return "%s" % self.safe_name
+
+    # @property
+    # def get_safe_stat(self):
+    #     safe_things = self.things.all()
+    #     safe_consumables = self.consumables.all()
+    #     safe_money = self.money.all()
+    #     safe_things_sum_weight, safe_things_sum_value = safe_things.aggregate(Sum('weight'), Sum('sale_price'))
+    #     safe_consumables_sum_weight, safe_consumables_sum_value = safe_consumables.aggregate(Sum('weight'),
+    #                                                                                          Sum('sale_price'))
+    #     safe_money_sum_weight, safe_money_sum_value = safe_money.aggregate(Sum('weight'), Sum('rate'))
+    #     safe_sum_weight = safe_things_sum_weight + safe_consumables_sum_weight + safe_money_sum_weight
+    #     safe_sum_value = safe_things_sum_value + safe_consumables_sum_value + safe_money_sum_value
+    #     inventory_stat = dict(safe_things_sum_weight=safe_things_sum_weight,
+    #                           safe_things_sum_value=safe_things_sum_value,
+    #                           safe_consumables_sum_weight=safe_consumables_sum_weight,
+    #                           safe_consumables_sum_value=safe_consumables_sum_value,
+    #                           safe_money_sum_weight=safe_money_sum_weight,
+    #                           safe_money_sum_value=safe_money_sum_value, safe_sum_weight=safe_sum_weight,
+    #                           safe_sum_value=safe_sum_value)
+    #     return self.safe_stat
 
     def __str__(self):
         return "%s" % self.safe_name
@@ -989,6 +1136,7 @@ class Spell(models.Model):
     points_from_use = models.JSONField(verbose_name='очки характеристик от применения', blank=True, null=True)
     equipment_from_use = models.JSONField(verbose_name='расширение слотов от применения', blank=True, null=True)
     damage_from_use = models.JSONField(verbose_name='очки урона противнику от применения', blank=True, null=True)
+    person = models.ManyToManyField(Person, blank=True, null=True, verbose_name='Персонаж')
 
     class Meta:
         managed = True

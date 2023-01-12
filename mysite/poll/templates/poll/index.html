@@ -49,11 +49,12 @@
             </div>
 
          <!-- Это  общий аккордеон по инвентарю,сейфу, заклинаниям-->
-            <div class="col-md-4 col-xl-4">
+            <div class="col-md-3 col-xl-3">
                 <div class="accordion" id="prop_selector_{{person_detail.id}}">
                  <div class="accordion-item" id="prop_selected_{{person_detail.id}}">
                     <h6 class="accordion-header" id="header_prop{{person_detail.id}}">
-                        <button class="accordion-button collapsed  bg-warning text-white table-sm "  style="--bs-accordion-btn-padding-y:0.25rem" type="button"
+                        <button class="accordion-button collapsed  bg-warning text-white table-sm "
+                                style="--bs-accordion-btn-padding-y:0.25rem" type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#body_prop{{person_detail.id}}" aria-expanded="false"
                                 aria-controls="body_prop{{person_detail.id}}">
@@ -61,7 +62,8 @@
                         </button>
                     </h6>
                     <div id="body_prop{{person_detail.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header_prop{{person_detail.id}}" data-bs-parent="#prop_selector_{{person_detail.id}}">
+                         aria-labelledby="header_prop{{person_detail.id}}"
+                         data-bs-parent="#prop_selector_{{person_detail.id}}">
                         <div class="accordion-body">
 
                               <!-- Краткая справка по инвентарю - таблица-->
@@ -83,11 +85,10 @@
                             {% block personsafe %}
                                 {% include "poll\safe\safe_detail_other.html" with person_detail=person_detail %}
                             {% endblock personsafe %}
-
-                              <!-- Это заклинания-->
-<!--                         {% block personspell %}-->
-<!--                                {% include "poll\spell\spells_list.html" with person_detail=person_detail %}-->
-<!--                        {% endblock personspell %}-->
+                            <!-- Заклинания-->
+                            {% block personspells %}
+                                {% include "poll\spell\spell_detail_other.html" with person_detail=person_detail %}
+                            {% endblock personspells %}
 
                         </div>
                     </div>
@@ -96,30 +97,49 @@
             </div>
 
             <!-- Это Группы, партии, локации-->
-            <div class="col-md-3 col-xl-3">
+            <div class="col-md-4 col-xl-4">
               <!-- Здесь будет  общий аккордеон по инвентарю,сейфу, заклинаниям, союзам, локациям-->
-            {% block personunion %}
-             <!-- Это группа-->
-                {% block persongroup%}
-                        Группа
-                {% endblock persongroup %}
-            <!-- Это клан-->
-            {% block personclone%}
-                        Клан
-                {% endblock personclone %}
-             <!-- Это квесты-->
-             {% block quest%}
-                        Квесты
-                {% endblock quest %}
-             <!-- Это партия-->
-                {% block personparty %}
-                        Партия
-                {% endblock personparty %}
-                <!-- Это Локация-->
-                {% block personlocation %}
-                        Локация
-                {% endblock personlocation %}
-            {% endblock personunion %}
+                <div class="accordion" id="gr_selector_{{person_detail.id}}">
+                 <div class="accordion-item" id="gr_selected_{{person_detail.id}}">
+                    <h6 class="accordion-header" id="header_gr{{person_detail.id}}">
+                        <button class="accordion-button collapsed  bg-info text-white table-sm "
+                                style="--bs-accordion-btn-padding-y:0.25rem" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#body_gr{{person_detail.id}}" aria-expanded="false"
+                                aria-controls="body_gr{{person_detail.id}}">
+                            Группы, кланы, союзы:
+                        </button>
+                    </h6>
+                    <div id="body_gr{{person_detail.id}}" class="accordion-collapse collapse show"
+                         aria-labelledby="header_gr{{person_detail.id}}"
+                         data-bs-parent="#gr_selector_{{person_detail.id}}">
+                        <div class="accordion-body">
+                        {% block personunion %}
+                         <!-- Это группа-->
+                            {% block persongroup%}
+                               {% include "poll\group\group_detail_other.html" with person_detail=person_detail %}
+                            {% endblock persongroup %}
+                        <!-- Это клан-->
+                            {% block personclone%}
+                                    Клан
+                            {% endblock personclone %}
+                         <!-- Это квесты-->
+                            {% block quest%}
+                                    Квесты
+                            {% endblock quest %}
+                         <!-- Это партия-->
+                            {% block personparty %}
+                                    Партия
+                            {% endblock personparty %}
+                         <!-- Это Локация-->
+                            {% block personlocation %}
+                                 {% include "poll\location\location_detail_other.html" with person_detail=person_detail %}
+                            {% endblock personlocation %}
+                        {% endblock personunion %}
+                        </div>
+                    </div>
+                 </div>
+                </div>
             </div>
         </div>
     </div>
@@ -129,27 +149,43 @@
     <script type="text/javascript">
             $(document).ready(function(){
              $("[id^='p_']").hide(); //все персонажи в содержимом вкладок скрыты
-              //$("[id^='pers_selected_']").hide(); //все персонажи в аккордеоне скрыты
-                const keys=['sp', 'mp','ip','pp','ap','lp', 'bp', 'cp','fp'];
-                $("#sel li").click(function(){
-                   // $("[id^='pers_selected_']").hide();
+             $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+             $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+             $("#sel li").click(function(){
                     $("[id^='p_']").hide();
-                     //$("#pers").text($(this).text());  // На кнопке пишем имя выбранного персонажа
-                    const personId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[1];
                     //console.log(personId);
-                    $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
+                   // $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
                     $("#p_"+personId).show();
 
-                    let un_points =Number($("#unallocated_points_"+personId).val()); // Получаем нераспределенные очки
-
-                    let points=un_points;
-                    for (var i=0; i<=keys.length-1;i++) {
-                        points+=Number($("#"+keys[i]+'_'+personId).val()); // сумма очков с учетом нераспределенных
-                    }
-                    const sum_points = points;
-                    //console.log(sum_points);
                 });
 
+                $("#saf li").click(function(){
+                $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+                     const safeTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                     $("#safe_" + safeTabId + "_" + personId).show();
+                });
+
+                $("#inv li").click(function(){
+                      $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+
+                     const invTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                    //console.log(invTabId);
+                    //console.log(personId);
+                     $("#inventory_" + invTabId + "_" + personId).show();
+                });
+
+                 $("#gr li").click(function(){
+                      $("[id^='group_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+
+                     const invTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                    //console.log(invTabId);
+                    //console.log(personId);
+                     $("#group_" + invTabId + "_" + personId).show();
+                });
             });
 
      </script>

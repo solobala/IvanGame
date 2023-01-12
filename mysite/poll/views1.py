@@ -212,7 +212,12 @@ class PersonDetailView(LoginRequiredMixin, DetailView):
         context['unallocated_points'] = unallocated_points
         context['unallocated_permissions'] = unallocated_permissions
         context['features'] = self.object.features
-
+        context['personbar_detail'] = self.object.personbar_set.all()
+        context['inventory_detail'] = self.object.inventory_set.all()
+        context['safe_detail'] = self.object.safe_set.all()
+        context['thing_detail'] = self.object.thing_set.all()
+        context['consumable_detail'] = self.object.consumable_set.all()
+        context['money_detail'] = self.object.money_set.all()
         # context['person_img'] = person_img
         return context
 

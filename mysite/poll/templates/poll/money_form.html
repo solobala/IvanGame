@@ -1,11 +1,11 @@
-<!-- templates/person/person_form.html -->
+<!-- templates/money/money_form.html -->
 {% extends "poll/header.html" %}
-{% load bootstrap5 %}
 {% block content %}
-  <form  enctype="multipart/form-data" method="post">
+    <h1>Добавление Ценности</h1>
+<form method="post">
     {% csrf_token %}
     {{ form.media }}
-    {{ form.as_p }}
+   {{ form.as_p }}
     <input type="submit" value="Save">
 </form>
 {% endblock content %}

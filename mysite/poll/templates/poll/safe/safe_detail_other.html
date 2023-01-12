@@ -1,34 +1,34 @@
 {% block personsafe %}
 {% load poll_extras %}
  <!-- Это навигационная панель с вкладками Артефакты-расходники-деньги -->
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link"  href="#th_{{person_detail.id}}">Артефакты</a>
+<ul class="nav nav-tabs" id="saf">
+  <li class="nav-item" id="safeid_th_{{person_detail.id}}">
+    <a class="nav-link"  href="#safe_th_{{person_detail.id}}"><small>Артефакты</small></a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#cons_{{person_detail.id}}">Расходники</a>
+  <li class="nav-item" id="safeid_cons_{{person_detail.id}}">
+    <a class="nav-link" href="#safe_cons_{{person_detail.id}}"><small>Расходники</small></a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#money_{{person_detail.id}}">Деньги</a>
+  <li class="nav-item" id="safeid_money_{{person_detail.id}}">
+    <a class="nav-link" href="#safe_money_{{person_detail.id}}"><small>Деньги</small></a>
   </li>
  </ul>
 <!-- Это раздел, где будут артефакты-->
-<div id="th_{{person_detail.id}}">
- <!-- Это аккордеон для списка артефактов в рюкзаке -->
- <!-- Внутри таблица со списком артефактов -->
+<div id="safe_th_{{person_detail.id}}">
+  Это аккордеон для списка артефактов в сейфе
+  Внутри таблица со списком артефактов
     {% for safe_detail in person_detail.safe_set.all %}
-   <div class="accordion" id="inv_th{{person_detail.id}}">
+   <div class="accordion" id="saf_th{{person_detail.id}}">
        <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_th{{person_detail.id}}">
+           <h6 class="accordion-header" id="header_saf_th{{person_detail.id}}">
                <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
                        style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_th{{person_detail.id}}" aria-expanded="true"
-                       aria-controls="body_inv_th{{person_detail.id}}">
+                       data-bs-target="#body_saf_th{{person_detail.id}}" aria-expanded="true"
+                       aria-controls="body_saf_th{{person_detail.id}}">
                    <strong>Содержимое</strong>
                </button>
            </h6>
-           <div id="body_inv_th{{person_detail.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_th{{person_detail.id}}" data-bs-parent="#inv_th{{person_detail.id}}">
+           <div id="body_saf_th{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_saf_th{{person_detail.id}}" data-bs-parent="#saf_th{{person_detail.id}}">
                <div class="accordion-body">
                    <table class="table table-bordered border-primary table-sm table-hover" border="1">
                        <thead>
@@ -59,25 +59,25 @@
            </div>
        </div>
    </div>
-
+    {% endfor %}
 </div>
 <!-- Это раздел, где будут расходники -->
-<div id="cons_{{person_detail.id}}">
- <!-- Это аккордеон для списка расходников в рюкзаке -->
- <!-- Внутри таблица со списком расходников -->
-
-   <div class="accordion" id="inv_cons{{person_detail.id}}">
+<div id="safe_cons_{{person_detail.id}}">
+  Это аккордеон для списка расходников в сейфе
+  Внутри таблица со списком расходников
+  {% for safe_detail in person_detail.safe_set.all %}
+   <div class="accordion" id="saf_cons{{person_detail.id}}">
        <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_cons{{person_detail.id}}">
+           <h6 class="accordion-header" id="header_saf_cons{{person_detail.id}}">
                <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
                        style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_cons{{person_detail.id}}" aria-expanded="true"
-                       aria-controls="body_inv_cons{{person_detail.id}}">
+                       data-bs-target="#body_saf_cons{{person_detail.id}}" aria-expanded="true"
+                       aria-controls="body_saf_cons{{person_detail.id}}">
                    <strong>Содержимое</strong>
                </button>
            </h6>
-           <div id="body_inv_cons{{person_detail.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_cons{{person_detail.id}}" data-bs-parent="#inv_cons{{person_detail.id}}">
+           <div id="body_saf_cons{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_saf_cons{{person_detail.id}}" data-bs-parent="#saf_cons{{person_detail.id}}">
                <div class="accordion-body">
                    <table class="table table-bordered border-primary table-sm table-hover" border="1">
                        <thead>
@@ -111,24 +111,25 @@
            </div>
        </div>
    </div>
+    {% endfor %}
 </div>
-<!-- Это раздел, где будут деньги его пока нет -->
-<div id="money_{{person_detail.id}}">
- <!-- Это аккордеон для списка ценностей в рюкзаке -->
- <!-- Внутри таблица со списком ценностей -->
-    
-   <div class="accordion" id="inv_money{{person_detail.id}}">
+<!-- Это раздел, где будут деньги  -->
+<div id="safe_money_{{person_detail.id}}">
+  Это аккордеон для списка ценностей в сейфе
+  Внутри таблица со списком ценностей
+      {% for safe_detail in person_detail.safe_set.all %}
+   <div class="accordion" id="saf_mon{{person_detail.id}}">
        <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_money{{person_detail.id}}">
+           <h6 class="accordion-header" id="header_saf_mon_{{person_detail.id}}">
                <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
                        style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_money{{person_detail.id}}" aria-expanded="true"
-                       aria-controls="body_inv_money{{person_detail.id}}">
+                       data-bs-target="#body_saf_mon{{person_detail.id}}" aria-expanded="true"
+                       aria-controls="body_saf_mon{{person_detail.id}}">
                    <strong>Содержимое</strong>
                </button>
            </h6>
-           <div id="body_inv_money{{person_detail.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_money{{person_detail.id}}" data-bs-parent="#inv_money{{person_detail.id}}">
+           <div id="body_saf_mon{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_saf_mon{{person_detail.id}}" data-bs-parent="#saf_mon{{person_detail.id}}">
                <div class="accordion-body">
                    <table class="table table-bordered border-primary table-sm table-hover" border="1">
                        <thead>
@@ -154,7 +155,7 @@
 
                                 <td>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="{{ consumable_detail.id }}">
+                                        <input class="form-check-input" type="checkbox" value="" id="money{{ money_detail.id }}">
                                     </div>
                                 </td>
                             </tr>

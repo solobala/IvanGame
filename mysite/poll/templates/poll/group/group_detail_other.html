@@ -1,0 +1,124 @@
+{% block persongroup %}
+{% load poll_extras %}
+  <!-- Это навигационная панель с вкладками Моя группа - Персонажи рядом-->
+<ul class="nav nav-tabs" id="gr">
+  <li class="nav-item" id="grid_mygroup_{{person_detail.id}}">
+    <a class="nav-link"  href="#group_mygroup_{{person_detail.id}}">Моя группа</a>
+  </li>
+  <li class="nav-item" id="grid_free_{{person_detail.id}}">
+    <a class="nav-link" href="#group_free_{{person_detail.id}}">Рядом</a>
+  </li>
+ </ul>
+<!-- Это раздел, где будут члены группы-->
+<div id="group_mygroup_{{person_detail.id}}">
+{% if mygroup == True %}
+   <div class="accordion" id="gr_mygroup_{{person_detail.id}}">
+       {% for group_detail in person_detail.group_set.all %}
+        <div class="accordion-item">
+           <h6 class="accordion-header" id="header_gr_mygroup{{person_detail.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_gr_mygroup{{person_detail.id}}" aria-expanded="true"
+                       aria-controls="body_gr_mygroup{{person_detail.id}}">
+                   <strong>Члены группы</strong>
+               </button>
+           </h6>
+           <div id="body_gr_mygroup{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_gr_mygroup{{person_detail.id}}" data-bs-parent="#gr_mygroup{{person_detail.id}}">
+               <div class="accordion-body">
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Статус</td><td>Персонаж</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                            <tr>
+                                <td>Организатор</td>
+                                <td><a href="/poll/persons/{{ inviter.id }}/">{{ inviter.person_name }}</a></td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="inviter{{ inviter.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                             {% for participant in participants %}
+                            <tr>
+                                <td>Участник</td>
+                                <td>
+                                    <a href="/poll/persons/{{ participant.id }}/">{{ participant.person_name }}</a>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="participant{{ participant.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+                    Выйти Присоединиться Организовать Пригласить Написать
+               </div>
+           </div>
+       </div>
+       {% endfor %}
+    </div>
+{% else %}
+    Не в группе
+{% endif %}
+
+</div>
+<!-- Это раздел, где будут игроки рядом-->
+<div id="group_free_{{person_detail.id}}">
+<!--  Это аккордеон для списка Персонажей в пределах локации-->
+<!--  Внутри таблица со списком Персонажей-->
+
+   <div class="accordion" id="gr_gam_{{person_detail.id}}">
+       <div class="accordion-item">
+           <h6 class="accordion-header" id="header_gr_gam{{person_detail.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_gr_gam{{person_detail.id}}" aria-expanded="true"
+                       aria-controls="body_gr_gam{{person_detail.id}}">
+                   <strong>Персонажи {{ location.location_name }}</strong>
+               </button>
+           </h6>
+           <div id="body_gr_gam{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_gr_gam{{person_detail.id}}" data-bs-parent="#gr_gam{{person_detail.id}}">
+               <div class="accordion-body">
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                        <tbody>
+                            {% for gamer in persons %}
+                                {% if gamer.status == 1 and gamer.get_location == person_detail.get_location  and gamer.get_location %}
+                            <tr>
+                                <td>
+                                    {{ gamer.person_name }}
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="gamer{{ gamer.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                                {% endif %}
+                            {% endfor %}
+                       </tbody>
+                   </table>
+                   Написать
+               </div>
+           </div>
+       </div>
+   </div>
+
+</div>
+
+{% endblock persongroup %}
+
+
+
+

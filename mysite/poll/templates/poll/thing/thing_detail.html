@@ -7,39 +7,39 @@
             <tbody>
                 <tr>
                     <td><h4>Название: </h4></td>
-                    <td>{{ consumable_detail.consumable_name }}</td>
+                    <td>{{ thing_detail.thing_name }}</td>
                 </tr>
                 <tr>
                     <td><h4>Описание: </h4></td>
-                    <td> {{ consumable_detail.consumable_description|safe }}</td>
+                    <td> {{ thing_detail.thing_description|safe }}</td>
                 </tr>
                 <tr>
                     <td><h4>Цена покупки:</h4></td>
-                    <td> {{ consumable_detail.sale_price }}</td>
+                    <td> {{ thing_detail.sale_price }}</td>
                 </tr>
                 <tr>
                     <td><h4>Цена продажи: </h4></td>
-                    <td> {{ consumable_detail.buy_price }}</td>
+                    <td> {{ thing_detail.buy_price }}</td>
                 </tr>
                 <tr>
                     <td colspan="2">
                         <div class="accordion" id="cons_points_to_make">
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="header_points_to_make_{{key_make}}">
+                                <h2 class="accordion-header" id="header_points_to_make_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
                                             data-bs-toggle="collapse"
-                                            data-bs-target="#body_points_to_make_{{key_make}}" aria-expanded="true"
-                                            aria-controls="body_points_to_make_{{key_make}}">
+                                            data-bs-target="#body_points_to_make_{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_points_to_make_{{thing_detail.id}}">
                                         <strong>Очки х-к для создания</strong>
                                     </button>
                                 </h2>
-                                <div id="body_points_to_make_{{key_make}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_points_to_make_{key_make}}"
+                                <div id="body_points_to_make_{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_points_to_make_{thing_detail.id}}"
                                      data-bs-parent="#cons_points_to_make">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
-                                            {% for key_make, value_make in consumable_detail.points_to_make.items %}
+                                            {% for key_make, value_make in thing_detail.points_to_make.items %}
                                             <tr>
                                                 <td>{% get_label 'dict_points' key_make %}</td>
                                                 <td align="right">{{ value_make }}</td>
@@ -57,22 +57,22 @@
                     <td colspan="2">
                         <div class="accordion" id="cons_points_to_use">
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="header_points_to_use_{{key_use}}">
+                                <h2 class="accordion-header" id="header_points_to_use_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
                                             data-bs-toggle="collapse"
-                                            data-bs-target="#body_points_to_use_{{key_use}}" aria-expanded="true"
-                                            aria-controls="body_points_to_use_{{key_use}}">
+                                            data-bs-target="#body_points_to_use_{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_points_to_use_{{thing_detail.id}}">
                                         <strong>Очки х-к от применения</strong>
                                     </button>
                                 </h2>
-                                <div id="body_points_to_use_{{key_use}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_points_to_use_{key_use}}" data-bs-parent="#cons_points_to_use">
+                                <div id="body_points_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_points_to_use_{thing_detail.id}}" data-bs-parent="#cons_points_to_use">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
-                                            {% for key_use, value_use in consumable_detail.points_from_use.items %}
+                                            {% for key_use, value_use in thing_detail.points_from_use.items %}
                                             <tr>
-                                                <td>{% get_label 'dict_points' key_use %}</td>
+                                                <td>{% get_label "dict_points" key_use %}</td>
                                                 <td align="right">{{ value_use }}</td>
                                             </tr>
                                             {% endfor %}
@@ -88,23 +88,54 @@
                     <td colspan="2">
                         <div class="accordion" id="cons_res_to_use">
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="header_res_to_use_{{key_res}}">
+                                <h2 class="accordion-header" id="header_res_to_use_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
                                             data-bs-toggle="collapse"
-                                            data-bs-target="#body_res_to_use_{{key_res}}" aria-expanded="true"
-                                            aria-controls="body_res_to_use_{{key_res}}">
-                                        <strong>Очки х-к от применения</strong>
+                                            data-bs-target="#body_res_to_use_{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_res_to_use_{{thing_detail.id}}">
+                                        <strong>Очки сопротивлений от применения</strong>
                                     </button>
                                 </h2>
-                                <div id="body_res_to_use_{{key_res}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_res_to_use_{key_res}}" data-bs-parent="#cons_res_to_use">
+                                <div id="body_res_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_res_to_use_{thing_detail.id}}" data-bs-parent="#cons_res_to_use">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
-                                            {% for key_res, value_res in consumable_detail.resistances_from_use.items %}
+                                            {% for key_res, value_res in thing_detail.resistances_from_use.items %}
                                             <tr>
                                                 <td>{% get_label 'dict_resistances' key_res %}</td>
                                                 <td align="right">{{ value_res }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                    <tr>
+                    <td colspan="2">
+                        <div class="accordion" id="cons_perm_to_use">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="header_perm_to_use_{{thing_detail.id}}">
+                                    <button class="accordion-button collapsed table-sm" type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#body_perm_to_use_{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_perm_to_use_{{thing_detail.id}}">
+                                        <strong>Очки навыков от применения</strong>
+                                    </button>
+                                </h2>
+                                <div id="body_perm_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_perm_to_use_{thing_detail.id}}" data-bs-parent="#cons_perm_to_use">
+                                    <div class="accordion-body">
+                                        <table>
+                                            <tbody>
+                                            {% for key_perm, value_perm in thing_detail.permissions_from_use.items %}
+                                            <tr>
+                                                <td>{% get_label 'dict_permissions' key_perm %}</td>
+                                                <td align="right">{{ value_perm }}</td>
                                             </tr>
                                             {% endfor %}
                                             </tbody>
@@ -119,20 +150,20 @@
                     <td colspan="2">
                         <div class="accordion" id="cons_cond">
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="header_cond{{key_cond}}">
+                                <h2 class="accordion-header" id="header_cond{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
                                             data-bs-toggle="collapse"
-                                            data-bs-target="#body_cond{{key_cond}}" aria-expanded="true"
-                                            aria-controls="body_cond{{key_cond}}">
+                                            data-bs-target="#body_cond{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_cond{{thing_detail.id}}">
                                         <strong>Кондиции</strong>
                                     </button>
                                 </h2>
-                                <div id="body_cond{{key_cond}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_cond{{key_cond}}" data-bs-parent="#cons_cond">
+                                <div id="body_cond{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_cond{{thing_detail.id}}" data-bs-parent="#cons_cond">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
-                                            {% for key_cond, value_cond in consumable_detail.conditions.items %}
+                                            {% for key_cond, value_cond in thing_detail.conditions.items %}
                                             <tr>
                                                 <td>{% get_label 'dict_conditions' key_cond %}</td>
                                                 <td align="right">{{ value_cond }}</td>
@@ -150,22 +181,22 @@
                     <td colspan="2">
                         <div class="accordion" id="cons_damage">
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="header_damage_{{key_damage}}">
+                                <h2 class="accordion-header" id="header_damage_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
                                             data-bs-toggle="collapse"
-                                            data-bs-target="#body_damage_{{key_damage}}" aria-expanded="true"
-                                            aria-controls="body_damage_{{key_damage}}">
+                                            data-bs-target="#body_damage_{{thing_detail.id}}" aria-expanded="true"
+                                            aria-controls="body_damage_{{thing_detail.id}}">
                                         <strong>Очки урона противнику от применения</strong>
                                     </button>
                                 </h2>
-                                <div id="body_damage_{{key_damage}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_damage_{{key_damage}}" data-bs-parent="#cons_damage">
+                                <div id="body_damage_{{thing_detail.id}}" class="accordion-collapse collapse"
+                                     aria-labelledby="header_damage_{{thing_detail.id}}" data-bs-parent="#cons_damage">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
-                                            {% for key_damage, value_damage in consumable_detail.conditions.items %}
+                                            {% for key_damage, value_damage in thing_detail.conditions.items %}
                                             <tr>
-                                                <td>{% get_label 'dict_damages' key_damage %}</td>
+                                                <td>{% get_label 'dict_conditions' key_damage %}</td>
                                                 <td align="right">{{ value_damage }}</td>
                                             </tr>
                                             {% endfor %}
@@ -182,10 +213,8 @@
     </div>
     <hr>
     {% if user.username == 'gameadmin' %}
-    <p align="left"><a href="{% url 'poll:consumable-update' consumable_detail.pk %}">+ Изменить Расходник {{
-        consumable_detail.consumable_name }}?</a></p>
-    <p align="left"><a href="{% url 'poll:consumable-delete' consumable_detail.pk %}">- Удалить Расходник {{
-        consumable_detail.consumable_name }}?</a></p>
+    <p align="left"><a href="{% url 'poll:thing-update' thing_detail.pk %}">+ Изменить Артефакт {{ thing_detail.thing_name }}?</a></p>
+    <p align="left"><a href="{% url 'poll:thing-delete' thing_detail.pk %}">- Удалить Артефакт {{ thing_detail.thing_name }}?</a></p>
     {% endif %}
 </div>
 

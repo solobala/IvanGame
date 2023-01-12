@@ -3,12 +3,12 @@ from django.contrib.auth import login, authenticate, logout  # add this
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
-
+from django.db.models import Sum
 from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-#  from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, EmptyResultSet
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -137,31 +137,174 @@ def password_reset_request(request):
 def index(request):
     """
     Функция отображения для страницы игрока, вошедшего в систему.
+    Возвращается вся актуальная информация по персонажам игрока
     """
+    # CONTEXT надо переписывать, а то последний персонаж затирает все предыдущие, а над чтобы все там были
     context = dict()
+    participants = []
+    context['owners'] = Owner.objects.all().order_by("owner_name")
+    context['persons'] = Person.objects.all().order_by("person_name")
+    context['free_owners'] = Owner.objects.filter(person__status=1).distinct('owner_name')
+    context['num_owners'] = Owner.objects.all().count()
+    context['num_persons'] = Person.objects.all().count()
+    context['num_owners_available'] = Owner.objects.filter(person__status=1).distinct('owner_name').count()
+    context['num_persons_available'] = Person.objects.filter(status=1).count()
+    context['num_persons_buzy'] = Person.objects.filter(status=2).count()
+    context['num_persons_freezed'] = Person.objects.filter(status=0).count()
     if request.user.username != "gameadmin":
-        ow = Owner.objects.get(created_by=request.user)
-        context['owner_detail'] = ow
-        context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
-        context['person_detail'] = ow.person_set.all()
-        context['owners'] = Owner.objects.all()
-        context['free_owners'] = Owner.objects.filter(person__status=1).distinct('owner_name')
-    return render(request, 'poll/index.html', context=context)
+        try:
+            ow = Owner.objects.get(created_by=request.user)
+            persons = ow.person_set.all()
+            context['owner_detail'] = ow
+            context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
+            context['person_detail'] = persons
+            inventory_things_sum_weight = 0
+            inventory_things_sum_value = 0
+            inventory_consumables_sum_weight = 0
+            inventory_consumables_sum_value = 0
+            inventory_money_sum_weight = 0
+            inventory_money_sum_value = 0
+            inventory_sum_weight = 0
+            inventory_sum_value = 0
+            safe_things_sum_weight = 0
+            safe_things_sum_value = 0
+            safe_consumables_sum_weight = 0
+            safe_consumables_sum_value = 0
+            safe_money_sum_weight = 0
+            safe_money_sum_value = 0
+            safe_sum_weight = 0
+            safe_sum_value = 0
+            sum_weight = 0
+            sum_value = 0
 
-    # # Генерация "количеств" некоторых главных объектов
-    # num_owners = Owner.objects.all().count()
-    # num_persons = Person.objects.all().count()
-    # # Доступные игроки и персонажи
-    # num_owners_available = Owner.objects.filter(person__status=1).distinct('owner_name').count()
-    # num_persons_available = Person.objects.filter(status=1).count()  # Метод 'all()' применён по умолчанию.
-    # return render(
-    #     request,
-    #     'poll/index.html',
-    #
-    #     #{'owner_detail': Owner.objects.get(created_by=request.user)},
-    #     # context={'num_owners': num_owners, 'num_persons': num_persons,
-    #     #          'num_owners_available': num_owners_available, 'num_persons_available': num_persons_available},
-    # )
+            person_properties = {"inventory_things_sum_weight": 0,
+                                 "inventory_things_sum_value": 0,
+                                 "inventory_consumables_sum_weight": 0,
+                                 "inventory_consumables_sum_value": 0,
+                                 "inventory_money_sum_weight": 0,
+                                 "inventory_money_sum_value": 0,
+                                 "inventory_sum_weight": 0,
+                                 "inventory_sum_value": 0,
+                                 "safe_things_sum_weight": 0,
+                                 "safe_things_sum_value": 0,
+                                 "safe_consumables_sum_weight": 0,
+                                 "safe_consumables_sum_value": 0,
+                                 "safe_money_sum_weight": 0,
+                                 "safe_money_sum_value": 0,
+                                 "safe_sum_weight": 0,
+                                 "safe_sum_value": 0,
+                                 "sum_weight": 0,
+                                 "sum_value": 0
+                                 }
+            #  -------------------------------------------------------------------------------------------------------------
+            # Для каждого из персонажей считаем статистики
+            #  -------------------------------------------------------------------------------------------------------------
+            for person in persons:
+                safe = person.safe_set.all()
+                inventory = person.inventory_set.all()
+                spells = person.spell_set.all()
+                #  ---------------------------------------------------------------------------------------------------------
+                # по сейфу - он у каждого персонажа только один или его нет вообще
+                #  ---------------------------------------------------------------------------------------------------------
+                try:
+                    if safe.exists():
+                        safe_things = safe[0].things.all()
+                        safe_consumables = safe[0].consumables.all()
+                        safe_money = safe[0].money.all()
+                        safe_things_sum_weight, safe_things_sum_value = safe_things.aggregate(Sum('weight'),
+                                                                                              Sum('sale_price'))
+                        safe_consumables_sum_weight, safe_consumables_sum_value = safe_consumables.aggregate(Sum('weight'),
+                                                                                                             Sum('sale_price'))
+                        safe_money_sum_weight, safe_money_sum_value = safe_money.aggregate(Sum('weight'), Sum('rate'))
+
+                        safe_sum_weight = safe_things_sum_weight + safe_consumables_sum_weight + safe_money_sum_weight
+
+                        safe_sum_value = safe_things_sum_value + safe_consumables_sum_value + safe_money_sum_value
+                        # context['safe'] = safe
+                        # context['safe_things'] = safe_things
+                        # context['safe_consumables'] = safe_consumables
+                        # context['safe_moneys'] = safe_money
+
+                except EmptyResultSet:
+                    context['safe'] = 'без сейфа'
+                #  ---------------------------------------------------------------------------------------------------------
+                # по рюкзаку:
+                #  ---------------------------------------------------------------------------------------------------------
+                try:
+                    if inventory.exists():
+                        inventory_things = inventory[0].things.all()
+                        inventory_consumables = inventory[0].consumables.all()
+                        inventory_money = inventory[0].money.all()
+
+                        inventory_things_sum_weight, inventory_things_sum_value = inventory_things.aggregate(
+                            Sum('weight'),
+                            Sum('sale_price'))
+                        inventory_consumables_sum_weight, inventory_consumables_sum_value = \
+                            inventory_consumables.aggregate(Sum('weight'), Sum('sale_price'))
+                        inventory_money_sum_weight, inventory_money_sum_value = inventory_money.aggregate(Sum('weight'),
+                                                                                                             Sum('rate'))
+
+                        inventory_sum_weight = inventory_things_sum_weight + \
+                                               inventory_consumables_sum_weight + \
+                                               inventory_money_sum_weight
+                        inventory_sum_value = inventory_things_sum_value + \
+                                              inventory_consumables_sum_value + \
+                                              inventory_money_sum_value
+                        context['inventory'] = inventory
+                        context['inventory_things'] = inventory_things
+                        context['inventory_consumables'] = inventory_consumables
+                        context['inventory_money'] = inventory_money
+                except EmptyResultSet:
+                    context['inventory'] = 'без рюкзака'
+                #  -------------------------------------------------------------------------------------------------------------
+                # суммарно
+                #  -------------------------------------------------------------------------------------------------------------
+                sum_weight = inventory_sum_weight + safe_sum_weight
+                sum_value = inventory_sum_value + safe_sum_value
+                person_properties = {"inventory_things_sum_weight": inventory_things_sum_weight,
+                                     "inventory_things_sum_value": inventory_things_sum_value,
+                                     "inventory_consumables_sum_weight": inventory_consumables_sum_weight,
+                                     "inventory_consumables_sum_value": inventory_consumables_sum_value,
+                                     "inventory_money_sum_weight": inventory_money_sum_weight,
+                                     "inventory_money_sum_value": inventory_money_sum_value,
+                                     "inventory_sum_weight": inventory_sum_weight,
+                                     "inventory_sum_value": inventory_sum_value,
+                                     "safe_things_sum_weight": safe_things_sum_weight,
+                                     "safe_things_sum_value": safe_things_sum_value,
+                                     "safe_consumables_sum_weight": safe_consumables_sum_weight,
+                                     "safe_consumables_sum_value": safe_consumables_sum_value,
+                                     "safe_money_sum_weight": safe_money_sum_weight,
+                                     "safe_money_sum_value": safe_money_sum_value,
+                                     "safe_sum_weight": safe_sum_weight,
+                                     "safe_sum_value": safe_sum_value,
+                                     "sum_weight": sum_weight,
+                                     "sum_value": sum_value
+                                     }
+                # context['person_properties'] = person_properties
+                # context['spells'] = spells
+                if person.group_set.all().exists():
+                    context['mygroup'] = True
+                    try:
+                        gr = person.group_set.all()[0].members.through.objects.filter(group__id=person.group_set.all()[0].pk)
+                        # context['inviter'] = gr[0].inviter
+                        for membership in gr:
+                            participants.append(membership.person)
+                        # context['participants'] = participants
+
+                    except ObjectDoesNotExist:
+                        pass
+                else:
+                    context['mygroup'] = False
+
+                try:
+                    loca = person.get_location
+                    # context['location'] = Location.objects.get(id=loca)
+                except ObjectDoesNotExist:
+                    context['location'] = None
+
+        except ObjectDoesNotExist:
+            pass
+    return render(request, 'poll/index.html', context=context)
 
 
 class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequiredMixin, CreateView):
@@ -972,6 +1115,11 @@ class LocationUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
+    context_object_name = 'location_update'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
     def form_valid(self, form):
         """
@@ -1253,6 +1401,7 @@ class FractionUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
+    context_object_name = 'fraction_update'
 
     def form_valid(self, form):
         """
@@ -1332,6 +1481,7 @@ class ZoneUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
+    context_object_name = 'zone_update'
 
     def form_valid(self, form):
         """
@@ -1536,6 +1686,7 @@ class SafeCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
     """
     Создание нового Сейфа
     """
+    template_name = 'add/safe_form.html'
     model = Safe
     fields = '__all__'
     login_url = 'poll:login'
@@ -1572,25 +1723,35 @@ class InventoryDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Артефакты в рюкзаке
-        my_things = self.object.thing_set.all()
+        my_things = self.object.prefetch_related('things')
         # расходники в рюкзаке
-        my_consumables = self.object.consumable_set.all()
+        my_consumables = self.object.prefetch_related('consumables')
+        # ценности в рюкзаке
+        my_money = self.object.prefetch_related('money')
         consumables_sum_weight = 0
         things_sum_weight = 0
         consumables_sum_value = 0
+        money_sum_weight = 0
         things_sum_value = 0
+        money_sum_value = 0
         for item in my_things:
             things_sum_weight += item.weight
             things_sum_value += item.sale_price
         for item in my_consumables:
             consumables_sum_weight += item.weight
             consumables_sum_value += item.sale_price
-        context['things_sum_weight'] = things_sum_weight
-        context['things_sum_value'] = things_sum_value
-        context['consumables_sum_weight'] = consumables_sum_weight
-        context['consumables_sum_value'] = consumables_sum_value
-        context['things'] = my_things
-        context['consumables'] = my_consumables
+        for item in my_money:
+            money_sum_weight += item.weight
+            money_sum_value += item.rate
+        context['inventory_things_sum_weight'] = things_sum_weight
+        context['inventory_things_sum_value'] = things_sum_value
+        context['inventory_consumables_sum_weight'] = consumables_sum_weight
+        context['inventory_consumables_sum_value'] = consumables_sum_value
+        context['inventory_money_sum_weight'] = things_sum_weight
+        context['inventory_money_sum_value'] = things_sum_value
+        context['inventory_things'] = my_things
+        context['inventory_consumables'] = my_consumables
+        context['inventory_money'] = my_consumables
         return context
 
 
@@ -1633,6 +1794,7 @@ class InventoryCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView)
     """
     Создание нового Сейфа
     """
+    template_name = 'add/inventory_form.html'
     model = Inventory
     fields = '__all__'
     login_url = 'poll:login'
@@ -1668,7 +1830,6 @@ class ThingDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         return context
 
 
@@ -1681,6 +1842,7 @@ class ThingUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
+    context_object_name = 'thing_update'
 
     def form_valid(self, form):
         """
@@ -1755,7 +1917,7 @@ class ConsumableUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView
     Редактирование Артефакта
     """
     model = Consumable
-
+    context_object_name = 'consumable_update'
     fields = '__all__'
     template_name_suffix = '_update'
     login_url = 'poll:login'
@@ -1799,6 +1961,86 @@ class ConsumableCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView
          """
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
+
+class MoneyListView(LoginRequiredMixin, ListView):
+    """
+    Просмотр полного списка Ценностей
+    """
+    template_name = 'poll/money/money_list.html'
+    context_object_name = 'money_list'
+    model = Money
+    login_url = 'poll:login'
+
+
+class MoneyCreateView(LoginRequiredMixin, JsonableResponseMixin, CreateView):
+    """
+    Создание новой Ценности
+    """
+    model = Money
+    fields = '__all__'
+    login_url = 'poll:login'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была создана Ценность
+        :param form:
+        :return:
+        """
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class MoneyUpdateView(LoginRequiredMixin, JsonableResponseMixin, UpdateView):
+    """
+    Редактирование Ценности
+    """
+    model = Money
+
+    fields = '__all__'
+    template_name_suffix = '_update'
+    login_url = 'poll:login'
+    context_object_name = 'money_update'
+
+    def form_valid(self, form):
+        """
+        Сведения о том, кем была изменена Ценность
+        :param form:
+        :return:
+        """
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class MoneyDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    Удаление Ценности
+    """
+    model = Money
+    template_name_suffix = '_delete'
+    success_url = reverse_lazy('poll:money-list')
+    context_object_name = 'money_detail'
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['money_type'] = context['money_detail'].money_type
+        return context
+
+
+class MoneyDetailView(LoginRequiredMixin, DetailView):
+    """
+    Просмотр детальной информации по Ценности
+    """
+    template_name = 'poll/money/money_detail.html'
+    context_object_name = 'money_detail'
+    model = Money
+    login_url = 'poll:login'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
 
 
 #  REST API
@@ -1958,3 +2200,8 @@ class ThingViewSet(viewsets.ModelViewSet):
 class ConsumableViewSet(viewsets.ModelViewSet):
     queryset = Consumable.objects.all()
     serializer_class = ConsumableSerializer
+
+
+class MoneyViewSet(viewsets.ModelViewSet):
+    queryset = Money.objects.all()
+    serializer_class = MoneySerializer

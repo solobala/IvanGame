@@ -1,14 +1,15 @@
-<div class="accordion" id="saf_about">
+{% block personsafe_about %}
+<div class="accordion" id="saf_about_{{person_detail.id}}">
     <div class="accordion-item">
-        <h2 class="accordion-header" id="header_saf{{key_saf}}">
-            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#body_saf{{key_saf}}" aria-expanded="true"
-                    aria-controls="body_saf{{key_saf}}">
-                <strong>Сейф-справка</strong>
+        <h2 class="accordion-header" id="header_saf_{{person_detail.id}}">
+            <button class="accordion-button collapsed table-sm" style="--bs-accordion-btn-padding-y:0.25rem" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#body_saf_{{person_detail.id}}" aria-expanded="true"
+                    aria-controls="body_saf_{{person_detail.id}}">
+                <strong>Сейф</strong>
             </button>
         </h2>
-        <div id="body_saf{{key_saf}}" class="accordion-collapse collapse"
-             aria-labelledby="header_saf{{key_saf}}" data-bs-parent="#saf_about">
+        <div id="body_saf_{{person_detail.id}}" class="accordion-collapse collapse"
+             aria-labelledby="header_saf_{{person_detail.id}}" data-bs-parent="#saf_about_{{person_detail.id}}">
             <div class="accordion-body">
                 <table class="table table-bordered border-primary table-sm table-hover" border="1">
                     <tbody>
@@ -32,32 +33,40 @@
                     </tr>
                     <tr>
                         <td>Макс. стоимость</td>
-                        <td>{{ safe_detail.max_value }}</td>
+                        <td>{{ safe_detail.safe_max_value }}</td>
                     </tr>
                     <tr>
                         <td>Текущий вес, в т.ч.</td>
 
-                        <td>{{ safe_detail.consumables_sum_weight|add:inventory_detail.things_sum_weight }}</td>
+                        <td>{{ safe_detail.safe_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес расходников</td>
-                        <td>{{ safe_detail.consumables_sum_weight }}</td>
+                        <td>{{ safe_detail.safe_consumables_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес артефактов</td>
-                        <td>{{ inventory_detail.things_sum_weight }}</td>
+                        <td>{{ safe_detail.safe_things_sum_weight }}</td>
+                    </tr>
+                     <tr>
+                        <td>Вес ценностей</td>
+                        <td>{{ safe_detail.safe_money_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость, в т.ч.</td>
-                        <td>{{ safe_detail.consumables_sum_value|add:inventory_detail.things_sum_value}}</td>
+                        <td>{{ safe_detail.safe_sum_value}}</td>
                     </tr>
                     <tr>
                         <td>Стоимость расходников</td>
-                        <td>{{ safe_detail.consumables_sum_value }}</td>
+                        <td>{{ safe_detail.safe_consumables_sum_value }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость артефактов</td>
-                        <td>{{ safe_detail.things_sum_value }}</td>
+                        <td>{{ safe_detail.safe_things_sum_value }}</td>
+                    </tr>
+                    <tr>
+                        <td>Стоимость ценностей</td>
+                        <td>{{ safe_detail.safe_money_sum_value }}</td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -66,4 +75,4 @@
         </div>
     </div>
 </div>
-
+{% endblock personsafe_about %}

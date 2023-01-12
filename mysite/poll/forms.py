@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.forms import MultiValueField
+import json
 from .models import Action, Feature, Owner, Person, PersonBar
 from ckeditor.widgets import CKEditorWidget
 from . import slovar
@@ -26,6 +28,51 @@ class NewUserForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class PointsWidget(forms.MultiWidget):
+    def __init__(self, attrs=None):
+        widgets = {"sp": forms.NumberInput(attrs=attrs),
+                   "mp": forms.NumberInput(attrs=attrs),
+                   "ip": forms.NumberInput(attrs=attrs),
+                   "pp": forms.NumberInput(attrs=attrs),
+                   "ap": forms.NumberInput(attrs=attrs),
+                   "fp": forms.NumberInput(attrs=attrs),
+                   "lp": forms.NumberInput(attrs=attrs),
+                   "bp": forms.NumberInput(attrs=attrs),
+                   "cp": forms.NumberInput(attrs=attrs)
+
+                   }
+        super().__init__(self, widgets, attrs)
+
+    def decompress(self, value):
+        if isinstance(value, dict):
+            value.sp = value['sp']
+            value.mp = value['mp']
+            value.ip = value['ip']
+            value.pp = value['pp']
+            value.ap = value['ap']
+            value.fp = value['fp']
+            value.lp = value['lp']
+            value.bp = value['bp']
+            value.cp = value['cp']
+            return [value.sp, value.mp, value.ip, value.pp, value.ap, value.fp, value.lp, value.bp, value.cp]
+        elif isinstance(value, str):
+            a = json.loads(value)
+            return [a.sp, a.mp, a.ip, a.pp, a.ap, a.fp, a.lp, a.bp, a.cp]
+        return [None, None, None, None, None, None, None, None, None]
+
+    def has_changed(self, initial, data):
+        if initial is None:
+            initial = {i: 0 for i in slovar.dict_points}
+        else:
+            if not isinstance(initial, dict):
+                initial = self.widget.decompress(initial)
+            for field, initial, data in zip(self.fields, initial, data):
+                initial = field.to_python(initial)
+                data = field.to_python(data)
+
+
 
 
 # https://colinkingswood.github.io/Model-Form-Customisation/
@@ -286,7 +333,8 @@ class PersonForm(forms.ModelForm):
 
 PersonFormSet = inlineformset_factory(
     Owner, Person, fields=('owner', 'person_name', 'person_img', 'link', 'biography', 'character', 'interests',
-                           'phobias', 'race', 'location_birth', 'birth_date', 'location_death', 'death_date', 'status', 'features'),
+                           'phobias', 'race', 'location_birth', 'birth_date', 'location_death', 'death_date', 'status',
+                           'features'),
     form=PersonForm, extra=1, can_delete=True, can_delete_extra=True)
 
 

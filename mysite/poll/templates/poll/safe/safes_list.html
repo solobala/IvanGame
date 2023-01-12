@@ -6,7 +6,7 @@
             <h1>Сейфы</h1>
            <ul class="list-group">
             {% for item in safes_list %}
-                <li class="list-group-item" aria-current="true"><a href="/poll/safes/{{ safe.id }}/">{{ safe.safe_name }}</a></li>
+                <li class="list-group-item" aria-current="true"><a href="/poll/safes/{{ item.id }}/">{{ item.safe_name }}</a></li>
             {% endfor %}
             </ul>
             {% if user.username == 'gameadmin' %}

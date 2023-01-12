@@ -1,0 +1,46 @@
+{% block personspells %}
+<!-- Это раздел, где будут заклинания-->
+<div class="accordion" id="spell_{{person_detail.id}}">
+    <div class="accordion-item">
+        <h6 class="accordion-header" id="header_spell_{{person_detail.id}}">
+            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                    style="--bs-accordion-btn-padding-y:0.25rem"
+                    data-bs-target="#body_spell_{{person_detail.id}}" aria-expanded="true"
+                    aria-controls="body_spell_{{person_detail.id}}">
+                <strong>Заклинания</strong>
+            </button>
+        </h6>
+           <div id="body_spell_{{person_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_spell_{{person_detail.id}}" data-bs-parent="#spell_{{person_detail.id}}">
+               <div class="accordion-body">
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                             {% for spell_detail in person_detail.spell_set.all %}
+                            <tr>
+                                <td>
+                                    {{ spell_detail.spell_name }}
+                                </td>
+
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="spell_{{ spell_detail.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+    </div>
+</div>
+{% endblock personspells %}
+
+
+
+

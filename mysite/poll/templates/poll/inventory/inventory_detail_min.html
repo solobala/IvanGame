@@ -1,14 +1,15 @@
-<div class="accordion" id="inv_about">
+{% block personinventory_about %}
+<div class="accordion" id="inv_about_{{person_detail.id}}">
     <div class="accordion-item">
-        <h2 class="accordion-header" id="header_inv{{key_inv}}">
-            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#body_inv{{key_inv}}" aria-expanded="true"
-                    aria-controls="body_inv{{key_inv}}">
-                <strong>Инвентарь-справка</strong>
+        <h2 class="accordion-header" id="header_inv_{{person_detail.id}}">
+            <button class="accordion-button collapsed table-sm" style="--bs-accordion-btn-padding-y:0.25rem" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#body_inv_{{person_detail.id}}" aria-expanded="true"
+                    aria-controls="body_inv_{{person_detail.id}}">
+                <strong>Инвентарь</strong>
             </button>
         </h2>
-        <div id="body_inv{{key_inv}}" class="accordion-collapse collapse"
-             aria-labelledby="header_inv{{key_inv}}" data-bs-parent="#inv_about">
+        <div id="body_inv_{{person_detail.id}}" class="accordion-collapse collapse"
+             aria-labelledby="header_inv_{{person_detail.id}}" data-bs-parent="#inv_about_{{person_detail.id}}">
             <div class="accordion-body">
                 <table class="table table-bordered border-primary table-sm table-hover" border="1">
                     <tbody>
@@ -33,27 +34,35 @@
                     <tr>
                         <td>Текущий вес, в т.ч.</td>
 
-                        <td>{{ inventory_detail.consumables_sum_weight|add:inventory_detail.things_sum_weight }}</td>
+                        <td>{{ inventory_detail.inventory_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_weight }}</td>
+                        <td>{{ inventory_detail.inventory_consumables_sum_weight }}</td>
+                    </tr>
+                    <tr>
+                        <td>Вес ценностей</td>
+                        <td>{{ inventory_detail.inventory_money_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес артефактов</td>
-                        <td>{{ inventory_detail.things_sum_weight }}</td>
+                        <td>{{ inventory_detail.inventory_things_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость, в т.ч.</td>
-                        <td>{{ inventory_detail.consumables_sum_value|add:inventory_detail.things_sum_value}}</td>
+                        <td>{{ inventory_detail.inventory_sum_value}}</td>
                     </tr>
                     <tr>
                         <td>Стоимость расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_value }}</td>
+                        <td>{{ inventory_detail.inventory_consumables_sum_value }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость артефактов</td>
-                        <td>{{ inventory_detail.things_sum_value }}</td>
+                        <td>{{ inventory_detail.inventory_things_sum_value }}</td>
+                    </tr>
+                     <tr>
+                        <td>Стоимость ценностей</td>
+                        <td>{{ inventory_detail.inventory_money_sum_value }}</td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -62,4 +71,4 @@
         </div>
     </div>
 </div>
-
+{% endblock personinventory_about %}

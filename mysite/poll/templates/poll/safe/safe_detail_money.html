@@ -1,16 +1,16 @@
-<!--Список артефактов в рюкзаке-->
+<!--Список Ценностей в сейфе-->
 <table class="table table-bordered border-primary table-sm table-hover" border="1" xmlns="http://www.w3.org/1999/html">
       <tbody>
         <thead>
              <tr>
-                <th>Название</th><th>Вес</th><th>Цена</th>
+                <th>Название</th><th>Вес</th><th>Номинал</th>
             </tr>
         </thead>
-       {% for item in inventory_detail.things.all %}
+       {% for item in safe_detail.money %}
         <tr>
-            <td><a href="/poll/things/{{ item.id }}/">{{ item.thing_name }}</a></td>
+            <td><a href="/poll/money/{{ money.id }}/">{{ item.money_type }}</a></td>
             <td>{{ item.weight }}</td>
-            <td>{{ item.sale_price }}</td>
+            <td>{{ item.rate }}</td>
         </tr>
         {% endfor %}
       </tbody>

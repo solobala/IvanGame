@@ -9,7 +9,7 @@
         <div class="row">
             <nav class="navbar fixed-top navbar-expand-lg navbar-dark">
                 <!-- Желтая кнопочка сворачивает и разворачивает левый сайдбар-->
-                      <button class="btn btn-warning btn-sm" type="button" data-bs-toggle="collapse"
+                      <button class="btn btn-warning btn-sm" title="-" type="button" data-bs-toggle="collapse"
                             data-bs-target="#sidebar" aria-expanded="false" aria-controls="sidebar">
                        <details><summary></summary></details>
                     </button>
@@ -24,14 +24,14 @@
                         <!--Навигационная панель для Окно игрока-->
                         <!--Скрытое поле чтобы запомнить выбранный персонаж-->
                         <input class="form-control" id="selid" type="hidden">
+
                         <!--панель вкладок для выбора персонажа-->
                         <ul class="nav nav-tabs" id="sel">
                             {% for selected_person in owner_detail.person_set.all %}
-                            <li class="nav-item" id="tab_{{selected_person.id}}">
+                            <li class="nav-item" id="tab_{{selected_person.id}}" >
                                 <a class="nav-link " aria-current="page" href="#p_{{selected_person.id}}">{{ selected_person.person_name }}</a>
                             </li>
                             {% endfor %}
-
                         </ul>
                          {% else %} <!--Back-end for gameadmin'-->
                         <ul class="navbar-nav ">
@@ -71,10 +71,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:consumables-list' %}">Расходники</a>
                             </li>
+                              <li class="nav-item">
+                                <a class="nav-link" href="{% url 'poll:money-list' %}">Ценности</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:zones-list' %}">Зоны</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link " aria-current="page" href="{% url 'poll:owners-list' %}">Игроки</a>
                             </li>
@@ -84,17 +86,20 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'poll:personbars-list' %}">Персонбары</a>
                             </li>
+                        </ul>
                             {% endif %}
+                         <ul class="navbar-nav ">
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'poll:persons-list' %}">Персонажи</a>
+                                <a class="nav-link" href="{% url 'poll:persons-list' %}">Персонажи: {{ num_persons }}</a>
                             </li>
+
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="/poll/persons/" id="dropdown" data-bs-toggle="dropdown"
+                                <a class="nav-link dropdown-toggle" href="/poll/persons/" id="person_dropdown" data-bs-toggle="dropdown"
                                    aria-expanded="false"> в т.ч.</a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdown" data-bs-popper="none">
-                                    <li><a class="dropdown-item" href="/poll/1/persons/">Свободные</a></li>
-                                    <li><a class="dropdown-item" href="/poll/2/persons/">Занятые</a></li>
-                                    <li><a class="dropdown-item" href="/poll/0/persons/">Заморозка</a></li>
+                                    <li><a class="dropdown-item" href="/poll/1/persons/">Свободные: {{ num_persons_available }}</a></li>
+                                    <li><a class="dropdown-item" href="/poll/2/persons/">Занятые: {{ num_persons_buzy}}</a></li>
+                                    <li><a class="dropdown-item" href="/poll/0/persons/">Заморозка: {{ num_persons_freezed }}</a></li>
                                 </ul>
                             </li>
 

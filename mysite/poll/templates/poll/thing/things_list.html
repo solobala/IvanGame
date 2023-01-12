@@ -6,7 +6,7 @@
             <h1>Артефакты</h1>
            <ul class="list-group">
             {% for item in things_list %}
-                <li class="list-group-item" aria-current="true"><a href="/poll/things/{{ thing.id }}/">{{ thing.thing_name }}</a></li>
+                <li class="list-group-item" aria-current="true"><a href="/poll/things/{{ item.id }}/">{{ item.thing_name }}</a></li>
             {% endfor %}
             </ul>
             {% if user.username == 'gameadmin' %}

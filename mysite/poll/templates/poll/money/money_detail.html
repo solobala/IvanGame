@@ -2,51 +2,25 @@
 {% block content %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
-        <!--      Здесь должен быть аккордеон - справка по vjney-->
         <table class="table table-bordered border-primary table-sm table-hover" border="1">
             <tbody>
             <tr>
-              <td>Название</td><td> {{ money_detail.money_type }}</td>
+              <td>Название</td><td> {{ money_detail.get_money_type_display }} </td>
             </tr>
              <tr>
-              <td>Общая сумма, в т.ч. </td><td>{{ money_detail.sum_value }}</td>
+              <td>Вес, г </td><td>{{ money_detail.weight }}</td>
             </tr>
             <tr>
-              <td>Золото</td><td>{{ money_detail.gold_sum_value }}</td>
-            </tr>
-            <tr>
-              <td>Серебро</td><td>{{ money_detail.silver_sum_value }}</td>
-            </tr>
-            <tr>
-              <td>Медь</td><td>{{ money_detail.copper_sum_value }}</td>
-            </tr>
-            <tr>
-              <td>Прочее</td><td>{{ money_detail.other_sum_value }}</td>
-            </tr>
-            <tr>
-              <td>Вес, в т.ч. </td><td>{{ money_detail.sum_weight }}</td>
-            </tr>
-            <tr>
-              <td>Вес золота</td><td>{{ money_detail.gold_sum_weight }}</td>
-            </tr>
-            <tr>
-              <td>Вес серебра</td><td>{{ money_detail.silver_sum_weight }}</td>
-            </tr>
-            <tr>
-              <td>Вес меди</td><td>{{ money_detail.copper_sum_weight }}</td>
-            </tr>
-            <tr>
-              <td>Вес прочего</td><td>{{ money_detail.other_sum_weight }}</td>
+              <td>Номинал, ед.</td><td>{{ money_detail.rate }}</td>
             </tr>
            </tbody>
         </table>
-<!--      Здесь должен быть аккордеон с прокруткой - список Артефактов-->
-<!--      Здесь должен быть аккордеон с прокруткой - список Расходников-->
+
     </div>
 <hr>
 {% if user.username == 'gameadmin' %}
-  <p align="left"> <a href="{% url 'poll:money-update' money_detail.pk %}">+ Изменить Кошелек {{ money_detail.safe_name }}?</a></p>
-  <p align="left"><a href="{% url 'poll:safe-delete' money_detail.pk %}">- Удалить Кошелек {{ money_detail.safe_name }}?</a></p>
+  <p align="left"> <a href="{% url 'poll:money-update' money_detail.pk %}">+ Изменить Ценность {{ money_detail.money_type }}?</a></p>
+  <p align="left"><a href="{% url 'poll:money-delete' money_detail.pk %}">- Удалить Ценность {{ money_detail.money_type }}?</a></p>
 {% endif %}
 </div>
 {% endblock %}

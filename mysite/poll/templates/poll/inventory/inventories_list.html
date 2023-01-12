@@ -6,7 +6,7 @@
             <h1>Рюкзаки</h1>
            <ul class="list-group">
             {% for item in inventories_list %}
-                <li class="list-group-item" aria-current="true"><a href="/poll/inventories/{{ inventory.id }}/">{{ inventory.inventory_name }}</a></li>
+                <li class="list-group-item" aria-current="true"><a href="/poll/inventories/{{ item.id }}/">{{ item.inventory_name }}</a></li>
             {% endfor %}
             </ul>
             {% if user.username == 'gameadmin' %}

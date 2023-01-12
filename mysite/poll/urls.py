@@ -27,23 +27,23 @@ app_name = 'poll'
 router = SimpleRouter()  # это пример из youtube
 
 
-router.register(r'owner', views.OwnerViewSet, basename='owner')
-router.register(r'person', views.PersonViewSet, basename='person')
-router.register(r'group', views.GroupViewSet)
-router.register(r'membership', views.MembershipViewSet)
-router.register(r'race', views.RaceViewSet)
-router.register(r'region', views.RegionViewSet)
-router.register(r'location', views.LocationViewSet)
-router.register(r'zone', views.ZoneViewSet)
-router.register(r'action', views.ActionViewSet)
-router.register(r'fraction', views.FractionViewSet)
-router.register(r'feature', views.FeatureViewSet)
-router.register(r'history', views.HistoryViewSet)
-router.register(r'personbar', views.PersonBarViewSet)
-router.register(r'thing', views.ThingViewSet)
-router.register(r'consumable', views.ConsumableViewSet)
-router.register(r'inventory', views.InventoryViewSet)
-router.register(r'safe', views.SafeViewSet)
+# router.register(r'owner', views.OwnerViewSet, basename='owner')
+# router.register(r'person', views.PersonViewSet, basename='person')
+# router.register(r'group', views.GroupViewSet)
+# router.register(r'membership', views.MembershipViewSet)
+# router.register(r'race', views.RaceViewSet)
+# router.register(r'region', views.RegionViewSet)
+# router.register(r'location', views.LocationViewSet)
+# router.register(r'zone', views.ZoneViewSet)
+# router.register(r'action', views.ActionViewSet)
+# router.register(r'fraction', views.FractionViewSet)
+# router.register(r'feature', views.FeatureViewSet)
+# router.register(r'history', views.HistoryViewSet)
+# router.register(r'personbar', views.PersonBarViewSet)
+# router.register(r'thing', views.ThingViewSet)
+# router.register(r'consumable', views.ConsumableViewSet)
+# router.register(r'inventory', views.InventoryViewSet)
+# router.register(r'safe', views.SafeViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -158,6 +158,13 @@ urlpatterns = [
     # обновление карточки расходников
     path('consumables/<int:pk>/delete/', ConsumableDeleteView.as_view(), name='consumable-delete'),  # удаление
     path('consumables/add/', ConsumableCreateView.as_view(), name='consumable-add'),  # добавить расходников
+    
+    path('money/', MoneyListView.as_view(), name='money-list'),  # список ценностей
+    path('money/<int:pk>/', MoneyDetailView.as_view(), name='money-detail'),  # просмотр карточки ценностей
+    path('money/<int:pk>/update/', MoneyUpdateView.as_view(), name='money-update'),
+    # обновление карточки ценности
+    path('money/<int:pk>/delete/', MoneyDeleteView.as_view(), name='money-delete'),  # удаление
+    path('money/add/', MoneyCreateView.as_view(), name='money-add'),  # добавить ценность
 
     path('owners/', views.OwnerList.as_view()),
     path('owners/<int:pk>/', views.OwnerDetail.as_view()),
