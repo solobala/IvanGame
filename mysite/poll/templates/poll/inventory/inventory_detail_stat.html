@@ -1,0 +1,47 @@
+
+{% load poll_extras %}
+
+
+<tr>
+                                <td>Текущий вес, в т.ч.</td>
+
+                                <td>{{ inventory_stat|get_value_from_dict:'inventory_sum_weight' }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Вес расходников</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_consumables_sum_weight" }}</td>
+                            </tr>
+
+                                <tr>
+                                <td>Вес ценностей</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_money_sum_weight"}}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Вес артефактов</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_things_sum_weight" }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Стоимость, в т.ч.</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_sum_value" }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Стоимость расходников</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_consumables_sum_value" }}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Стоимость артефактов</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_things_sum_value" }}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Стоимость ценностей</td>
+                                <td>{{ inventory_stat|get_value_from_dict:"inventory_money_sum_value" }}</td>
+                            </tr>
+
+
+

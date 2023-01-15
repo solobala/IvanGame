@@ -1,74 +1,242 @@
-{% block personinventory_about %}
-<div class="accordion" id="inv_about_{{person_detail.id}}">
+
+<!-- берем элемент словаря - список, который относится к конкретному персонажу-->
+{% if inventory_detail %}
+<div class="accordion" id="inv_about_{{person.id}}">
     <div class="accordion-item">
-        <h2 class="accordion-header" id="header_inv_{{person_detail.id}}">
+        <h2 class="accordion-header" id="header_inv_{{person.id}}">
             <button class="accordion-button collapsed table-sm" style="--bs-accordion-btn-padding-y:0.25rem" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#body_inv_{{person_detail.id}}" aria-expanded="true"
-                    aria-controls="body_inv_{{person_detail.id}}">
+                    data-bs-target="#body_inv_{{person.id}}" aria-expanded="true"
+                    aria-controls="body_inv_{{person.id}}">
                 <strong>Инвентарь</strong>
             </button>
         </h2>
-        <div id="body_inv_{{person_detail.id}}" class="accordion-collapse collapse"
-             aria-labelledby="header_inv_{{person_detail.id}}" data-bs-parent="#inv_about_{{person_detail.id}}">
+        <div id="body_inv_{{person.id}}" class="accordion-collapse collapse"
+             aria-labelledby="header_inv_{{person.id}}" data-bs-parent="#inv_about_{{person.id}}">
             <div class="accordion-body">
+ <!-- перебираем элементы списка - пары ключ-значение -->
                 <table class="table table-bordered border-primary table-sm table-hover" border="1">
                     <tbody>
-                    {% for inventory_detail in person_detail.inventory_set.all %}
-                    {% if inventory_detail.inventory_name %}
-                    <tr>
-                        <td>Название</td>
-                        <td> {{ inventory_detail.inventory_name }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if inventory_detail.inventory_description %}
-                    <tr>
-                        <td>Описание</td>
-                        <td>{{ inventory_detail.inventory_description|safe }}</td>
-                    </tr>
-                    {% endif %}
-
-                    <tr>
-                        <td>Максимальный вес</td>
-                        <td>{{ inventory_detail.inventory_max_weight }}</td>
-                    </tr>
-                    <tr>
-                        <td>Текущий вес, в т.ч.</td>
-
-                        <td>{{ inventory_detail.inventory_sum_weight }}</td>
-                    </tr>
-                    <tr>
-                        <td>Вес расходников</td>
-                        <td>{{ inventory_detail.inventory_consumables_sum_weight }}</td>
-                    </tr>
-                    <tr>
-                        <td>Вес ценностей</td>
-                        <td>{{ inventory_detail.inventory_money_sum_weight }}</td>
-                    </tr>
-                    <tr>
-                        <td>Вес артефактов</td>
-                        <td>{{ inventory_detail.inventory_things_sum_weight }}</td>
-                    </tr>
-                    <tr>
-                        <td>Стоимость, в т.ч.</td>
-                        <td>{{ inventory_detail.inventory_sum_value}}</td>
-                    </tr>
-                    <tr>
-                        <td>Стоимость расходников</td>
-                        <td>{{ inventory_detail.inventory_consumables_sum_value }}</td>
-                    </tr>
-                    <tr>
-                        <td>Стоимость артефактов</td>
-                        <td>{{ inventory_detail.inventory_things_sum_value }}</td>
-                    </tr>
+                            {% if inventory_detail.inventory_name %}
+                                <tr>
+                                    <td>Название</td>
+                                    <td> {{ inventory_detail.inventory_name }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if inventory_detail.inventory_description %}
+                                <tr>
+                                    <td>Описание</td>
+                                    <td>{{ inventory_detail.inventory_description|safe }}</td>
+                                </tr>
+                            {% endif %}
+                             {% if inventory_detail.inventory_max_weight %}
+                                <tr>
+                                    <td>Максимальный вес</td>
+                                    <td>{{ inventory_detail.inventory_max_weight }}</td>
+                                </tr>
+                            {% endif %}
                      <tr>
-                        <td>Стоимость ценностей</td>
-                        <td>{{ inventory_detail.inventory_money_sum_value }}</td>
-                    </tr>
-                    {% endfor %}
+                                <td>Текущий вес, в т.ч.</td>
+
+                                <td>{{ inventory_stat.inventory_sum_weight }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Вес расходников</td>
+                                <td>{{ inventory_stat.inventory_consumables_sum_weight }}</td>
+                            </tr>
+
+                                <tr>
+                                <td>Вес ценностей</td>
+                                <td>{{ inventory_stat.inventory_money_sum_weight }}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Вес артефактов</td>
+                                <td>{{ inventory_stat.inventory_things_sum_weight }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Стоимость, в т.ч.</td>
+                                <td>{{ inventory_stat.inventory_sum_value }}</td>
+                            </tr>
+
+                              <tr>
+                                <td>Стоимость расходников</td>
+                                <td>{{ inventory_stat.inventory_consumables_sum_value }}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Стоимость артефактов</td>
+                                <td>{{ inventory_stat.inventory_things_sum_value }}</td>
+                            </tr>
+
+                               <tr>
+                                <td>Стоимость ценностей</td>
+                                <td>{{ inventory_stat.inventory_money_sum_value }}</td>
+                            </tr>
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-{% endblock personinventory_about %}
+<ul class="nav nav-tabs" id="inv">
+  <li class="nav-item" id="invid_th_{{person.id}}">
+    <a class="nav-link"  href="#inventory_th_{{person.id}}"><small>Артефакты</small></a>
+  </li>
+  <li class="nav-item" id="invid_cons_{{person.id}}">
+    <a class="nav-link" href="#inventory_cons_{{person.id}}"><small>Расходники</small></a>
+  </li>
+  <li class="nav-item" id="invid_mon_{{person.id}}">
+    <a class="nav-link" href="#inventory_mon_{{person.id}}"><small>Деньги</small></a>
+  </li>
+ </ul>
+<!-- Это раздел, где будут артефакты-->
+<div id="inventory_th_{{person.id}}">
+  <div class="accordion" id="inv_th_{{person.id}}">
+       <div class="accordion-item">
+           <h6 class="accordion-header" id="header_inv_th_{{person.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_inv_th_{{person.id}}" aria-expanded="true"
+                       aria-controls="body_inv_th_{{person.id}}">
+                   <strong>Содержимое</strong>
+               </button>
+           </h6>
+           <div id="body_inv_th_{{person.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_inv_th_{{person.id}}" data-bs-parent="#inv_th_{{person.id}}">
+               <div class="accordion-body">
+                 {% block inventory_things %}
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                             {% for thing in inventory_things %}
+                            <tr>
+                                <td>
+                                    {{ thing.thing_name }}
+                                </td>
+                                <td>
+                                    {{ thing.weight }}
+                                </td>
+
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="thing_{{ thing.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+                  {% endblock inventory_things %}
+
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+<!-- Это раздел, где будут расходники -->
+<div id="inventory_cons_{{person.id}}">
+   <div class="accordion" id="inv_cons_{{person.id}}">
+       <div class="accordion-item">
+           <h6 class="accordion-header" id="header_inv_cons_{{person.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_inv_cons_{{person.id}}" aria-expanded="true"
+                       aria-controls="body_inv_cons_{{person.id}}">
+                   <strong>Содержимое</strong>
+               </button>
+           </h6>
+           <div id="body_inv_cons_{{person.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_inv_cons_{{person.id}}" data-bs-parent="#inv_cons_{{person.id}}">
+               <div class="accordion-body">
+                {% block inventory_consumables %}
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                        <tbody>
+                            {% for consumable in inventory_consumables %}
+                            <tr>
+                                <td>
+                                    {{ consumable.consumable_name }}
+                                </td>
+                                <td>
+                                    {{ consumable.weight }}
+                                </td>
+                                 <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="consumable_{{ consumable.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+                {% endblock inventory_consumables %}
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+<!-- Это раздел, где будут деньги  -->
+<div id="inventory_mon_{{person.id}}">
+   <div class="accordion" id="inv_mon_{{person.id}}">
+       <div class="accordion-item">
+           <h6 class="accordion-header" id="header_inv_mon_{{person.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_inv_mon_{{person.id}}" aria-expanded="true"
+                       aria-controls="body_inv_mon_{{person.id}}">
+                   <strong>Содержимое</strong>
+               </button>
+           </h6>
+           <div id="body_inv_mon_{{person.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_inv_mon_{{person.id}}" data-bs-parent="#inv_mon_{{person.id}}">
+               <div class="accordion-body">
+                    {% block inventory_money %}
+
+                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Номинал</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                            {% for money_detail in inventory_money %}
+                            <tr>
+                                <td>
+                                    {{ money_detail.get_money_type_display }}
+                                </td>
+                                <td>
+                                    {{ money_detail.weight }}
+                                </td>
+                                <td>
+                                    {{ money_detail.rate }}
+                                </td>
+
+
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="money_{ money_detail.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+                   {% endblock inventory_money %}
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+{% endif %}
+

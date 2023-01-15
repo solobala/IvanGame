@@ -1,5 +1,6 @@
 {% extends "poll/header.html" %}
 {% block content %}
+{% block safe_about %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
         <!--      Здесь  аккордеон - справка по сейфу-->
@@ -21,31 +22,31 @@
               <td>Стоимость аренды</td><td>{{ safe_detail.rental_price }}</td><!--Здесь должен быть прайс по аренде сейфов в зависимости от стоимости-->
             </tr>
             <tr>
-              <td>Максимальный вес</td><td>{{ safe_detail.max_weight }}</td>
+              <td>Максимальная стоимость</td><td>{{ safe_detail.max_value }}</td>
             </tr>
             <tr>
-              <td>Стоимость предметов, в т.ч. </td><td>{{ safe_detail.sum_value }}</td>
+              <td>Стоимость предметов, в т.ч. </td><td>{{ safe_sum_value }}</td>
             </tr>
             <tr>
-              <td>Стоимость расходников</td><td>{{ safe_detail.consumables_sum_value }}</td>
+              <td>Стоимость расходников</td><td>{{safe_consumables_sum_value }}</td>
             </tr>
             <tr>
-              <td>Стоимость артефактов</td><td>{{ safe_detail.things_sum_value }}</td>
+              <td>Стоимость артефактов</td><td>{{ safe_things_sum_value }}</td>
             </tr>
             <tr>
-              <td>Стоимость ценностей</td><td>{{ safe_detail.money_sum_value }}</td>
+              <td>Стоимость ценностей</td><td>{{ safe_money_sum_value }}</td>
             </tr>
             <tr>
-              <td>Вес предметов, в т.ч. </td><td>{{ safe_detail.sum_weight }}</td>
+              <td>Вес предметов, в т.ч. </td><td>{{ safe_sum_weight }}</td>
             </tr>
             <tr>
-              <td>Вес расходников</td><td>{{ safe_detail.consumables_sum_weight }}</td>
+              <td>Вес расходников</td><td>{{ safe_consumables_sum_weight }}</td>
             </tr>
             <tr>
-              <td>Вес артефактов</td><td>{{ safe_detail.things_sum_weight }}</td>
+              <td>Вес артефактов</td><td>{{ safe_things_sum_weight }}</td>
             </tr>
             <tr>
-              <td>Вес ценностей</td><td>{{ safe_detail.money_sum_weight }}</td>
+              <td>Вес ценностей</td><td>{{ safe_money_sum_weight }}</td>
             </tr>
            </tbody>
         </table>
@@ -59,4 +60,6 @@
   <p align="left"><a href="{% url 'poll:safe-delete' safe_detail.pk %}">- Удалить Сейф {{ safe_detail.safe_name }}?</a></p>
 {% endif %}
 </div>
-{% endblock %}
+{% endblock safe_about %}
+{
+{% endblock content%}

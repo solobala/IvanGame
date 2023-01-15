@@ -1,0 +1,36 @@
+
+{% load poll_extras %}
+<table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Номинал</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                            {% for money_detail in inventory_money %}
+                            <tr>
+                                <td>
+                                    {{ money_detail.get_money_type_display }}
+                                </td>
+                                <td>
+                                    {{ money_detail.weight }}
+                                </td>
+                                <td>
+                                    {{ money_detail.rate }}
+                                </td>
+
+
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="money{{ money_detail.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+
+
+
+
+

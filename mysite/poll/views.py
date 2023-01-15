@@ -1,65 +1,38 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout  # add this
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.template.loader import render_to_string
-from django.db.models import Sum
+from django.db.models import  Count
 from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.core.exceptions import ObjectDoesNotExist, EmptyResultSet
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import  EmptyResultSet
+from django.contrib.auth.mixins import  PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from rest_framework import viewsets
 from .models import *
-from django.views.generic import DetailView, ListView
+
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import NewUserForm, ActionUpdateForm, FeatureUpdateForm, OwnerForm
 from django.http import JsonResponse
 from django.urls import reverse
 from rest_framework import generics
-from . import slovar
+# from . import slovar
 from .forms import PersonFormSet
 
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+# from rest_framework.response import Response
+# from rest_framework.decorators import api_view
+# from rest_framework import status
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from collections import namedtuple
-from .serializers import *
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+# from collections import namedtuple
+# from .serializers import *
 from .views1 import *
-
-
-class JsonableResponseMixin:
-    """
-    Mixin to add JSON support to a form.
-    Must be used with an object-based FormView (e.g. CreateView)
-    """
-
-    def form_invalid(self, form):
-        response = super().form_invalid(form)
-        if self.request.accepts('text/html'):
-            return response
-        else:
-            return JsonResponse(form.errors, status=400)
-
-    def form_valid(self, form):
-        # We make sure to call the parent's form_valid() method because
-        # it might do some processing (in the case of CreateView, it will
-        # call form.save() for example).
-        response = super().form_valid(form)
-        if self.request.accepts('text/html'):
-            return response
-        else:
-            data = {
-                'pk': self.object.pk,
-            }
-            return JsonResponse(data)
 
 
 def register_request(request):
@@ -137,20 +110,22 @@ def password_reset_request(request):
 def index(request):
     """
     Функция отображения для страницы игрока, вошедшего в систему.
-    Возвращается вся актуальная информация по персонажам игрока
+    Возвращается вся актуальная информация по всем персонажам игрока
     """
     # CONTEXT надо переписывать, а то последний персонаж затирает все предыдущие, а над чтобы все там были
     context = dict()
     participants = []
-    context['owners'] = Owner.objects.all().order_by("owner_name")
-    context['persons'] = Person.objects.all().order_by("person_name")
-    context['free_owners'] = Owner.objects.filter(person__status=1).distinct('owner_name')
-    context['num_owners'] = Owner.objects.all().count()
-    context['num_persons'] = Person.objects.all().count()
-    context['num_owners_available'] = Owner.objects.filter(person__status=1).distinct('owner_name').count()
-    context['num_persons_available'] = Person.objects.filter(status=1).count()
-    context['num_persons_buzy'] = Person.objects.filter(status=2).count()
-    context['num_persons_freezed'] = Person.objects.filter(status=0).count()
+    person_properties = dict()
+
+    # context['owners'] = Owner.objects.all().order_by("owner_name")
+    # context['persons'] = Person.objects.all().order_by("person_name")
+    # context['free_owners'] = Owner.objects.filter(person__status=1).distinct('owner_name')
+    # context['num_owners'] = Owner.objects.all().count()
+    # context['num_persons'] = Person.objects.all().count()
+    # context['num_owners_available'] = Owner.objects.filter(person__status=1).distinct('owner_name').count()
+    # context['num_persons_available'] = Person.objects.filter(status=1).count()
+    # context['num_persons_buzy'] = Person.objects.filter(status=2).count()
+    # context['num_persons_freezed'] = Person.objects.filter(status=0).count()
     if request.user.username != "gameadmin":
         try:
             ow = Owner.objects.get(created_by=request.user)
@@ -158,130 +133,127 @@ def index(request):
             context['owner_detail'] = ow
             context['owner_status_'] = ['Занят' if context['owner_detail'].owner_status == '1' else 'Свободен'][0]
             context['person_detail'] = persons
-            inventory_things_sum_weight = 0
-            inventory_things_sum_value = 0
-            inventory_consumables_sum_weight = 0
-            inventory_consumables_sum_value = 0
-            inventory_money_sum_weight = 0
-            inventory_money_sum_value = 0
-            inventory_sum_weight = 0
-            inventory_sum_value = 0
-            safe_things_sum_weight = 0
-            safe_things_sum_value = 0
-            safe_consumables_sum_weight = 0
-            safe_consumables_sum_value = 0
-            safe_money_sum_weight = 0
-            safe_money_sum_value = 0
-            safe_sum_weight = 0
-            safe_sum_value = 0
-            sum_weight = 0
-            sum_value = 0
 
-            person_properties = {"inventory_things_sum_weight": 0,
-                                 "inventory_things_sum_value": 0,
-                                 "inventory_consumables_sum_weight": 0,
-                                 "inventory_consumables_sum_value": 0,
-                                 "inventory_money_sum_weight": 0,
-                                 "inventory_money_sum_value": 0,
-                                 "inventory_sum_weight": 0,
-                                 "inventory_sum_value": 0,
-                                 "safe_things_sum_weight": 0,
-                                 "safe_things_sum_value": 0,
-                                 "safe_consumables_sum_weight": 0,
-                                 "safe_consumables_sum_value": 0,
-                                 "safe_money_sum_weight": 0,
-                                 "safe_money_sum_value": 0,
-                                 "safe_sum_weight": 0,
-                                 "safe_sum_value": 0,
-                                 "sum_weight": 0,
-                                 "sum_value": 0
-                                 }
+            person_spells = dict()
             #  -------------------------------------------------------------------------------------------------------------
             # Для каждого из персонажей считаем статистики
             #  -------------------------------------------------------------------------------------------------------------
             for person in persons:
-                safe = person.safe_set.all()
-                inventory = person.inventory_set.all()
-                spells = person.spell_set.all()
+
+                inventory_things_sum_weight = 0
+                inventory_things_sum_value = 0
+                inventory_consumables_sum_weight = 0
+                inventory_consumables_sum_value = 0
+                inventory_money_sum_weight = 0
+                inventory_money_sum_value = 0
+                inventory_sum_weight = 0
+                inventory_sum_value = 0
+                safe_things_sum_weight = 0
+                safe_things_sum_value = 0
+                safe_consumables_sum_weight = 0
+                safe_consumables_sum_value = 0
+                safe_money_sum_weight = 0
+                safe_money_sum_value = 0
+                safe_sum_weight = 0
+                safe_sum_value = 0
+                sum_weight = 0
+                sum_value = 0
+                properties = dict()
+                safe_stat = {}
+                inventory_stat = {}
+                person_spells = person.spell_set.all()
+                properties["spells"] = person_spells
                 #  ---------------------------------------------------------------------------------------------------------
                 # по сейфу - он у каждого персонажа только один или его нет вообще
                 #  ---------------------------------------------------------------------------------------------------------
                 try:
-                    if safe.exists():
-                        safe_things = safe[0].things.all()
-                        safe_consumables = safe[0].consumables.all()
-                        safe_money = safe[0].money.all()
-                        safe_things_sum_weight, safe_things_sum_value = safe_things.aggregate(Sum('weight'),
-                                                                                              Sum('sale_price'))
-                        safe_consumables_sum_weight, safe_consumables_sum_value = safe_consumables.aggregate(Sum('weight'),
-                                                                                                             Sum('sale_price'))
-                        safe_money_sum_weight, safe_money_sum_value = safe_money.aggregate(Sum('weight'), Sum('rate'))
+                    safe = Safe.objects.get(person=person.id)
+                    # арефакты в сейфе
+                    safe_things = safe.things.all()
+                    # расходники в сейфе
+                    safe_consumables = safe.consumables.all()
+                    # деньги в сейфe
+                    safe_money = safe.money.all()
+                    # суммарно вес и стоимость артефактов  в сейфе
+                    for element in safe_things:
+                        safe_things_sum_weight += element.weight
+                        safe_things_sum_value += element.sale_price
+                    # суммарно вес и стоимость расходников в сейфе
+                    for element in safe_consumables:
+                        safe_consumables_sum_weight += element.weight
+                        safe_consumables_sum_value += element.sale_price
+                    # суммарно вес и стоимость денег в сейфе
+                    for element in safe_money:
+                        safe_money_sum_weight += element.weight
+                        safe_money_sum_value += element.rate
+                    # вес сейфа и стоимость сейфа
+                    safe_sum_weight = safe_things_sum_weight + safe_consumables_sum_weight + safe_money_sum_weight
+                    safe_sum_value = safe_things_sum_value + safe_consumables_sum_value + safe_money_sum_value
 
-                        safe_sum_weight = safe_things_sum_weight + safe_consumables_sum_weight + safe_money_sum_weight
+                    safe_stat["safe_sum_weight"] = safe_sum_weight
+                    safe_stat["safe_sum_value"] = safe_sum_value
+                    safe_stat["safe_things_sum_weight"] = safe_things_sum_weight
+                    safe_stat["safe_things_sum_value"] = safe_things_sum_value
+                    safe_stat["safe_consumables_sum_weight"] = safe_consumables_sum_weight
+                    safe_stat["safe_consumables_sum_value"] = safe_sum_value
+                    safe_stat["safe_money_sum_weight"] = safe_consumables_sum_weight
+                    safe_stat["safe_money_sum_value"] = safe_sum_value
 
-                        safe_sum_value = safe_things_sum_value + safe_consumables_sum_value + safe_money_sum_value
-                        # context['safe'] = safe
-                        # context['safe_things'] = safe_things
-                        # context['safe_consumables'] = safe_consumables
-                        # context['safe_moneys'] = safe_money
+                    properties["person"] = person
+                    properties["safe"] = safe
+                    properties["safe_consumables"] = safe_consumables
+                    properties["safe_money"] = safe_money
+                    properties["safe_things"] = safe_things
+                    properties["safe_stat"] = safe_stat
 
-                except EmptyResultSet:
-                    context['safe'] = 'без сейфа'
+                except ObjectDoesNotExist:
+                    pass
+
                 #  ---------------------------------------------------------------------------------------------------------
                 # по рюкзаку:
                 #  ---------------------------------------------------------------------------------------------------------
                 try:
-                    if inventory.exists():
-                        inventory_things = inventory[0].things.all()
-                        inventory_consumables = inventory[0].consumables.all()
-                        inventory_money = inventory[0].money.all()
+                    inventory = Inventory.objects.get(person=person.id)
+                    inventory_things = inventory.things.all()
+                    inventory_consumables = inventory.consumables.all()
+                    inventory_money = inventory.money.all()
+                    for element in inventory_things:
+                        inventory_things_sum_weight += element.weight
+                        inventory_things_sum_value += element.sale_price
+                    for element in inventory_consumables:
+                        inventory_consumables_sum_weight += element.weight
+                        inventory_consumables_sum_value += element.sale_price
+                    for element in inventory_money:
+                        inventory_money_sum_weight += element.weight
+                        inventory_money_sum_value += element.rate
+                    inventory_sum_weight = inventory_things_sum_weight + \
+                                           inventory_consumables_sum_weight + \
+                                           inventory_money_sum_weight
+                    inventory_sum_value = inventory_things_sum_value + \
+                                          inventory_consumables_sum_value + \
+                                          inventory_money_sum_value
+                    inventory_stat["inventory_sum_weight"]= inventory_sum_weight
+                    inventory_stat["inventory_sum_value"] = inventory_sum_value
+                    inventory_stat["inventory_things_sum_weight"] = inventory_things_sum_weight
+                    inventory_stat["inventory_things_sum_value"] = inventory_things_sum_value
+                    inventory_stat["inventory_consumables_sum_weight"] = inventory_consumables_sum_weight
+                    inventory_stat["inventory_consumables_sum_value"] = inventory_consumables_sum_value
+                    inventory_stat["inventory_money_sum_weight"] = inventory_money_sum_weight
+                    inventory_stat["inventory_money_sum_value"] = inventory_money_sum_value
+                    properties["inventory"] = inventory
+                    properties["inventory_things"] = inventory_things
+                    properties["inventory_consumables"] = inventory_consumables
+                    properties["inventory_money"] = inventory_money
+                    properties["inventory_stat"] = inventory_stat
 
-                        inventory_things_sum_weight, inventory_things_sum_value = inventory_things.aggregate(
-                            Sum('weight'),
-                            Sum('sale_price'))
-                        inventory_consumables_sum_weight, inventory_consumables_sum_value = \
-                            inventory_consumables.aggregate(Sum('weight'), Sum('sale_price'))
-                        inventory_money_sum_weight, inventory_money_sum_value = inventory_money.aggregate(Sum('weight'),
-                                                                                                             Sum('rate'))
-
-                        inventory_sum_weight = inventory_things_sum_weight + \
-                                               inventory_consumables_sum_weight + \
-                                               inventory_money_sum_weight
-                        inventory_sum_value = inventory_things_sum_value + \
-                                              inventory_consumables_sum_value + \
-                                              inventory_money_sum_value
-                        context['inventory'] = inventory
-                        context['inventory_things'] = inventory_things
-                        context['inventory_consumables'] = inventory_consumables
-                        context['inventory_money'] = inventory_money
-                except EmptyResultSet:
-                    context['inventory'] = 'без рюкзака'
+                except ObjectDoesNotExist:
+                    pass
                 #  -------------------------------------------------------------------------------------------------------------
                 # суммарно
                 #  -------------------------------------------------------------------------------------------------------------
-                sum_weight = inventory_sum_weight + safe_sum_weight
-                sum_value = inventory_sum_value + safe_sum_value
-                person_properties = {"inventory_things_sum_weight": inventory_things_sum_weight,
-                                     "inventory_things_sum_value": inventory_things_sum_value,
-                                     "inventory_consumables_sum_weight": inventory_consumables_sum_weight,
-                                     "inventory_consumables_sum_value": inventory_consumables_sum_value,
-                                     "inventory_money_sum_weight": inventory_money_sum_weight,
-                                     "inventory_money_sum_value": inventory_money_sum_value,
-                                     "inventory_sum_weight": inventory_sum_weight,
-                                     "inventory_sum_value": inventory_sum_value,
-                                     "safe_things_sum_weight": safe_things_sum_weight,
-                                     "safe_things_sum_value": safe_things_sum_value,
-                                     "safe_consumables_sum_weight": safe_consumables_sum_weight,
-                                     "safe_consumables_sum_value": safe_consumables_sum_value,
-                                     "safe_money_sum_weight": safe_money_sum_weight,
-                                     "safe_money_sum_value": safe_money_sum_value,
-                                     "safe_sum_weight": safe_sum_weight,
-                                     "safe_sum_value": safe_sum_value,
-                                     "sum_weight": sum_weight,
-                                     "sum_value": sum_value
-                                     }
-                # context['person_properties'] = person_properties
-                # context['spells'] = spells
+                properties["sum_weight"] = inventory_sum_weight + safe_sum_weight
+                properties["sum_value"] = inventory_sum_value + safe_sum_value
+
                 if person.group_set.all().exists():
                     context['mygroup'] = True
                     try:
@@ -297,14 +269,46 @@ def index(request):
                     context['mygroup'] = False
 
                 try:
-                    loca = person.get_location
-                    # context['location'] = Location.objects.get(id=loca)
+                    if person.personlocation_set.all().exists():
+                        loca = person.personlocation_set.get(person=person.id)
+                        properties["location"] = loca
                 except ObjectDoesNotExist:
-                    context['location'] = None
+                    properties["location"] = None
+
+                person_properties[person.id] = properties
 
         except ObjectDoesNotExist:
             pass
-    return render(request, 'poll/index.html', context=context)
+    context['person_properties'] = person_properties
+    print(context)
+    return render(request=request, template_name='poll/index.html', context=context)
+
+
+class JsonableResponseMixin:
+    """
+    Mixin to add JSON support to a form.
+    Must be used with an object-based FormView (e.g. CreateView)
+    """
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.accepts('text/html'):
+            return response
+        else:
+            return JsonResponse(form.errors, status=400)
+
+    def form_valid(self, form):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).
+        response = super().form_valid(form)
+        if self.request.accepts('text/html'):
+            return response
+        else:
+            data = {
+                'pk': self.object.pk,
+            }
+            return JsonResponse(data)
 
 
 class OwnerCreateView(LoginRequiredMixin, JsonableResponseMixin, PermissionRequiredMixin, CreateView):
@@ -1625,25 +1629,37 @@ class SafeDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Артефакты в сейфе
-        my_things = self.object.thing_set.all()
+        my_things = self.object.things.all()
         # расходники в сейфе
-        my_consumables = self.object.consumable_set.all()
+        my_consumables = self.object.consumables.all()
+        # ценности в сейфе
+        my_money = self.object.money.all()
         consumables_sum_weight = 0
         things_sum_weight = 0
         consumables_sum_value = 0
         things_sum_value = 0
+        money_sum_weight = 0
+        money_sum_value = 0
         for item in my_things:
             things_sum_weight += item.weight
             things_sum_value += item.sale_price
         for item in my_consumables:
             consumables_sum_weight += item.weight
             consumables_sum_value += item.sale_price
-        context['things_sum_weight'] = things_sum_weight
-        context['things_sum_value'] = things_sum_value
-        context['consumables_sum_weight'] = consumables_sum_weight
-        context['consumables_sum_value'] = consumables_sum_value
-        context['things'] = my_things
-        context['consumables'] = my_consumables
+        for item in my_money:
+            money_sum_weight += item.weight
+            money_sum_value += item.rate
+        context['safe_things_sum_weight'] = things_sum_weight
+        context['safe_things_sum_value'] = things_sum_value
+        context['safe_consumables_sum_weight'] = consumables_sum_weight
+        context['safe_consumables_sum_value'] = consumables_sum_value
+        context['safe_money_sum_weight'] = money_sum_weight
+        context['safe_money_sum_value'] = money_sum_value
+        context['safe_sum_weight'] = things_sum_weight + consumables_sum_weight + money_sum_weight
+        context['safe_sum_value'] = things_sum_value + consumables_sum_value + money_sum_value
+        context['safe_things'] = my_things
+        context['safe_consumables'] = my_consumables
+        context['safe_money'] = my_money
         return context
 
 
@@ -1723,11 +1739,11 @@ class InventoryDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Артефакты в рюкзаке
-        my_things = self.object.prefetch_related('things')
+        my_things = self.object.things.all()
         # расходники в рюкзаке
-        my_consumables = self.object.prefetch_related('consumables')
+        my_consumables = self.object.consumables.all()
         # ценности в рюкзаке
-        my_money = self.object.prefetch_related('money')
+        my_money = self.object.money.all()
         consumables_sum_weight = 0
         things_sum_weight = 0
         consumables_sum_value = 0
@@ -1743,15 +1759,36 @@ class InventoryDetailView(LoginRequiredMixin, DetailView):
         for item in my_money:
             money_sum_weight += item.weight
             money_sum_value += item.rate
+        amounts = []
+        quantities = []
+        unique_money = my_money.distinct('money_type', 'rate').values('money_type', 'rate') # уникальные ценности по названию+ номинал
+        unique_consumables = my_consumables.distinct('consumable_name', 'weight')# уникальные расходники по названию и весу
+
+        for item in unique_money:
+            amounts.append(my_money.values('money_type', 'rate').annotate(amount=Count('id'))) # количество уникальных ценностей
+        for item in unique_consumables:
+            quantities.append(my_consumables.values('consumable_name', 'weight').annotate(quantity=Count('id'))) # количество уникальных расходников
+        print(quantities[0])
+        context['quantities'] = quantities[0]
+        context['amounts'] = amounts
         context['inventory_things_sum_weight'] = things_sum_weight
         context['inventory_things_sum_value'] = things_sum_value
         context['inventory_consumables_sum_weight'] = consumables_sum_weight
         context['inventory_consumables_sum_value'] = consumables_sum_value
-        context['inventory_money_sum_weight'] = things_sum_weight
-        context['inventory_money_sum_value'] = things_sum_value
+        context['inventory_money_sum_weight'] = money_sum_weight
+        context['inventory_money_sum_value'] = money_sum_value
+        context['inventory_sum_weight'] = things_sum_weight + consumables_sum_weight + money_sum_weight
+        context['inventory_sum_value'] = things_sum_value + consumables_sum_value + money_sum_value
         context['inventory_things'] = my_things
         context['inventory_consumables'] = my_consumables
-        context['inventory_money'] = my_consumables
+        context['inventory_money'] = my_money
+        print(context['quantities'])
+        for pos in context['quantities']:
+            for key, value in pos.items():
+                print(key, value)
+                print
+        # print(context['amount'])
+        # print(context['quantity'])
         return context
 
 

@@ -1,0 +1,33 @@
+
+{% load poll_extras %}
+
+<table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Кол-во</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                        <tbody>
+                            {% for consumable in inventory_consumables %}
+                            <tr>
+                                <td>
+                                    {{ consumable.consumable_name }}
+                                </td>
+                                <td>
+                                    {{ consumable.weight }}
+                                </td>
+                                 <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="consumable{{ consumable_detail.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+
+
+
+
+
+

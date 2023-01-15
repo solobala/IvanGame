@@ -1,5 +1,6 @@
 {% extends "poll/header.html" %}
-{% block personinventory_about %}
+{% block content %}
+{% block inventory_about %}
 <div class="accordion" id="inv_about_{{person_detail.id}}">
     <div class="accordion-item">
         <h2 class="accordion-header" id="header_inv_{{person_detail.id}}">
@@ -15,11 +16,11 @@
             <div class="accordion-body">
                 <table class="table table-bordered border-primary table-sm table-hover" border="1">
                     <tbody>
-                    {% for inventory_detail in person_detail.inventory_set.all %}
+
                     {% if inventory_detail.inventory_name %}
                     <tr>
                         <td>Название</td>
-                        <td> {{ inventory_detail.inventory_name }}</td>
+                        <td> {{ inventory_detail.inventory_name }} </td>
                     </tr>
                     {% endif %}
                     {% if inventory_detail.inventory_description %}
@@ -36,84 +37,69 @@
                     <tr>
                         <td>Текущий вес, в т.ч.</td>
 
-                        <td>{{ inventory_detail.sum_weight }}</td>
+                        <td>{{ inventory_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_weight }}</td>
+                        <td>{{ inventory_consumables_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес ценностей</td>
-                        <td>{{ inventory_detail.money_sum_weight }}</td>
+                        <td>{{ inventory_money_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Вес артефактов</td>
-                        <td>{{ inventory_detail.things_sum_weight }}</td>
+                        <td>{{inventory_things_sum_weight }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость, в т.ч.</td>
-                        <td>{{ inventory_detail.sum_value}}</td>
+                        <td>{{ inventory_sum_value}}</td>
                     </tr>
                     <tr>
                         <td>Стоимость расходников</td>
-                        <td>{{ inventory_detail.consumables_sum_value }}</td>
+                        <td>{{ inventory_consumables_sum_value }}</td>
                     </tr>
                     <tr>
                         <td>Стоимость артефактов</td>
-                        <td>{{ inventory_detail.things_sum_value }}</td>
+                        <td>{{ inventory_things_sum_value }}</td>
                     </tr>
                      <tr>
                         <td>Стоимость ценностей</td>
-                        <td>{{ inventory_detail.money_sum_value }}</td>
+                        <td>{{ inventory_money_sum_value }}</td>
                     </tr>
-                    {% endfor %}
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-{% endblock personinventory_about %}
+{% endblock inventory_about %}
 
-{% block personinventory %}
+{% block inventory_other %}
+
   <!-- Это навигационная панель с вкладками Артефакты-расходники-деньги -->
 <ul class="nav nav-tabs" id="inv">
-  <li class="nav-item" id="invid_th_{{person_detail.id}}">
-    <a class="nav-link"  href="#inventory_th_{{person_detail.id}}">Артефакты</a>
+  <li class="nav-item" id="invid_th_{{inventory_detail.id}}">
+    <a class="nav-link"  href="#inventory_th_{{inventory_detail.id}}"><small>Артефакты</small></a>
   </li>
-  <li class="nav-item" id="invid_cons_{{person_detail.id}}">
-    <a class="nav-link" href="#inventory_cons_{{person_detail.id}}">Расходники</a>
+  <li class="nav-item" id="invid_cons_{{inventory_detail.id}}">
+    <a class="nav-link" href="#inventory_cons_{{inventory_detail.id}}"><small>Расходники</small></a>
   </li>
-  <li class="nav-item" id="invid_money_{{person_detail.id}}">
-    <a class="nav-link" href="#inventory_money_{{person_detail.id}}">Деньги</a>
+  <li class="nav-item" id="invid_money_{{inventory_detail.id}}">
+    <a class="nav-link" href="#inventory_money_{{inventory_detail.id}}"><small>Деньги</small></a>
   </li>
  </ul>
 <!-- Это раздел, где будут артефакты-->
-<div id="inventory_th_{{person_detail.id}}">
-  Это аккордеон для списка артефактов в рюкзаке
-  Внутри таблица со списком артефактов
-{% for inventory_detail in person_detail.inventory_set.all %}
-   <div class="accordion" id="inv_th_{{person_detail.id}}">
-       <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_th{{person_detail.id}}">
-               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                       style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_th{{person_detail.id}}" aria-expanded="true"
-                       aria-controls="body_inv_th{{person_detail.id}}">
-                   <strong>Содержимое</strong>
-               </button>
-           </h6>
-           <div id="body_inv_th{{person_detail.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_th{{person_detail.id}}" data-bs-parent="#inv_th{{person_detail.id}}">
-               <div class="accordion-body">
-                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+<div id="inventory_th_{{inventory_detail.id}}">
+    <table class="table table-bordered border-primary table-sm table-hover" border="1">
                        <thead>
                             <tr>
                                 <td>Название</td><td>Вес</td><td>Выбор</td>
                             </tr>
                        </thead>
                        <tbody>
-                             {% for thing_detail in inventory_detail.thing_set.all %}
+                             {% for thing_detail in inventory_things %}
                             <tr>
                                 <td>
                                     {{ thing_detail.thing_name }}
@@ -131,93 +117,152 @@
                             {% endfor %}
                        </tbody>
                    </table>
-               </div>
-           </div>
-       </div>
-   </div>
-{% endfor %}
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
+<!--   <div class="accordion" id="inv_th_{{inventory_detail.id}}">-->
+<!--       <div class="accordion-item">-->
+<!--           <h6 class="accordion-header" id="header_inv_th_{{inventory_detail.id}}">-->
+<!--               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"-->
+<!--                       style="&#45;&#45;bs-accordion-btn-padding-y:0.25rem"-->
+<!--                       data-bs-target="#body_inv_th_{{inventory_detail.id}}" aria-expanded="true"-->
+<!--                       aria-controls="body_inv_th_{{inventory_detail.id}}">-->
+<!--                   <strong>Содержимое</strong>-->
+<!--               </button>-->
+<!--           </h6>-->
+<!--           <div id="body_inv_th_{{inventory_detail.id}}" class="accordion-collapse collapse"-->
+<!--                aria-labelledby="header_inv_th_{{inventory_detail.id}}" data-bs-parent="#inv_th_{{inventory_detail.id}}">-->
+<!--               <div class="accordion-body">-->
+
+<!--                   <table class="table table-bordered border-primary table-sm table-hover" border="1">-->
+<!--                       <thead>-->
+<!--                            <tr>-->
+<!--                                <td>Название</td><td>Вес</td><td>Выбор</td>-->
+<!--                            </tr>-->
+<!--                       </thead>-->
+<!--                       <tbody>-->
+<!--                             {% for item in inventory_things %}-->
+<!--                            <tr>-->
+<!--                                <td>-->
+<!--                                    {{ item.thing_name }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ item.weight }}-->
+<!--                                </td>-->
+
+<!--                                <td>-->
+<!--                                    <div class="form-check">-->
+<!--                                        <input class="form-check-input" type="checkbox" value="" id="thing_{{ item.id }}">-->
+<!--                                    </div>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                            {% endfor %}-->
+<!--                       </tbody>-->
+<!--                   </table>-->
+<!--               </div>-->
+<!--           </div>-->
+<!--       </div>-->
+<!--   </div>-->
+<!--{% endfor %}-->
 </div>
 <!-- Это раздел, где будут расходники -->
-<div id="inventory_cons_{{person_detail.id}}">
-  Это аккордеон для списка расходников в рюкзаке
-  Внутри таблица со списком расходников
-{% for inventory_detail in person_detail.inventory_set.all %}
-   <div class="accordion" id="inv_cons_{{person_detail.id}}">
+<div id="inventory_cons_{{inventory_detail.id}}">
+    <table class="table table-bordered border-primary table-sm table-hover" border="1">
+         <tbody>
+        {% for pos in quantities %}
+            <tr>
+                {% for key, value in pos.items %}
+                    <td>{{ key }}:</td><td>{{ value}}</td>
+                {% endfor %)
+            </tr>
+        {% empty %}
+        Нет данных
+        {% endfor %}
+        </tbody>
+     </table>
+    <table class="table table-bordered border-primary table-sm table-hover" border="1">
+        <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+        <tbody>
+        {% for item in inventory_consumables %}
+        <tr>
+            <td>
+                {{ item.consumable_name }}
+            </td>
+            <td>
+                {{ item.weight }}
+            </td>
+            <td>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="consumable_{{ item.id }}">
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
+   <div class="accordion" id="inv_cons_{{inventory_detail.id}}">
        <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_cons{{inventory.id}}">
+           <h6 class="accordion-header" id="header_inv_cons_{{inventory_detail.id}}">
                <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
                        style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_cons{{inventory.id}}" aria-expanded="true"
-                       aria-controls="body_inv_cons{{inventory.id}}">
+                       data-bs-target="#body_inv_cons_{{inventory_detail.id}}" aria-expanded="true"
+                       aria-controls="body_inv_cons_{{inventory_detail.id}}">
                    <strong>Содержимое</strong>
                </button>
            </h6>
-           <div id="body_inv_cons{{inventory.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_cons{{inventory.id}}" data-bs-parent="#inv_cons{{inventory.id}}">
+           <div id="body_inv_cons_{{inventory_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_inv_cons_{{inventory_detail.id}}" data-bs-parent="#inv_cons_{{inventory_detail.id}}">
                <div class="accordion-body">
-                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
-                       <thead>
-                            <tr>
-                                <td>Название</td><td>Вес</td><td>Кол-во</td><td>Выбор</td>
-                            </tr>
-                       </thead>
-                        <tbody>
-                            {% for consumable_detail in inventory.consumable_set.all %}
-                            <tr>
-                                <td>
-                                    {{ consumable_detail.consumable_name }}
-                                </td>
-                                <td>
-                                    {{ consumable_detail.weight }}
-                                </td>
-                                <td>
-                                    {{ consumable_detail.quantity }}
-                                </td>
+<!--                   <table class="table table-bordered border-primary table-sm table-hover" border="1">-->
+<!--                       <thead>-->
+<!--                            <tr>-->
+<!--                                <td>Название</td><td>Вес</td><td>Кол-во</td><td>Выбор</td>-->
+<!--                            </tr>-->
+<!--                       </thead>-->
+<!--                        <tbody>-->
+<!--                            {% for item in inventory_detail.consumables.all %}-->
+<!--                            <tr>-->
+<!--                                <td>-->
+<!--                                    {{ item.consumable_name }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ item.weight }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ item.quantity }}-->
+<!--                                </td>-->
 
-                                <td>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="consumable{{ consumable_detail.id }}">
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                       </tbody>
-                   </table>
+<!--                                <td>-->
+<!--                                    <div class="form-check">-->
+<!--                                        <input class="form-check-input" type="checkbox" value="" id="consumable_{{ item.id }}">-->
+<!--                                    </div>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                            {% endfor %}-->
+<!--                       </tbody>-->
+<!--                   </table>-->
                </div>
            </div>
        </div>
    </div>
-{% endfor %}
+<!--{% endfor %}-->
 </div>
 <!-- Это раздел, где будут деньги  -->
-<div id="inventory_money_{{person_detail.id}}">
-  Это аккордеон для списка ценностей в рюкзаке
-  Внутри таблица со списком ценностей
-{% for inventory_detail in person_detail.inventory_set.all %}
-   <div class="accordion" id="inv_mon_{{person_detail.id}}">
-       <div class="accordion-item">
-           <h6 class="accordion-header" id="header_inv_mon{{inventory.id}}">
-               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                       style="--bs-accordion-btn-padding-y:0.25rem"
-                       data-bs-target="#body_inv_mon{{inventory.id}}" aria-expanded="true"
-                       aria-controls="body_inv_mon{{inventory.id}}">
-                   <strong>Содержимое</strong>
-               </button>
-           </h6>
-           <div id="body_inv_mon{{inventory.id}}" class="accordion-collapse collapse"
-                aria-labelledby="header_inv_mon{{inventory.id}}" data-bs-parent="#inv_mon{{inventory.id}}">
-               <div class="accordion-body">
-                   <table class="table table-bordered border-primary table-sm table-hover" border="1">
+<div id="inventory_money_{{inventory_detail.id}}">
+     <table class="table table-bordered border-primary table-sm table-hover" border="1">
                        <thead>
                             <tr>
-                                <td>Название</td><td>Вес</td><td>Номинал</td><td>Кол-во</td><td>Выбор</td>
+                                <td>Название</td><td>Вес</td><td>Номинал</td><td>Выбор</td>
                             </tr>
                        </thead>
                        <tbody>
-                            {% for money_detail in inventory.money_set.all %}
+                            {% for money_detail in inventory_money %}
                             <tr>
                                 <td>
-                                    {{ money_detail.money_type }}
+                                    {{ money_detail.get_money_type_display }}
                                 </td>
                                 <td>
                                     {{ money_detail.weight }}
@@ -225,9 +270,7 @@
                                 <td>
                                     {{ money_detail.rate }}
                                 </td>
-                                <td>
-                                    {{ money_detail.amount }}
-                                </td>
+
 
                                 <td>
                                     <div class="form-check">
@@ -238,13 +281,102 @@
                             {% endfor %}
                        </tbody>
                    </table>
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
+   <div class="accordion" id="inv_mon_{{inventory_detail.id}}">
+       <div class="accordion-item">
+           <h6 class="accordion-header" id="header_inv_mon_{{inventory_detail.id}}">
+               <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                       style="--bs-accordion-btn-padding-y:0.25rem"
+                       data-bs-target="#body_inv_mon_{{inventory_detail.id}}" aria-expanded="true"
+                       aria-controls="body_inv_mon_{{inventory_detail.id}}">
+                   <strong>Содержимое</strong>
+               </button>
+           </h6>
+           <div id="body_inv_mon_{{inventory_detail.id}}" class="accordion-collapse collapse"
+                aria-labelledby="header_inv_mon_{{inventory_detail.id}}" data-bs-parent="#inv_mon_{{inventory_detail.id}}">
+               <div class="accordion-body">
+<!--                   <table class="table table-bordered border-primary table-sm table-hover" border="1">-->
+<!--                       <thead>-->
+<!--                            <tr>-->
+<!--                                <td>Название</td><td>Вес</td><td>Номинал</td><td>Кол-во</td><td>Выбор</td>-->
+<!--                            </tr>-->
+<!--                       </thead>-->
+<!--                       <tbody>-->
+<!--                            {% for money_detail in inventory_detail.money.all %}-->
+<!--                            <tr>-->
+<!--                                <td>-->
+<!--                                    {{ money_detail.get_money_type_display }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ money_detail.weight }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ money_detail.rate }}-->
+<!--                                </td>-->
+<!--                                <td>-->
+<!--                                    {{ money_detail.amount }}-->
+<!--                                </td>-->
+
+<!--                                <td>-->
+<!--                                    <div class="form-check">-->
+<!--                                        <input class="form-check-input" type="checkbox" value="" id="money{{ money_detail.id }}">-->
+<!--                                    </div>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                            {% endfor %}-->
+<!--                       </tbody>-->
+<!--                   </table>-->
                </div>
            </div>
        </div>
    </div>
-{% endfor %}
+<!--{% endfor %}-->
+       <script type="text/javascript">
+            $(document).ready(function(){
+             $("[id^='p_']").hide(); //все персонажи в содержимом вкладок скрыты
+             $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+             $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+             $("#sel li").click(function(){
+                    $("[id^='p_']").hide();
+                     const personId = $(this).attr('id').split('_')[1];
+                    //console.log(personId);
+                   // $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
+                    $("#p_"+personId).show();
+
+                });
+
+                $("#saf li").click(function(){
+                $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+                     const safeTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                     $("#safe_" + safeTabId + "_" + personId).show();
+                });
+
+                $("#inv li").click(function(){
+                      $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+
+                     const invTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                    //console.log(invTabId);
+                    //console.log(personId);
+                     $("#inventory_" + invTabId + "_" + personId).show();
+                });
+
+                 $("#gr li").click(function(){
+                      $("[id^='group_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
+
+                     const invTabId = $(this).attr('id').split('_')[1];
+                     const personId = $(this).attr('id').split('_')[2];
+                    //console.log(invTabId);
+                    //console.log(personId);
+                     $("#group_" + invTabId + "_" + personId).show();
+                });
+            });
+
+     </script>
 </div>
-{% endblock personinventory %}
+{% endblock inventory_other %}
+{% endblock content %}
 
 
 

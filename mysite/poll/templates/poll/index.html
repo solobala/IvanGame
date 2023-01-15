@@ -1,16 +1,16 @@
 {% extends "poll/header.html" %}
-
+{% load poll_extras %}
 {% block content %}
     {% if user.username != "gameadmin" %}
-    {% for person_detail in owner_detail.person_set.all %}
-    <div class="row" id="p_{{person_detail.id}}">
+ {% for person in person_detail %}
+    <div class="row" id="p_{{person.id}}">
         <!-- Это все персонажи и их характеристики-->
         <!-- Видимым будет тот, у которого id = id вкладки-->
         <div class ="row">
-        {% for personbar_detail in person_detail.personbar_set.all %}
-            <!-- Это прогрессбары по каждому из персонажей тоже нужно прятать-->
+
+        {% for personbar_detail in person.personbar_set.all %}
+<!--            Здесь ыть прогрессбары-->
             {% block progressbar %}
-<!--            Здесь должны быть прогрессбары-->
                 {% include "poll/personbar/personbar_progress.html" with personbar_detail=personbar_detail %}
             {%endblock progressbar %}
         {% endfor %}
@@ -19,28 +19,28 @@
 
          <!-- Это  общий аккордеон по Персонажу, х-кам, навыкам-->
             <div class="col-md-3 col-xl-3" style="margin-left:0px;">
-                <div class="accordion" id="pers_selector_{{person_detail.id}}">
-                 <div class="accordion-item" id="pers_selected_{{person_detail.id}}">
-                    <h6 class="accordion-header" id="header_{{person_detail.id}}">
+                <div class="accordion" id="pers_selector_{{person.id}}">
+                 <div class="accordion-item" id="pers_selected_{{person.id}}">
+                    <h6 class="accordion-header" id="header_{{person.id}}">
                         <button class="accordion-button collapsed  bg-success text-dark table-sm"
                                 style="--bs-accordion-btn-padding-y:0.25rem" type="button"
                                 data-bs-toggle="collapse"
-                                data-bs-target="#body_{{person_detail.id}}" aria-expanded="false"
-                                aria-controls="body_{{person_detail.id}}">
-                            {{person_detail.person_name}}
+                                data-bs-target="#body_{{person.id}}" aria-expanded="false"
+                                aria-controls="body_{{person.id}}">
+                            {{person.person_name}}
                         </button>
                     </h6>
-                    <div id="body_{{person_detail.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header_{{ person_detail.id }}" data-bs-parent="#pers_selector_{{person_detail.id}}">
+                    <div id="body_{{person.id}}" class="accordion-collapse collapse show"
+                         aria-labelledby="header_{{ person.id }}" data-bs-parent="#pers_selector_{{person.id}}">
                         <div class="accordion-body">
                                <!-- Краткие сведения о персонаже (портрет)-->
                             {% block personportrait %}
-                                {% include "poll\person\person_detail_min.html" with person_detail=person_detail %}
+                                {% include "poll\person\person_detail_min.html" with person_detail=person %}
                             {% endblock personportrait %}
 
                                 <!-- Очки, навыки, устойчивочть и др.-->
                             {% block personbar %}
-                                {% include "poll\person\person_detail_other.html" with person_detail=person_detail %}
+                                {% include "poll\person\person_detail_other.html" with person_detail=person %}
                             {% endblock personbar %}
                         </div>
                     </div>
@@ -50,44 +50,54 @@
 
          <!-- Это  общий аккордеон по инвентарю,сейфу, заклинаниям-->
             <div class="col-md-3 col-xl-3">
-                <div class="accordion" id="prop_selector_{{person_detail.id}}">
-                 <div class="accordion-item" id="prop_selected_{{person_detail.id}}">
-                    <h6 class="accordion-header" id="header_prop{{person_detail.id}}">
+                <div class="accordion" id="prop_selector_{{person.id}}">
+                 <div class="accordion-item" id="prop_selected_{{person.id}}">
+                    <h6 class="accordion-header" id="header_prop{{person.id}}">
                         <button class="accordion-button collapsed  bg-warning text-white table-sm "
                                 style="--bs-accordion-btn-padding-y:0.25rem" type="button"
                                 data-bs-toggle="collapse"
-                                data-bs-target="#body_prop{{person_detail.id}}" aria-expanded="false"
-                                aria-controls="body_prop{{person_detail.id}}">
+                                data-bs-target="#body_prop{{person.id}}" aria-expanded="false"
+                                aria-controls="body_prop{{person.id}}">
                             В распоряжении:
                         </button>
                     </h6>
-                    <div id="body_prop{{person_detail.id}}" class="accordion-collapse collapse show"
-                         aria-labelledby="header_prop{{person_detail.id}}"
-                         data-bs-parent="#prop_selector_{{person_detail.id}}">
+                    <div id="body_prop{{person.id}}" class="accordion-collapse collapse show"
+                         aria-labelledby="header_prop{{person.id}}"
+                         data-bs-parent="#prop_selector_{{person.id}}">
+<!--                        <div class="accordion-body">-->
+<!--                            &lt;!&ndash; Краткая справка по инвентарю - таблица&ndash;&gt;-->
+<!--                        </div>-->
                         <div class="accordion-body">
+                            {% include "poll\inventory\inventory_detail_min.html" with inventory_detail=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory' inventory_stat=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_stat' inventory_things=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_things' inventory_consumables=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_consumables' inventory_money=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_money' %}
+<!--                            {% include "poll\inventory\inventory_things_list.html" with-->
+<!--                            inventory_things=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_things'-->
+<!--                            %}-->
+<!--                            {% include "poll\inventory\inventory_consumables_list.html" with-->
+<!--                            inventory_consumables=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_consumables'-->
+<!--                            %}-->
+<!--                            {% include "poll\inventory\inventory_money_list.html" with-->
+<!--                            inventory_money=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_money'-->
+<!--                            %}-->
 
-                              <!-- Краткая справка по инвентарю - таблица-->
-                            {% block personinventory_about %}
-                               {% include "poll\inventory\inventory_detail_min.html" with person_detail=person_detail %}
-                            {% endblock personinventory_about %}
 
-                               <!-- Содержимое инвентаря-->
-                            {% block personinventory %}
-                                {% include "poll\inventory\inventory_detail_other.html" with person_detail=person_detail %}
-                            {% endblock personinventory %}
+<!--                            &lt;!&ndash; Содержимое инвентаря&ndash;&gt;-->
+<!--                            {% block inventory %}-->
+<!--                            {% include "poll\inventory\inventory_detail_other.html" with-->
+<!--                            inventory_detail=inventory_detail %}-->
+<!--                            {% endblock inventory %}-->
 
-                                <!-- Краткая справка по сейфу-->
+                            <!-- Краткая справка по сейфу-->
                             {% block personsafe_about %}
-                               {% include "poll\safe\safe_detail_min.html" with person_detail=person_detail %}
+                            {% include "poll\safe\safe_detail_min.html" with person_detail=person_detail %}
                             {% endblock personsafe_about %}
 
-                               <!-- Содержимое сейфа-->
+                            <!-- Содержимое сейфа-->
                             {% block personsafe %}
-                                {% include "poll\safe\safe_detail_other.html" with person_detail=person_detail %}
+                            {% include "poll\safe\safe_detail_other.html" with person_detail=person_detail %}
                             {% endblock personsafe %}
                             <!-- Заклинания-->
                             {% block personspells %}
-                                {% include "poll\spell\spell_detail_other.html" with person_detail=person_detail %}
+                            {% include "poll\spell\spell_detail_other.html" with person_detail=person_detail %}
                             {% endblock personspells %}
 
                         </div>
@@ -144,52 +154,10 @@
         </div>
     </div>
 
-    {% endfor %}
+
     <!-- Это скрипт для изменения очков скрытия персонажей и пр. -->
-    <script type="text/javascript">
-            $(document).ready(function(){
-             $("[id^='p_']").hide(); //все персонажи в содержимом вкладок скрыты
-             $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
-             $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
-             $("#sel li").click(function(){
-                    $("[id^='p_']").hide();
-                     const personId = $(this).attr('id').split('_')[1];
-                    //console.log(personId);
-                   // $("#selid").val($(this).attr('id'));  // в скрытом поле запоминаем его id
-                    $("#p_"+personId).show();
 
-                });
-
-                $("#saf li").click(function(){
-                $("[id^='safe_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
-                     const safeTabId = $(this).attr('id').split('_')[1];
-                     const personId = $(this).attr('id').split('_')[2];
-                     $("#safe_" + safeTabId + "_" + personId).show();
-                });
-
-                $("#inv li").click(function(){
-                      $("[id^='inventory_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
-
-                     const invTabId = $(this).attr('id').split('_')[1];
-                     const personId = $(this).attr('id').split('_')[2];
-                    //console.log(invTabId);
-                    //console.log(personId);
-                     $("#inventory_" + invTabId + "_" + personId).show();
-                });
-
-                 $("#gr li").click(function(){
-                      $("[id^='group_']").hide(); //все вещи в сейфах в содержимом вкладок скрыты
-
-                     const invTabId = $(this).attr('id').split('_')[1];
-                     const personId = $(this).attr('id').split('_')[2];
-                    //console.log(invTabId);
-                    //console.log(personId);
-                     $("#group_" + invTabId + "_" + personId).show();
-                });
-            });
-
-     </script>
-
+{% endfor %}
     {% endif %}
 {% endblock content %}
 

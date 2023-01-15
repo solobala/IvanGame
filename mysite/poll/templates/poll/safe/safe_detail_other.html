@@ -37,7 +37,7 @@
                             </tr>
                        </thead>
                        <tbody>
-                             {% for thing_detail in safe_detail.thing_set.all %}
+                             {% for thing_detail in safe_detail.things.all %}
                             <tr>
                                 <td>
                                     {{ thing_detail.thing_name }}
@@ -86,7 +86,7 @@
                             </tr>
                        </thead>
                         <tbody>
-                            {% for consumable_detail in safe_detail.consumable_set.all %}
+                            {% for consumable_detail in safe_detail.consumables.all %}
                             <tr>
                                 <td>
                                     {{ consumable_detail.consumable_name }}
@@ -138,10 +138,10 @@
                             </tr>
                        </thead>
                        <tbody>
-                            {% for money_detail in safe_detail.money_set.all %}
+                            {% for money_detail in safe_detail.money.all %}
                             <tr>
                                 <td>
-                                    {{ money_detail.money_type }}
+                                    {{ money_detail.get_money_type_display }}
                                 </td>
                                 <td>
                                     {{ money_detail.weight }}

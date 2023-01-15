@@ -1,0 +1,31 @@
+{% load poll_extras %}
+                    <table class="table table-bordered border-primary table-sm table-hover" border="1">
+                       <thead>
+                            <tr>
+                                <td>Название</td><td>Вес</td><td>Выбор</td>
+                            </tr>
+                       </thead>
+                       <tbody>
+                             {% for thing in inventory_things %}
+                            <tr>
+                                <td>
+                                    {{ thing.thing_name }}
+                                </td>
+                                <td>
+                                    {{ thing.weight }}
+                                </td>
+
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="thing{{ thing_detail.id }}">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                       </tbody>
+                   </table>
+
+
+
+
+

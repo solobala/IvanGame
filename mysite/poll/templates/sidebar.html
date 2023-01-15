@@ -5,27 +5,27 @@
     <title>Title</title>
 </head>
 <body>
-                 {% if user.username != 'gameadmin' %}
-                <div class="accordion" id="owner_selector">
-                    <div class="accordion-item" id="owner_selector_{{owner_detail.id}}">
-                        <h6 class="accordion-header" id="sidebar_header">
-                            <button class="accordion-button  collapsed  bg-success text-white"
+{% if user.username != 'gameadmin' %}
+<div class="accordion" id="owner_selector">
+    <div class="accordion-item" id="owner_selector_{{owner_detail.id}}">
+        <h6 class="accordion-header" id="sidebar_header">
+            <button class="accordion-button  collapsed  bg-success text-white"
                                     style="--bs-accordion-btn-padding-y:0.25rem" type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#sidebar_body" aria-expanded="false"
                                     aria-controls="sidebar_body">
-                                Игрок
-                            </button>
-                        </h6>
-                        <div id="sidebar_body" class="accordion-collapse collapse show"
-                             aria-labelledby="sidebar_header" data-bs-parent="#owner_selector">
-                            <div class="accordion-body">
-                                {% include "poll\owner\owner_detail_min.html" with owner_detail=owner_detail %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+                Игрок
+            </button>
+        </h6>
+        <div id="sidebar_body" class="accordion-collapse collapse show"
+             aria-labelledby="sidebar_header" data-bs-parent="#owner_selector">
+            <div class="accordion-body">
+                {% include "poll\owner\owner_detail_min.html" with owner_detail=owner_detail %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 <!--                &lt;!&ndash; Это дропдаун со списком игроков"&ndash;&gt;-->
 <!--                <input type="text" name="Owners" id="Owners" list="myOwner" style="width:100%;" placeholder="Игроки: {{ num_owners }}"/>-->
 <!--                <datalist id="myOwner">-->
@@ -33,32 +33,32 @@
 <!--                    <option><a href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></option>-->
 <!--                     {% endfor %}-->
 <!--                </datalist>-->
-                  <navbar-nav-scroll>
-                <div class="dropdown" >
-                          <button class="btn btn-secondary dropdown-toggle" type="button"
+<navbar-nav-scroll>
+    <div class="dropdown" >
+        <button class="btn btn-secondary dropdown-toggle" type="button"
                                   data-bs-toggle="dropdown" aria-expanded="false" style=" width:100%; --bs-accordion-btn-padding-y:0.25rem">
                             Все Игроки: {{ num_owners }}
                           </button>
-                          <ul class="dropdown-menu" style="overflow-y:auto; max-height:80vh">
-                              {% for other_owner in owners %}
-                            <li><a class="dropdown-item" href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></li>
-                              {% endfor %}
-                          </ul>
-                </div>
-                      </navbar-nav-scroll>
+        <ul class="dropdown-menu" style="overflow-y:auto; max-height:80vh">
+            {% for other_owner in owners %}
+            <li><a class="dropdown-item" href="/poll/owners/{{ other_owner.id }}/">{{ other_owner.owner_name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</navbar-nav-scroll>
 <!--                 Это дропдаун со списком свободных игроков"-->
 
-                <div class="dropdown" >
-                          <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
+<div class="dropdown" >
+    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                   aria-expanded="false" style=" width:100%; --bs-accordion-btn-padding-y:0.25rem">
                             Свободные: {{ num_owners_available }}
-                          </button>
-                          <ul class="dropdown-menu">
-                              {% for item in free_owners %}
-                            <li><a class="dropdown-item" href="/poll/free_owners/{{ item.id }}/">{{ item.owner_name }}</a></li>
-                              {% endfor %}
-                          </ul>
-                </div>
+    </button>
+    <ul class="dropdown-menu">
+        {% for item in free_owners %}
+        <li><a class="dropdown-item" href="/poll/free_owners/{{ item.id }}/">{{ item.owner_name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
 <!--              <input type="text" name="Owners" id="FreeOwners" list="myFreeOwner" style="width:100%;" placeholder="Свободные Игроки: {{ num_owners_available }}"/>-->
 <!--                <datalist id="myFreeOwner">-->
 <!--                    {% for item in free_owners %}-->
@@ -66,28 +66,28 @@
 <!--                        {% endfor %}-->
 <!--                </datalist>-->
                 <!-- Это ссылки на зоны, локации и др"-->
-                <ul class="nav flex-column" >
-                          <li class="nav-item">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                            Карта
-                            </button>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">ЛОР</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Фракции</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Локации</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Зоны</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Помощь</a>
-                          </li>
-                        </ul>
+<ul class="nav flex-column" >
+    <li class="nav-item">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Карта
+        </button>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">ЛОР</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'poll:fractions-list' %}">Фракции</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'poll:locations-list' %}">Локации</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'poll:zones-list' %}">Зоны</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Помощь</a>
+    </li>
+</ul>
 
 <!-- Кнопка-триггер модального окна -->
 

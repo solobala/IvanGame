@@ -1,4 +1,4 @@
-{% block personinventory %}
+{% block inventory %}
 {% load poll_extras %}
   <!-- Это навигационная панель с вкладками Артефакты-расходники-деньги -->
 <ul class="nav nav-tabs" id="inv">
@@ -15,7 +15,7 @@
 <!-- Это раздел, где будут артефакты-->
 <div id="inventory_th_{{person_detail.id}}">
 
-{% for inventory_detail in person_detail.inventory_set.all %}
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
    <div class="accordion" id="inv_th_{{person_detail.id}}">
        <div class="accordion-item">
            <h6 class="accordion-header" id="header_inv_th{{person_detail.id}}">
@@ -58,12 +58,12 @@
            </div>
        </div>
    </div>
-{% endfor %}
+<!--{% endfor %}-->
 </div>
 <!-- Это раздел, где будут расходники -->
 <div id="inventory_cons_{{person_detail.id}}">
 
-{% for inventory_detail in person_detail.inventory_set.all %}
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
    <div class="accordion" id="inv_cons_{{person_detail.id}}">
        <div class="accordion-item">
            <h6 class="accordion-header" id="header_inv_cons{{inventory.id}}">
@@ -109,12 +109,12 @@
            </div>
        </div>
    </div>
-{% endfor %}
+<!--{% endfor %}-->
 </div>
 <!-- Это раздел, где будут деньги  -->
 <div id="inventory_money_{{person_detail.id}}">
 
-{% for inventory_detail in person_detail.inventory_set.all %}
+<!--{% for inventory_detail in person_detail.inventory_set.all %}-->
    <div class="accordion" id="inv_mon_{{person_detail.id}}">
        <div class="accordion-item">
            <h6 class="accordion-header" id="header_inv_mon{{inventory.id}}">
@@ -138,7 +138,7 @@
                             {% for money_detail in inventory.money.all %}
                             <tr>
                                 <td>
-                                    {{ money_detail.money_type }}
+                                    {{ money_detail.get_money_type_display }}
                                 </td>
                                 <td>
                                     {{ money_detail.weight }}
@@ -163,9 +163,9 @@
            </div>
        </div>
    </div>
-{% endfor %}
+<!--{% endfor %}-->
 </div>
-{% endblock personinventory %}
+{% endblock inventory %}
 
 
 
