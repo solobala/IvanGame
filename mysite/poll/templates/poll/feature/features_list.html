@@ -10,7 +10,8 @@
             {% endfor %}
             </ul>
             {% if user.username == 'gameadmin' %}
-            <p><a href="{% url 'poll:feature-add' %}">+ Добавить Свойство?</a></p>
+             <p><a href="{% url 'poll:feature-add' %}">+ Добавить Свойство?</a></p>
+
             {% endif %}
         </div>
     </div>

@@ -8,3 +8,4 @@ django-ckeditor
 Pillow
 django-bootstrap_v5
 coverage
+django-jsoneditor

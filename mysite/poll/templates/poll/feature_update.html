@@ -1,13 +1,14 @@
 <!-- templates/feature/feature_update.html -->
 {% extends "poll/header.html" %}
+{% load bootstrap5 %}
 {% block content %}
     <h1>Изменение Свойства</h1>
  <div style="width:350px; margin-left:20px;margin-top:20px">
 <form method="post">
-    {% csrf_token %}
 
+    {% csrf_token %}
     {{ form.media }}
-    {{ form.as_p }}
+    {{ form.as_div }}
     <input type="submit" value="Save">
 </form>
 {% if user.username == 'gameadmin' %}

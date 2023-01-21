@@ -64,40 +64,15 @@
                     <div id="body_prop{{person.id}}" class="accordion-collapse collapse show"
                          aria-labelledby="header_prop{{person.id}}"
                          data-bs-parent="#prop_selector_{{person.id}}">
-<!--                        <div class="accordion-body">-->
-<!--                            &lt;!&ndash; Краткая справка по инвентарю - таблица&ndash;&gt;-->
-<!--                        </div>-->
+
                         <div class="accordion-body">
                             {% include "poll\inventory\inventory_detail_min.html" with inventory_detail=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory' inventory_stat=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_stat' inventory_things=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_things' inventory_consumables=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_consumables' inventory_money=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_money' %}
-<!--                            {% include "poll\inventory\inventory_things_list.html" with-->
-<!--                            inventory_things=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_things'-->
-<!--                            %}-->
-<!--                            {% include "poll\inventory\inventory_consumables_list.html" with-->
-<!--                            inventory_consumables=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_consumables'-->
-<!--                            %}-->
-<!--                            {% include "poll\inventory\inventory_money_list.html" with-->
-<!--                            inventory_money=person_properties|get_value_from_dict:person.id|get_value_from_dict:'inventory_money'-->
-<!--                            %}-->
-
-
-<!--                            &lt;!&ndash; Содержимое инвентаря&ndash;&gt;-->
-<!--                            {% block inventory %}-->
-<!--                            {% include "poll\inventory\inventory_detail_other.html" with-->
-<!--                            inventory_detail=inventory_detail %}-->
-<!--                            {% endblock inventory %}-->
-
                             <!-- Краткая справка по сейфу-->
-                            {% block personsafe_about %}
-                            {% include "poll\safe\safe_detail_min.html" with person_detail=person_detail %}
-                            {% endblock personsafe_about %}
+                            {% include "poll\safe\safe_detail_min.html" with safe_detail=person_properties|get_value_from_dict:person.id|get_value_from_dict:'safe' safe_stat=person_properties|get_value_from_dict:person.id|get_value_from_dict:'safe_stat' safe_things=person_properties|get_value_from_dict:person.id|get_value_from_dict:'safe_things' safe_consumables=person_properties|get_value_from_dict:person.id|get_value_from_dict:'safe_consumables' safe_money=person_properties|get_value_from_dict:person.id|get_value_from_dict:'safe_money' %}
 
-                            <!-- Содержимое сейфа-->
-                            {% block personsafe %}
-                            {% include "poll\safe\safe_detail_other.html" with person_detail=person_detail %}
-                            {% endblock personsafe %}
                             <!-- Заклинания-->
                             {% block personspells %}
-                            {% include "poll\spell\spell_detail_other.html" with person_detail=person_detail %}
+                            {% include "poll\spell\spell_detail_other.html" with spells=person_properties|get_value_from_dict:person.id|get_value_from_dict:'spells' person=person %}
                             {% endblock personspells %}
 
                         </div>

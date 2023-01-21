@@ -1,25 +1,23 @@
-{% extends "poll/header.html" %}
-{% block content %}
 {% load poll_extras %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
-        <table class="table table-bordered border-primary table-sm table-hover" border="1">
+        <table class="table table-borderless  table-sm table-hover" >
             <tbody>
                 <tr>
-                    <td>Название: </td>
-                    <td>{{ consumable_detail.consumable_name }}</td>
+
+                    <td colspan="2">{{ consumable_detail.consumable_name }}</td>
                 </tr>
                 <tr>
-                    <td>Описание: </td>
-                    <td> {{ consumable_detail.consumable_description|safe }}</td>
+
+                    <td colspan="2"> <small>{{ consumable_detail.consumable_description|safe }}</small></td>
                 </tr>
                 <tr>
-                    <td>Цена покупки:</td>
-                    <td> {{ consumable_detail.sale_price }}</td>
+                    <td><small>Цена покупки: </small></td>
+                    <td> <small>{{ consumable_detail.sale_price }}</small></td>
                 </tr>
                 <tr>
-                    <td>Цена продажи: </td>
-                    <td> {{ consumable_detail.buy_price }}</td>
+                    <td><small>Цена продажи: </small></td>
+                    <td> <small>{{ consumable_detail.buy_price }}</small></td>
                 </tr>
                 <tr>
                     <td colspan="2">
@@ -32,7 +30,7 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#body_points_to_make_{{consumable_detail.id}}" aria-expanded="true"
                                             aria-controls="body_points_to_make_{{consumable_detail.id}}">
-                                        Очки х-к для создания
+                                        <small>Очки х-к для создания</small>
                                     </button>
                                 </h2>
                                 <div id="body_points_to_make_{{consumable_detail.id}}" class="accordion-collapse collapse"
@@ -66,7 +64,7 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#body_points_to_use_{{consumable_detail.id}}" aria-expanded="true"
                                             aria-controls="body_points_to_use_{{consumable_detail.id}}">
-                                        Очки х-к от применения
+                                        <small>Очки х-к от применения</small>
                                     </button>
                                 </h2>
                                 <div id="body_points_to_use_{{consumable_detail.id}}" class="accordion-collapse collapse"
@@ -99,7 +97,7 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#body_res_to_use_{{consumable_detail.id}}" aria-expanded="true"
                                             aria-controls="body_res_to_use_{{consumable_detail.id}}">
-                                        Очки устойчивости от применения
+                                        <small>Очки устойчивости от применения</small>
                                     </button>
                                 </h2>
                                 <div id="body_res_to_use_{{consumable_detail.id}}" class="accordion-collapse collapse"
@@ -133,7 +131,7 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#body_cond{{consumable_detail.id}}" aria-expanded="true"
                                             aria-controls="body_cond{{consumable_detail.id}}">
-                                        Кондиции
+                                        <small>Кондиции</small>
                                     </button>
                                 </h2>
                                 <div id="body_cond{{consumable_detail.id}}" class="accordion-collapse collapse"
@@ -155,7 +153,7 @@
                         </div>
                     </td>
                 </tr>
-                
+
                 <tr>
                     <td colspan="2">
                         <div class="accordion" id="cons_damage">
@@ -167,7 +165,7 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#body_damage_{{consumable_detail.id}}" aria-expanded="true"
                                             aria-controls="body_damage_{{consumable_detail.id}}">
-                                        Очки урона
+                                        <small>Очки урона</small>
                                     </button>
                                 </h2>
                                 <div id="body_damage_{{consumable_detail.id}}" class="accordion-collapse collapse"
@@ -192,13 +190,4 @@
             </tbody>
         </table>
     </div>
-    <hr>
-    {% if user.username == 'gameadmin' %}
-    <p align="left"><a href="{% url 'poll:consumable-update' consumable_detail.pk %}">+ Изменить Расходник {{consumable_detail.consumable_name }}?</a></p>
-    <p align="left"><a href="{% url 'poll:consumable-delete' consumable_detail.pk %}">- Удалить Расходник {{consumable_detail.consumable_name }}?</a></p>
-     <p align="left"><a href="{% url 'poll:consumables-list' %}">Вернуться к списку расходников?</a></p>
-
-    {% endif %}
 </div>
-
-{% endblock %}

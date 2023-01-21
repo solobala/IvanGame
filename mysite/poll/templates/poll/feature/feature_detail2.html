@@ -1,0 +1,210 @@
+{% extends "poll/header.html" %}
+{% block content %}
+  <h2>{{ feature_detail.feature_name }}</h2>
+  <div style="margin-left:20px;margin-top:20px">
+  <p><h4>Название: </h4> {{ feature_detail.feature_name }}</p>
+  <p><h4>Описание: </h4> {{ feature_detail.feature_description|safe }}</p>
+
+           <table class="editorDemoTable" width="350" border="1">
+            <tbody>
+             <tr >
+                 <td colspan="2"><h4>Характеристики: </h4></td>
+            </tr>
+              <tr>
+                <td>Стамина: </td>
+                <td>{{ feature_detail.sp }} </td>
+            </tr>
+            <tr>
+                <td>Колдовство: </td>
+                <td>{{ feature_detail.mp }}</td>
+            </tr>
+            <tr>
+                <td>Интеллект: </td>
+                <td>{{ feature_detail.ip }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Сила: </td>
+                 <td>{{ feature_detail.pp }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Ловкость: </td>
+                <td>{{ feature_detail.ap }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Вера: </td>
+                <td>{{ feature_detail.fp }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Удача: </td>
+                <td>{{ feature_detail.lp }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Харизма: </td>
+                <td>{{ feature_detail.cp }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Рассудок: </td>
+                <td>{{ feature_detail.bp }}
+                 </td>
+            </tr>
+            <tr>
+            <td colspan="2"><h4>Навыки: </h4></td>
+            </tr>
+            <tr>
+                <td>Пирокинектика: </td>
+                 <td>{{ feature_detail.fire_access }}
+                 </td>
+            </tr>
+            <tr>
+                <td>Гидрософистика: </td>
+                 <td>{{ feature_detail.water_access }}
+                </td>
+            </tr>
+            <tr>
+                <td>Эрософистика: </td>
+                  <td>{{ wind_access }}
+            </tr>
+            <tr>
+                <td>Геомантия: </td>
+                 <td>{{ feature_detail.dirt_access }}
+            </tr>
+            <tr>
+                <td>Киловактика: </td>
+                 <td>{{ feature_detail.lightning_access }}
+            </tr>
+            <tr>
+                <td>Элафристика: </td>
+                 <td>{{ feature_detail.holy_access }}
+            </tr>
+            <tr>
+                <td>Катифристика: </td>
+                 <td>{{ feature_detail.curse_access }}
+            </tr>
+            <tr>
+                <td>Гематомантия: </td>
+                <td>{{ feature_detail.bleed_access }}
+            </tr>
+            <tr>
+                <td>Ботаника: </td>
+                <td>{{ feature_detail.nature_access }}
+            </tr>
+            <tr>
+                <td>Псифистика: </td>
+              <td>{{ feature_detail.mental_access }}
+            </tr>
+            <tr>
+                <td>Владение Двуручным оружем: </td>
+                 <td>{{ feature_detail.twohanded_access }}
+            </tr>
+            <tr>
+                <td>Владение Древковым оружием: </td>
+               <td>{{ feature_detail.polearm_access }}
+            </tr>
+            <tr>
+                <td>Владение Одноручным оружием: </td>
+                <td>{{ feature_detail.onehanded_access }}
+            </tr>
+            <tr>
+                <td>Владение Колющим оружием: </td>
+                <td>{{ feature_detail.stabbing_access }}
+            </tr>
+            <tr>
+                <td>Владение Режущим оружием: </td>
+                <td>{{ feature_detail.cutting_access }}
+            </tr>
+            <tr>
+                <td>Владение Дробящим оружием: </td>
+                <td>{{ feature_detail.crushing_access }}
+            </tr>
+            <tr>
+                <td>Владение Стрелковым оружем: </td>
+                <td>{{small_arms_access }}
+            </tr>
+            <tr>
+                <td>Владение Щитами: </td>
+                <td>{{ feature_detail.shields_access }}
+            </tr>
+            <tr>
+                <td colspan="2"><h4> Устойчивость:  </h4></td>
+
+            <tr>
+                <td>к огню: </td>
+                 <td>{{ feature_detail.fire_res }}
+            </tr>
+            <tr>
+                <td> к воде: </td>
+                 <td>{{ feature_detail.water_res }}
+            </tr>
+            <tr>
+                <td> к воздуху: </td>
+                 <td>{{ feature_detail.wind_res }}
+            </tr>
+            <tr>
+                <td> к земле: </td>
+                 <td>{{ feature_detail.dirt_res }}
+            </tr>
+            <tr>
+                <td> к молниям: </td>
+                 <td>{{ feature_detail.lightning_res }}
+            </tr>
+            <tr>
+                <td> к свету: </td>
+                 <td>{{ feature_detail.holy_res }}
+            </tr>
+            <tr>
+                <td> ко тьме: </td>
+                 <td>{{ feature_detail.curse_res }}
+            </tr>
+            <tr>
+                <td> к дроблению: </td>
+                 <td>{{ feature_detail.crush_res }}
+            </tr>
+            <tr>
+                <td> к порезам: </td>
+                 <td>{{ feature_detail.cut_res }}
+            </tr>
+            <tr>
+                <td> к протыканию: </td>
+                 <td>{{ feature_detail.stab_res }}
+            </tr>
+             <td colspan="2"><h4>Снаряжение: </h4></td>
+            <tr>
+                <td>Шлем: </td>
+                <td>{{ feature_detail.helmet_status }}
+            </tr>
+            <tr>
+                <td>Нагрудник: </td>
+                <td>{{ feature_detail.chest_status }}
+            </tr>
+            <tr>
+                <td>Сапоги: </td>
+                <td>{{ feature_detail.shoes_status }}
+            </tr>
+            <tr>
+                <td>Наручи: </td>
+                <td>{{ feature_detail.gloves_status }}
+            </tr>
+            <tr>
+                <td>Прочее: </td>
+                <td>{{ feature_detail.item_status }}
+            </tr>
+            </tbody>
+        </table>
+ </div>
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:feature-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
+<p align="left"><a href="{% url 'poll:feature-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

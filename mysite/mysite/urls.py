@@ -29,8 +29,6 @@ admin.autodiscover()
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('', include('poll.urls')),
-                  # url(r'^api/customers/$', views.owners_list),
-                  # url(r'^api/customers/(?P<pk>[0-9]+)$', views.owner_detail),
 
                   path('poll/', include('poll.urls')),
 

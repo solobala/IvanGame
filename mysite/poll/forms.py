@@ -1,10 +1,13 @@
+import pickle
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.forms import MultiValueField
+from django.forms import MultiValueField, IntegerField
 import json
-from .models import Action, Feature, Owner, Person, PersonBar
+from .models import Action, Feature, Owner, Person, PersonBar, Consumable
 from ckeditor.widgets import CKEditorWidget
+from django_json_widget.widgets import JSONEditorWidget
 from . import slovar
 from django.forms.models import inlineformset_factory
 
@@ -30,59 +33,14 @@ class NewUserForm(UserCreationForm):
         return user
 
 
-class PointsWidget(forms.MultiWidget):
-    def __init__(self, attrs=None):
-        widgets = {"sp": forms.NumberInput(attrs=attrs),
-                   "mp": forms.NumberInput(attrs=attrs),
-                   "ip": forms.NumberInput(attrs=attrs),
-                   "pp": forms.NumberInput(attrs=attrs),
-                   "ap": forms.NumberInput(attrs=attrs),
-                   "fp": forms.NumberInput(attrs=attrs),
-                   "lp": forms.NumberInput(attrs=attrs),
-                   "bp": forms.NumberInput(attrs=attrs),
-                   "cp": forms.NumberInput(attrs=attrs)
-
-                   }
-        super().__init__(self, widgets, attrs)
-
-    def decompress(self, value):
-        if isinstance(value, dict):
-            value.sp = value['sp']
-            value.mp = value['mp']
-            value.ip = value['ip']
-            value.pp = value['pp']
-            value.ap = value['ap']
-            value.fp = value['fp']
-            value.lp = value['lp']
-            value.bp = value['bp']
-            value.cp = value['cp']
-            return [value.sp, value.mp, value.ip, value.pp, value.ap, value.fp, value.lp, value.bp, value.cp]
-        elif isinstance(value, str):
-            a = json.loads(value)
-            return [a.sp, a.mp, a.ip, a.pp, a.ap, a.fp, a.lp, a.bp, a.cp]
-        return [None, None, None, None, None, None, None, None, None]
-
-    def has_changed(self, initial, data):
-        if initial is None:
-            initial = {i: 0 for i in slovar.dict_points}
-        else:
-            if not isinstance(initial, dict):
-                initial = self.widget.decompress(initial)
-            for field, initial, data in zip(self.fields, initial, data):
-                initial = field.to_python(initial)
-                data = field.to_python(data)
-
-
-
-
 # https://colinkingswood.github.io/Model-Form-Customisation/
 class ActionUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ActionUpdateForm, self).__init__(*args, **kwargs)
 
         self.fields['action_name'].widget = forms.TextInput()
-        self.fields['action_alias'].widget = forms.TextInput()
-        # self.fields['action_description'].widget = forms.Textarea(widget=CKEditorWidget())
+        self.fields['action_alias'].widget = CKEditorWidget()
+
         self.fields['action_description'].widget = CKEditorWidget()
         self.fields['sp'].widget = forms.NumberInput()
         self.fields['mp'].widget = forms.NumberInput()
@@ -130,10 +88,10 @@ class ActionUpdateForm(forms.ModelForm):
         self.fields['gloves_status'].widget = forms.NumberInput()
         self.fields['item_status'].widget = forms.NumberInput()
 
-        self.fields['points'].widget = forms.Textarea()
-        self.fields['permissions'].widget = forms.Textarea()
-        self.fields['resistances'].widget = forms.Textarea()
-        self.fields['equipment'].widget = forms.Textarea()
+        self.fields['points'].widget = forms.HiddenInput()
+        self.fields['permissions'].widget = forms.HiddenInput()
+        self.fields['resistances'].widget = forms.HiddenInput()
+        self.fields['equipment'].widget = forms.HiddenInput()
         self.fields['fov'].widget = forms.NumberInput()
         self.fields['rov'].widget = forms.NumberInput()
 
@@ -166,26 +124,35 @@ class ActionUpdateForm(forms.ModelForm):
                                   'action_alias': cleaned_data.get('action_alias'),
                                   'action_description': cleaned_data.get('action_description')})
 
+        # Заполним JSON-поля из NumericField
         points = dict()
         for key in slovar.dict_points.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             points[key] = self.cleaned_data[key]
-        self.cleaned_data.update({'points': points})
+
+        self.cleaned_data.update({"points": json.dumps(points, indent=4)})
+
         permissions = dict()
         for key in slovar.dict_permissions.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             permissions[key] = self.cleaned_data[key]
-        self.cleaned_data["permissions"] = permissions
+
+        self.cleaned_data.update({"permissions": json.dumps(permissions, indent=4)})
+
         resistances = dict()
         for key in slovar.dict_resistances.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             resistances[key] = self.cleaned_data[key]
-        self.cleaned_data["resistances"] = resistances
+
+        self.cleaned_data.update({"resistances": json.dumps(resistances, indent=4)})
+
         equipment = dict()
         for key in slovar.dict_equipment.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             equipment[key] = self.cleaned_data[key]
-        self.cleaned_data.update({"equipment": equipment})
+
+        self.cleaned_data.update({"equipment": json.dumps(equipment, indent=4)})
+
         return self.cleaned_data
 
 
@@ -194,9 +161,8 @@ class FeatureUpdateForm(forms.ModelForm):
         super(FeatureUpdateForm, self).__init__(*args, **kwargs)
 
         self.fields['feature_name'].widget = forms.TextInput()
-
-        # self.fields['action_description'].widget = forms.Textarea(widget=CKEditorWidget())
         self.fields['feature_description'].widget = CKEditorWidget()
+        self.fields['agg_points'].widget = forms.NumberInput()
         self.fields['sp'].widget = forms.NumberInput()
         self.fields['mp'].widget = forms.NumberInput()
         self.fields['ip'].widget = forms.NumberInput()
@@ -243,15 +209,15 @@ class FeatureUpdateForm(forms.ModelForm):
         self.fields['gloves_status'].widget = forms.NumberInput()
         self.fields['item_status'].widget = forms.NumberInput()
 
-        self.fields['points'].widget = forms.Textarea()
-        self.fields['permissions'].widget = forms.Textarea()
-        self.fields['resistances'].widget = forms.Textarea()
-        self.fields['equipment'].widget = forms.Textarea()
+        self.fields['points'].widget = forms.HiddenInput()
+        self.fields['permissions'].widget = forms.HiddenInput()
+        self.fields['resistances'].widget = forms.HiddenInput()
+        self.fields['equipment'].widget = forms.HiddenInput()
 
     class Meta:
         model = Feature
 
-        fields = ['feature_name', 'feature_description']
+        fields = ['feature_name', 'feature_description', 'agg_points']
         for key in slovar.dict_points.keys():
             fields.append(key)
         fields.append('points')
@@ -274,27 +240,35 @@ class FeatureUpdateForm(forms.ModelForm):
         self.cleaned_data.update({'feature_name': cleaned_data.get('feature_name'),
 
                                   'feature_description': cleaned_data.get('feature_description')})
-
+        # Заполним JSON-поля из NumericField
         points = dict()
         for key in slovar.dict_points.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             points[key] = self.cleaned_data[key]
-        self.cleaned_data.update({'points': points})
+
+        self.cleaned_data.update({"points": json.dumps(points, indent=4)})
+
         permissions = dict()
         for key in slovar.dict_permissions.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             permissions[key] = self.cleaned_data[key]
-        self.cleaned_data["permissions"] = permissions
+
+        self.cleaned_data.update({"permissions": json.dumps(permissions, indent=4)})
+
         resistances = dict()
         for key in slovar.dict_resistances.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             resistances[key] = self.cleaned_data[key]
-        self.cleaned_data["resistances"] = resistances
+
+        self.cleaned_data.update({"resistances": json.dumps(resistances, indent=4)})
+
         equipment = dict()
         for key in slovar.dict_equipment.keys():
             self.cleaned_data.update({key: cleaned_data.get(key)})
             equipment[key] = self.cleaned_data[key]
-        self.cleaned_data.update({"equipment": equipment})
+
+        self.cleaned_data.update({"equipment": json.dumps(equipment, indent=4)})
+
         return self.cleaned_data
 
 
@@ -338,32 +312,95 @@ PersonFormSet = inlineformset_factory(
     form=PersonForm, extra=1, can_delete=True, can_delete_extra=True)
 
 
-class PersonBarCharUpdateForm(forms.ModelForm):
+class ConsumableForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(PersonBarCharUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['summary_points'].widget = forms.MultiWidget(widgets={'sp': forms.NumberInput(),
-                                                                          'mp': forms.NumberInput(),
-                                                                          'ip': forms.NumberInput(),
-                                                                          'pp': forms.NumberInput(),
-                                                                          'ap': forms.NumberInput(),
-                                                                          'fp': forms.NumberInput(),
-                                                                          'lp': forms.NumberInput(),
-                                                                          'cp': forms.NumberInput(),
-                                                                          'bp': forms.NumberInput(),
-                                                                          })
+        super(ConsumableForm, self).__init__(*args, **kwargs)
+
+        self.fields['consumable_name'].widget = forms.TextInput()
+        self.fields['consumable_description'].widget = CKEditorWidget()
+        self.fields['sale_price'].widget = forms.NumberInput()
+        self.fields['buy_price'].widget = forms.NumberInput()
+        self.fields['weight'].widget = forms.NumberInput()
+        self.fields['conditions'].widget = forms.HiddenInput
+        for key in slovar.dict_conditions.keys():
+            if key not in ["load_capacity", "avg_magic_resistance", "avg_physic_resistance"]:
+                self.fields[key].widget = forms.NumberInput()
+        self.fields['points_to_make'].widget = forms.HiddenInput
+        for key in slovar.dict_points.keys():
+            self.fields[key + '_to_make'].widget = forms.NumberInput()
+        self.fields['points_from_use'].widget = forms.HiddenInput
+        for key in slovar.dict_points.keys():
+            self.fields[key + '_from_use'].widget = forms.NumberInput()
+        self.fields['resistances_from_use'].widget = forms.HiddenInput
+        for key in slovar.dict_resistances.keys():
+            self.fields[key].widget = forms.NumberInput()
+        self.fields['damage_from_use'].widget = forms.HiddenInput
+        for key in slovar.dict_damage.keys():
+            self.fields[key].widget = forms.NumberInput()
 
     class Meta:
-        model = PersonBar
-        fields = ['summary_points']
+        model = Consumable
+
+        fields = ['consumable_name', 'consumable_description', 'sale_price', 'buy_price', 'weight',
+                  'conditions']
+        for key in slovar.dict_conditions.keys():
+            if key not in ["load_capacity", "avg_magic_resistance", "avg_physic_resistance"]:
+                fields.append(key)
+        fields.append('points_to_make')
+        for key in slovar.dict_points.keys():
+            fields.append(key + '_to_make')
+        fields.append('points_from_use')
+        for key in slovar.dict_points.keys():
+            fields.append(key + '_from_use')
+        fields.append('resistances_from_use')
+        for key in slovar.dict_resistances.keys():
+            fields.append(key)
+        fields.append('damage_from_use')
+        for key in slovar.dict_damage.keys():
+            fields.append(key)
 
     def clean(self):
         cleaned_data = super().clean()
 
-        self.cleaned_data.update({'summary_points': cleaned_data.get('summary_points')})
+        conditions = dict()
+        points_to_make = dict()
+        points_from_use = dict()
 
-        summary_points = dict()
+        for key in slovar.dict_conditions.keys():
+            if key not in ["load_capacity", "avg_magic_resistance", "avg_physic_resistance"]:
+                conditions[key] = self.cleaned_data[key]
+
         for key in slovar.dict_points.keys():
-            self.cleaned_data.update({key: cleaned_data.get(key)})
-            summary_points[key] = self.cleaned_data[key]
-        self.cleaned_data.update({'summary_points': summary_points})
+            points_to_make[key + '_to_make'] = self.cleaned_data[key]
+            points_from_use[key + '_from_use'] = self.cleaned_data[key]
+
+        resistances_from_use = dict()
+        for key in slovar.dict_resistances.keys():
+            resistances_from_use[key] = self.cleaned_data[key]
+
+        damage_from_use = dict()
+        for key in slovar.dict_damage.keys():
+            damage_from_use[key] = self.cleaned_data[key]
+
+        cleaned_data['conditions'] = json.dumps(conditions, indent=4)
+        cleaned_data['points_to_make'] = json.dumps(points_to_make, indent=4)
+        cleaned_data['points_from_use'] = json.dumps(points_from_use, indent=4)
+        cleaned_data['resistances_from_use'] = json.dumps(resistances_from_use, indent=4)
+        cleaned_data['damage_from_use'] = json.dumps(damage_from_use, indent=4)
+     
         return self.cleaned_data
+
+    def save(self, commit=True):
+        consumable = super(ConsumableForm, self)
+        consumable.consumable_name = self.cleaned_data['consumable_name']
+        consumable.consumable_description = self.cleaned_data['consumable_description']
+        consumable.sale_price = self.cleaned_data['sale_price']
+        consumable.buy_price = self.cleaned_data['buy_price']
+        consumable.weight = self.cleaned_data['weight']
+        consumable.conditions = self.cleaned_data['conditions']
+        consumable.points_to_make = self.cleaned_data['points_to_make']
+        consumable.points_from_use = self.cleaned_data['points_from_use']
+        consumable.resistances_from_use = self.cleaned_data['resistances_from_use']
+        consumable.damage_from_use = self.cleaned_data['damage_from_use']
+
+        return consumable

@@ -7,7 +7,9 @@
     </thead>
     <tbody>
     <tr>
+        {% if owner_detail.owner_img %}
         <td align="center"><img src="{{ owner_detail.owner_img.url }}" width="80" alt="owner_img"></td>
+        {% endif %}
     </tr>
     <tr>
 

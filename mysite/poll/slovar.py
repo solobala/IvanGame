@@ -42,6 +42,7 @@ dict_resistances = {
     "stab_res": 'к протыканию'
 }
 
+
 dict_equipment = {
     "helmet_status": 'Шлем',
     "chest_status": 'Нагрудник',
@@ -124,6 +125,20 @@ dict_conditions = {
     "avg_physic_resistance": 'Устойчивость к физ. урону'
 
 }
+dict_damage = {
+    "fire_res_damage": 'от огня',
+    "water_res_damage": 'от воды',
+    "wind_res_damage": 'от воздуха',
+    "dirt_res_damage": 'от земли',
+    "lightning_res_damage": 'от молний',
+    "holy_res_damage": 'от света',
+    "curse_res_damage": 'от тьмы',
+    "crush_res_damage": 'от дробления',
+    "cut_res_damage": 'от порезов',
+    "stab_res_damage": 'от протыкания',
+    "clean_damage": 'чистый урон '
+}
+
 mypoints = dict()
 for key in dict_points.keys():
     mypoints[key] = 0

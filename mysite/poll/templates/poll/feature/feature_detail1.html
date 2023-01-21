@@ -1,0 +1,71 @@
+{% extends "poll/header.html" %}
+{% block content %}
+{% load poll_extras %}
+
+<h2>{{ feature_detail.feature_name }}</h2>
+<div style="margin-left:20px;margin-top:20px">
+
+
+  <table class="editorDemoTable" width="350" border="1">
+      <tbody>
+        <tr>
+            <td colspan="2"> {{ feature_detail.feature_description|safe }}</td>
+        </tr>
+        <tr><td><h4>Очки за особенность:</h4></td><td>{{ feature_detail.agg_points }}</td></tr>
+          <!--Характеристики персонажа в аккордеоне-->
+        <tr><td colspan="2"><h4>Характеристики: </h4></td></tr>
+            <!-- Помещаем в текст значения очков, чтобы можно было достать их javascriptom       -->
+        {{ value|json_script:feature_detail.points }}
+        {{ value|json_script:feature_detail.permissions }}
+        {{ value|json_script:feature_detail.resistances }}
+        {{ value|json_script:feature_detail.equipment }}
+
+        {% for key, value in dict_points.items %}
+        <tr>
+            <td>{{ dict_points|get_value_from_dict:key }} </td>
+            <td>{{ feature_detail.points|get_value_from_json:key }}</td>
+        </tr>
+
+        {% endfor %}
+
+        <tr>
+            <td colspan="2"><h4>Навыки: </h4></td>
+      </tr>
+         {% for key, value in dict_permissions.items %}
+        <tr>
+            <td> {{ dict_permissions|get_value_from_dict:key }}</td>
+            <td>{{ feature_detail.permissions|get_value_from_json:key }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+                <td colspan="2"><h4> Устойчивость:  </h4></td>
+      </tr>
+         {% for key, value in dict_resistances.items %}
+        <tr>
+            <td> {{ dict_resistances|get_value_from_dict:key }}</td>
+            <td>{{ feature_detail.resistances|get_value_from_json:key }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+             <td colspan="2"><h4>Снаряжение: </h4></td>
+      </tr>
+         {% for key, value in dict_equipment.items %}
+        <tr>
+            <td> {{ dict_equipment|get_value_from_dict:key }}</td>
+            <td>{{ feature_detail.equipment|get_value_from_json:key }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+</table>
+ </div>
+<hr>
+{% if user.username == 'gameadmin' %}
+
+<p align="left"> <a href="{% url 'poll:feature-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
+<p align="left"><a href="{% url 'poll:feature-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+
+{% endif %}
+
+
+
+{% endblock %}

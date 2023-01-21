@@ -6,19 +6,7 @@ from . import views, views1
 from .views import *
 from .views1 import *
 
-# from .views import OwnerCreateView, OwnerDeleteView, OwnersListView, \
-#     OwnersFreeListView, PersonBarDetailView, ActionDetailView, \
-#     ActionsListView, ActionUpdateView, ActionDeleteView, ActionCreateView, FeatureCreateView, FeatureUpdateView, \
-#     FeatureDeleteView, FractionDetailView, FractionUpdateView, FractionDeleteView, FractionsListView,  \
-#     FractionCreateView, ZonesListView, ZoneDetailView, ZoneCreateView, ZoneDeleteView, ZoneUpdateView
 
-# from .views import PersonDetailView, PersonCreateView, PersonUpdateView, PersonDeleteView
-# from .views import PersonsListView,  StatusPersonsListView, FeaturesListView, FeatureDetailView
-# from .views import MembershipListView, MembershipDeleteView, MembershipUpdateView
-# from .views import GroupsListView, GroupCreateView, GroupUpdateView, GroupDeleteView, GroupDetailView
-# from .views import RaceCreateView, RaceUpdateView, RaceDeleteView, RaceDetailView, RacesListView
-# from .views import LocationsListView, LocationCreateView, LocationUpdateView, LocationDeleteView, LocationDetailView
-# from .views import RegionsListView, RegionCreateView, RegionUpdateView, RegionDeleteView, RegionDetailView
 from rest_framework import routers
 app_name = 'poll'
 
@@ -27,27 +15,27 @@ app_name = 'poll'
 router = SimpleRouter()  # это пример из youtube
 
 
-# router.register(r'owner', views.OwnerViewSet, basename='owner')
-# router.register(r'person', views.PersonViewSet, basename='person')
-# router.register(r'group', views.GroupViewSet)
-# router.register(r'membership', views.MembershipViewSet)
-# router.register(r'race', views.RaceViewSet)
-# router.register(r'region', views.RegionViewSet)
-# router.register(r'location', views.LocationViewSet)
-# router.register(r'zone', views.ZoneViewSet)
-# router.register(r'action', views.ActionViewSet)
-# router.register(r'fraction', views.FractionViewSet)
-# router.register(r'feature', views.FeatureViewSet)
-# router.register(r'history', views.HistoryViewSet)
-# router.register(r'personbar', views.PersonBarViewSet)
-# router.register(r'thing', views.ThingViewSet)
-# router.register(r'consumable', views.ConsumableViewSet)
-# router.register(r'inventory', views.InventoryViewSet)
-# router.register(r'safe', views.SafeViewSet)
+router.register(r'owner', views.OwnerViewSet, basename='owner')
+router.register(r'person', views.PersonViewSet, basename='person')
+router.register(r'group', views.GroupViewSet)
+router.register(r'membership', views.MembershipViewSet)
+router.register(r'race', views.RaceViewSet)
+router.register(r'region', views.RegionViewSet)
+router.register(r'location', views.LocationViewSet)
+router.register(r'zone', views.ZoneViewSet)
+router.register(r'action', views.ActionViewSet)
+router.register(r'fraction', views.FractionViewSet)
+router.register(r'feature', views.FeatureViewSet)
+router.register(r'history', views.HistoryViewSet)
+router.register(r'personbar', views.PersonBarViewSet)
+router.register(r'thing', views.ThingViewSet)
+router.register(r'consumable', views.ConsumableViewSet)
+router.register(r'inventory', views.InventoryViewSet)
+router.register(r'safe', views.SafeViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
-    # path('poll/', views.index, name='index'),
+    # path('poll', views.index, name='index'),
 
     path('owners/', OwnersListView.as_view(), name='owners-list'),  # список игроков
 
@@ -106,6 +94,7 @@ urlpatterns = [
     path('features/<int:pk>/update', FeatureUpdateView.as_view(), name='feature-update'),  # обновление свойства
     path('features/<int:pk>/delete', FeatureDeleteView.as_view(), name='feature-delete'),  # удаление свойства
     path('features/add/', FeatureCreateView.as_view(), name='feature-add'),  # new свойства
+    # path('features/create/', create_view, name='feature-create'),  # new свойства
     path('features/', FeaturesListView.as_view(), name='features-list'),  # просмотр списка свойства
 
     path('locations/<int:pk>/', LocationDetailView.as_view(), name='location-detail'),  # просмотр карточки location
@@ -134,7 +123,7 @@ urlpatterns = [
 
     path('inventories/', InventoriesListView.as_view(), name='inventories-list'),  # список рюкзаков
     path('inventories/<int:pk>/', InventoryDetailView.as_view(), name='inventory-detail'),  # просмотр карточки рюкзака
-    path('inventories/<int:pk>/update/', InventoryUpdateView.as_view(), name='inventory-update'),  # обновление карточки рюкзака
+    path('inventories/<int:pk>/update/', InventoryUpdateView.as_view(), name='inventory-update'),  # обновление юкзака
     path('inventories/<int:pk>/delete/', InventoryDeleteView.as_view(), name='inventory-delete'),  # удаление
     path('inventories/add/', InventoryCreateView.as_view(), name='inventory-add'),  # добавить рюкзак
 
@@ -153,7 +142,7 @@ urlpatterns = [
     path('things/add/', ThingCreateView.as_view(), name='thing-add'),  # добавить артефакт
 
     path('consumables/', ConsumablesListView.as_view(), name='consumables-list'),  # список расходников
-    path('consumables/<int:pk>/', ConsumableDetailView.as_view(), name='consumable-detail'),  # просмотр карточки расходников
+    path('consumables/<int:pk>/', ConsumableDetailView.as_view(), name='consumable-detail'),  # просмотр расходников
     path('consumables/<int:pk>/update/', ConsumableUpdateView.as_view(), name='consumable-update'),
     # обновление карточки расходников
     path('consumables/<int:pk>/delete/', ConsumableDeleteView.as_view(), name='consumable-delete'),  # удаление
@@ -165,6 +154,13 @@ urlpatterns = [
     # обновление карточки ценности
     path('money/<int:pk>/delete/', MoneyDeleteView.as_view(), name='money-delete'),  # удаление
     path('money/add/', MoneyCreateView.as_view(), name='money-add'),  # добавить ценность
+
+    path('spells/', SpellsListView.as_view(), name='spells-list'),  # список заклинаний
+    path('spells/<int:pk>/', SpellDetailView.as_view(), name='spell-detail'),  # просмотр карточки заклинания
+    path('spells/<int:pk>/update/', SpellUpdateView.as_view(), name='spell-update'),
+    # обновление карточки заклинания
+    path('spells/<int:pk>/delete/', SpellDeleteView.as_view(), name='spell-delete'),  # удаление
+    path('spells/add/', SpellCreateView.as_view(), name='spell-add'),  # добавить заклинание
 
     path('owners/', views.OwnerList.as_view()),
     path('owners/<int:pk>/', views.OwnerDetail.as_view()),

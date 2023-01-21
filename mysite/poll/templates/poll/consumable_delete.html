@@ -1,0 +1,12 @@
+<!-- templates/consumable/consumable_delete.html -->
+{% extends "poll/header.html"  %}
+
+{% block content %}
+    <h1>Удаление Расходника</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form}}
+      <p>Are you sure you want to delete "{{ consumable_detail.consumable_name }}"?</p>
+      <input type="submit" value="Confirm" />
+    </form>
+{% endblock content %}

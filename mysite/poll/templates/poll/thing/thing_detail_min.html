@@ -1,17 +1,15 @@
-{% extends "poll/header.html" %}
-{% block content %}
 {% load poll_extras %}
 <div class="container-fluid" style="margin-left:20px;margin-top:65px">
     <div class="row">
         <table class="table table-borderless  table-sm table-hover" >
             <tbody>
                 <tr>
-                    <td>Название: </td>
-                    <td>{{ thing_detail.thing_name }}</td>
+
+                    <td colspan="2"><h6>{{ thing_detail.thing_name }}</h6></td>
                 </tr>
                 <tr>
-                    <td>Описание: </td>
-                    <td> {{ thing_detail.thing_description|safe }}</td>
+
+                    <td colspan="2"> {{ thing_detail.thing_description|safe }}</td>
                 </tr>
                 <tr>
                     <td>Цена покупки:</td>
@@ -23,7 +21,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_points_to_make">
+                        <div class="accordion" id="th_points_to_make">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_points_to_make_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -35,7 +33,7 @@
                                 </h2>
                                 <div id="body_points_to_make_{{thing_detail.id}}" class="accordion-collapse collapse"
                                      aria-labelledby="header_points_to_make_{thing_detail.id}}"
-                                     data-bs-parent="#cons_points_to_make">
+                                     data-bs-parent="#th_points_to_make">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -55,7 +53,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_points_to_use">
+                        <div class="accordion" id="th_points_to_use">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_points_to_use_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -66,7 +64,7 @@
                                     </button>
                                 </h2>
                                 <div id="body_points_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_points_to_use_{thing_detail.id}}" data-bs-parent="#cons_points_to_use">
+                                     aria-labelledby="header_points_to_use_{thing_detail.id}}" data-bs-parent="#th_points_to_use">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -86,7 +84,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_res_to_use">
+                        <div class="accordion" id="th_res_to_use">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_res_to_use_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -97,7 +95,7 @@
                                     </button>
                                 </h2>
                                 <div id="body_res_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_res_to_use_{thing_detail.id}}" data-bs-parent="#cons_res_to_use">
+                                     aria-labelledby="header_res_to_use_{thing_detail.id}}" data-bs-parent="#th_res_to_use">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -117,7 +115,7 @@
                 </tr>
                     <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_perm_to_use">
+                        <div class="accordion" id="th_perm_to_use">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_perm_to_use_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -128,7 +126,7 @@
                                     </button>
                                 </h2>
                                 <div id="body_perm_to_use_{{thing_detail.id}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_perm_to_use_{thing_detail.id}}" data-bs-parent="#cons_perm_to_use">
+                                     aria-labelledby="header_perm_to_use_{thing_detail.id}}" data-bs-parent="#th_perm_to_use">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -148,7 +146,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_cond">
+                        <div class="accordion" id="th_cond">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_cond{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -159,7 +157,7 @@
                                     </button>
                                 </h2>
                                 <div id="body_cond{{thing_detail.id}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_cond{{thing_detail.id}}" data-bs-parent="#cons_cond">
+                                     aria-labelledby="header_cond{{thing_detail.id}}" data-bs-parent="#th_cond">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -179,7 +177,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <div class="accordion" id="cons_damage">
+                        <div class="accordion" id="th_damage">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="header_damage_{{thing_detail.id}}">
                                     <button class="accordion-button collapsed table-sm" type="button"
@@ -190,7 +188,7 @@
                                     </button>
                                 </h2>
                                 <div id="body_damage_{{thing_detail.id}}" class="accordion-collapse collapse"
-                                     aria-labelledby="header_damage_{{thing_detail.id}}" data-bs-parent="#cons_damage">
+                                     aria-labelledby="header_damage_{{thing_detail.id}}" data-bs-parent="#th_damage">
                                     <div class="accordion-body">
                                         <table>
                                             <tbody>
@@ -211,11 +209,5 @@
             </tbody>
         </table>
     </div>
-    <hr>
-    {% if user.username == 'gameadmin' %}
-    <p align="left"><a href="{% url 'poll:thing-update' thing_detail.pk %}">+ Изменить Артефакт {{ thing_detail.thing_name }}?</a></p>
-    <p align="left"><a href="{% url 'poll:thing-delete' thing_detail.pk %}">- Удалить Артефакт {{ thing_detail.thing_name }}?</a></p>
-    {% endif %}
-</div>
+ </div>
 
-{% endblock %}

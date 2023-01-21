@@ -3,76 +3,67 @@
 
 {% block content %}
 {% include "poll\personbar\personbar_progress.html" with personbar_detail=personbar_detail %}
-            <table class="table table-bordered border-primary table-sm table-hover" border="1">
-                <tbody>
-                    <tr>
-                        <td>
-                            <h6>Основная характеристика:</h6>
-                        </td>
-                        <td>
-                            {% get_label 'dict_points' personbar_detail.summary_points|get_max %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h6>Основной навык:</h6>
-                        </td>
-                        <td>
-                            {% get_label 'dict_permissions' personbar_detail.summary_permissions|get_max %}
-                        </td>
-                    </tr>
-                     <tr>
-                        <td><h6>Дальность обзора: </h6></td>
-                        <td align="right">{{ personbar_detail.rov }}</td>
-                    </tr>
-                    <tr>
-                        <td><h6>Область обзора: </h6></td>
-                        <td align="right">{{ personbar_detail.fov }}</td>
-                    </tr>
-                <!--Характеристики персонажа в аккордеоне-->
-                    <tr>
-                        <td colspan="2">
-                            <div class="accordion" id="person_points_{{person_detail.id}}">
-                                 <div class="accordion-item">
-                                    <h6 class="accordion-header" id="header_poi{{person_detail.id}}">
-                                      <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
-                                              style="--bs-accordion-btn-padding-y:0.25rem"
-                                              data-bs-target="#body_poi{{person_detail.id}}" aria-expanded="true"
-                                              aria-controls="body_poi{{person_detail.id}}">
-                                        <strong>Характеристики</strong>
-                                      </button>
-                                    </h6>
-                                    <div id="body_poi{{person_detail.id}}" class="accordion-collapse collapse"
-                                        aria-labelledby="header_poi{{person_detail.id}}" data-bs-parent="#person_points_{{person_detail.id}}">
-                                        <div class="accordion-body">
-                                            <table>
-                                                <tbody>
-<!--                                                    <input type = "hidden" id="summary_points_{{person_detail.id}}" value="{{ pos.summary_points }}">-->
-                                                    {% for key_point, value_point in personbar_detail.summary_points.items  %}
-                                                    <tr>
-                                                        <td>{% get_label 'dict_points' key_point %}</td>
-                                                        <td align="right">
-                                                            <input type="number" value="{{ value_point }}" step="1" min="-127" max="128" id="{{key_point}}_{{person_detail.id}}">
-                                                        </td>
-                                                    </tr>
-                                                 {% endfor %}
-                                                     <tr>
-                                                        <td><h6>Нераспределенные очки: </h6></td>
-                                                         <td align="right">
-                                                              <input type="number" value="{{ personbar_detail.unallocated_points }}" step="1" min="0" max="107" id="unallocated_points_{{person_detail.id}}">
-                                                         </td>
-                                                     </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-
-
-                     <tr>
+<table class="table table-bordered border-primary table-sm table-hover" border="1">
+    <tbody>
+    <tr>
+        <td><h6>Основная характеристика:</h6></td>
+        <td>{% get_label 'dict_points' personbar_detail.summary_points|get_max %}</td>
+    </tr>
+    <tr>
+        <td><h6>Основной навык:</h6></td>
+        <td>{% get_label 'dict_permissions' personbar_detail.summary_permissions|get_max %}</td>
+    </tr>
+    <tr>
+        <td><h6>Дальность обзора: </h6></td>
+        <td align="right">{{ personbar_detail.rov }}</td>
+    </tr>
+    <tr>
+        <td><h6>Область обзора: </h6></td>
+        <td align="right">{{ personbar_detail.fov }}</td>
+    </tr>
+    <!--Характеристики персонажа в аккордеоне-->
+    <tr>
+        <td colspan="2">
+            <div class="accordion" id="person_points_{{person_detail.id}}">
+                <div class="accordion-item">
+                    <h6 class="accordion-header" id="header_poi{{person_detail.id}}">
+                        <button class="accordion-button collapsed table-sm"
+                                type="button" data-bs-toggle="collapse"
+                                style="--bs-accordion-btn-padding-y:0.25rem"
+                                data-bs-target="#body_poi{{person_detail.id}}" aria-expanded="true"
+                                aria-controls="body_poi{{person_detail.id}}">
+                            <strong>Характеристики</strong>
+                        </button>
+                    </h6>
+                    <div id="body_poi{{person_detail.id}}" class="accordion-collapse collapse"
+                         aria-labelledby="header_poi{{person_detail.id}}" data-bs-parent="#person_points_{{person_detail.id}}">
+                        <div class="accordion-body">
+                            <table>
+                                <tbody>
+                                <!--  <input type = "hidden" id="summary_points_{{person_detail.id}}" value="{{ pos.summary_points }}">-->
+                                {% for key_point, value_point in personbar_detail.summary_points.items  %}
+                                        <tr>
+                                            <td>{% get_label 'dict_points' key_point %}</td>
+                                            <td align="right">
+                                                <input type="number" value="{{ value_point }}" step="1" min="-127" max="128" id="{{key_point}}_{{person_detail.id}}">
+                                            </td>
+                                        </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td><h6>Нераспределенные очки: </h6></td>
+                                    <td align="right">
+                                        <input type="number" value="{{ personbar_detail.unallocated_points }}" step="1" min="0" max="107" id="unallocated_points_{{person_detail.id}}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
                         <td colspan="2">
                             <div class="accordion" id="person_resistances_{{person_detail.id}}">
                                  <div class="accordion-item">
@@ -105,7 +96,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
+    <tr>
                         <td colspan="2">
                             <div class="accordion" id="person_permissions_{{person_detail.id}}">
                                  <div class="accordion-item">
@@ -144,7 +135,7 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
+    <tr>
                         <td colspan="2">
                             <div class="accordion" id="person_equipment_{{personbar_detail.id}}">
                                  <div class="accordion-item">
@@ -175,8 +166,8 @@
                             </div>
                         </td>
                     </tr>
-                </tbody>
-            </table>
+    </tbody>
+</table>
 {% endblock content %}
 
 

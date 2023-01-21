@@ -8,7 +8,7 @@
 
                 <thead>
                     <td><h5> Действие: </h5></td>
-                    <td><h5>{{ action_detail.action_alias }}</h5></td>
+                    <td><h5>{{ action_detail.action_alias|safe }}</h5></td>
                 </thead>
                 <tbody>
                     <tr>
@@ -166,7 +166,7 @@
             </table>
             </sidebar>
             <aside class="col-3">
-                 <table class="table-danger  table-hover table-bordered table-sm"" border="3">
+                 <table class="table-danger  table-hover table-bordered table-sm" border="3">
 
                     <thead>
                             <td colspan="2"><h5> Устойчивость:  </h5></td>

@@ -1,210 +1,169 @@
 {% extends "poll/header.html" %}
+{% load poll_extras %}
+
 {% block content %}
-  <h2>{{ feature_detail.feature_name }}</h2>
-  <div style="margin-left:20px;margin-top:20px">
-  <p><h4>Название: </h4> {{ feature_detail.feature_name }}</p>
-  <p><h4>Описание: </h4> {{ feature_detail.feature_description|safe }}</p>
 
-           <table class="editorDemoTable" width="350" border="1">
-            <tbody>
-             <tr >
-                 <td colspan="2"><h4>Характеристики: </h4></td>
-            </tr>
-              <tr>
-                <td>Стамина: </td>
-                <td>{{ sp }} </td>
-            </tr>
-            <tr>
-                <td>Колдовство: </td>
-                <td>{{ mp }}</td>
-            </tr>
-            <tr>
-                <td>Интеллект: </td>
-                <td>{{ ip }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Сила: </td>
-                 <td>{{ pp }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Ловкость: </td>
-                <td>{{ ap }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Вера: </td>
-                <td>{{ fp }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Удача: </td>
-                <td>{{ lp }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Харизма: </td>
-                <td>{{ cp }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Рассудок: </td>
-                <td>{{ bp }}
-                 </td>
-            </tr>
-            <tr>
-            <td colspan="2"><h4>Навыки: </h4></td>
-            </tr>
-            <tr>
-                <td>Пирокинектика: </td>
-                 <td>{{ fire_access }}
-                 </td>
-            </tr>
-            <tr>
-                <td>Гидрософистика: </td>
-                 <td>{{ water_access }}
-                </td>
-            </tr>
-            <tr>
-                <td>эрософистика: </td>
-                  <td>{{ wind_access }}
-            </tr>
-            <tr>
-                <td>Геомантия: </td>
-                 <td>{{ dirt_access }}
-            </tr>
-            <tr>
-                <td>Киловактика: </td>
-                 <td>{{ lightning_access }}
-            </tr>
-            <tr>
-                <td>Элафристика: </td>
-                 <td>{{ holy_access }}
-            </tr>
-            <tr>
-                <td>Катифристика: </td>
-                 <td>{{ curse_access }}
-            </tr>
-            <tr>
-                <td>Гематомантия: </td>
-                <td>{{ bleed_access }}
-            </tr>
-            <tr>
-                <td>Ботаника: </td>
-                <td>{{ nature_access }}
-            </tr>
-            <tr>
-                <td>Псифистика: </td>
-              <td>{{ mental_access }}
-            </tr>
-            <tr>
-                <td>Владение Двуручным оружем: </td>
-                 <td>{{ twohanded_access }}
-            </tr>
-            <tr>
-                <td>Владение Древковым оружием: </td>
-               <td>{{ polearm_access }}
-            </tr>
-            <tr>
-                <td>Владение Одноручным оружием: </td>
-                <td>{{ onehanded_access }}
-            </tr>
-            <tr>
-                <td>Владение Колющим оружием: </td>
-                <td>{{ stabbing_access }}
-            </tr>
-            <tr>
-                <td>Владение Режущим оружием: </td>
-                <td>{{ cutting_access }}
-            </tr>
-            <tr>
-                <td>Владение Дробящим оружием: </td>
-                <td>{{ crushing_access }}
-            </tr>
-            <tr>
-                <td>Владение Стрелковым оружем: </td>
-                <td>{{small_arms_access }}
-            </tr>
-            <tr>
-                <td>Владение Щитами: </td>
-                <td>{{ shields_access }}
-            </tr>
-            <tr>
-                <td colspan="2"><h4> Устойчивость:  </h4></td>
+    <div class="col-2"></div>
+<table class="table table-bordered border-primary table-sm table-hover" border="1">
+    <tbody>
+        <tr><td colspan="2"> {{ feature_detail.feature_description|safe }}</td></tr>
+        <tr><td><h4>Очки за особенность:</h4></td><td>{{ feature_detail.agg_points }}</td></tr>
+        <!--Характеристики персонажа в аккордеоне-->
+        <tr>
+            <td colspan="2">
+                <div class="accordion" id="person_points_{{feature_detail.id}}">
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="header_poi{{feature_detail.id}}">
+                            <button class="accordion-button collapsed table-sm"
+                                    type="button" data-bs-toggle="collapse"
+                                    style="--bs-accordion-btn-padding-y:0.25rem"
+                                    data-bs-target="#body_poi{{feature_detail.id}}" aria-expanded="true"
+                                    aria-controls="body_poi{{feature_detail.id}}">
+                                <strong>Характеристики</strong>
+                            </button>
+                        </h6>
+                        <div id="body_poi{{feature_detail.id}}" class="accordion-collapse collapse"
+                             aria-labelledby="header_poi{{feature_detail.id}}" data-bs-parent="#person_points_{{feature_detail.id}}">
+                            <div class="accordion-body">
+                                <table class="table-warning table-hover table-bordered table-sm">
+                                    <tbody>
+                                       {% for key_point, value_point in dict_points.items %}
+                                            <tr>
+                                                <td>{% get_label 'dict_points' key_point %}</td>
+                                                <td align="right">
+                                                    {% if feature_detail.points %}
+                                                   {{ feature_detail.points|get_value_from_json:key_point }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="accordion" id="person_resistances_{{feature_detail.id}}">
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="header_res{{feature_detail.id}}">
+                            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                                  style="--bs-accordion-btn-padding-y:0.25rem"
+                                                  data-bs-target="#body_res{{feature_detail.id}}" aria-expanded="true"
+                                                  aria-controls="body_res{{feature_detail.id}}">
+                                <strong>Устойчивость</strong>
+                            </button>
+                        </h6>
+                        <div id="body_res{{feature_detail.id}}" class="accordion-collapse collapse"
+                             aria-labelledby="header_res{{feature_detail.id}}" data-bs-parent="#person_resistances_{{feature_detail.id}}">
+                            <div class="accordion-body">
+                                <table class="table-danger  table-hover table-bordered table-sm" border="3">
+                                    <tbody>
+                                    {% for key_res, value_res in dict_resistances.items %}
+                                    <tr>
+                                        <td>{% get_label 'dict_resistances' key_res %}</td>
+                                        <td align="right">
+                                             {% if feature_detail.resistances %}
+                                            {{ feature_detail.resistances|get_value_from_json:key_res }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="accordion" id="person_permissions_{{feature_detail.id}}">
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="header_per{{feature_detail.id}}">
+                            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                    style="--bs-accordion-btn-padding-y:0.25rem"
+                                    data-bs-target="#body_per{{feature_detail.id}}" aria-expanded="true"
+                                    aria-controls="body_per{{feature_detail.id}}">
+                                <strong>Навыки</strong>
+                            </button>
+                        </h6>
+                        <div id="body_per{{feature_detail.id}}" class="accordion-collapse collapse"
+                             aria-labelledby="header_per{{feature_detail.id}}" data-bs-parent="#person_permissions_{{feature_detail.id}}">
+                            <div class="accordion-body">
+                               <table class="table-success table-hover table-bordered table-sm">
+                                    <tbody>
+                                    {% for key_per, value_per in dict_permissions.items %}
+                                    <tr>
+                                        <td>{% get_label 'dict_permissions' key_per %}</td>
+                                        <td align="right">
+                                             {% if feature_detail.permissions %}
+                                            {{ feature_detail.permissions|get_value_from_json:key_per }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
 
-            <tr>
-                <td>к огню: </td>
-                 <td>{{ fire_res }}
-            </tr>
-            <tr>
-                <td> к воде: </td>
-                 <td>{{ water_res }}
-            </tr>
-            <tr>
-                <td> к воздуху: </td>
-                 <td>{{ wind_res }}
-            </tr>
-            <tr>
-                <td> к земле: </td>
-                 <td>{{ dirt_res }}
-            </tr>
-            <tr>
-                <td> к молниям: </td>
-                 <td>{{ lightning_res }}
-            </tr>
-            <tr>
-                <td> к свету: </td>
-                 <td>{{ holy_res }}
-            </tr>
-            <tr>
-                <td> ко тьме: </td>
-                 <td>{{ curse_res }}
-            </tr>
-            <tr>
-                <td> к дроблению: </td>
-                 <td>{{ crush_res }}
-            </tr>
-            <tr>
-                <td> к порезам: </td>
-                 <td>{{ cut_res }}
-            </tr>
-            <tr>
-                <td> к протыканию: </td>
-                 <td>{{ stab_res }}
-            </tr>
-             <td colspan="2"><h4>Снаряжение: </h4></td>
-            <tr>
-                <td>Шлем: </td>
-                <td>{{ helmet_status }}
-            </tr>
-            <tr>
-                <td>Нагрудник: </td>
-                <td>{{ chest_status }}
-            </tr>
-            <tr>
-                <td>Сапоги: </td>
-                <td>{{ shoes_status }}
-            </tr>
-            <tr>
-                <td>Наручи: </td>
-                <td>{{ gloves_status }}
-            </tr>
-            <tr>
-                <td>Прочее: </td>
-                <td>{{ item_status }}
-            </tr>
-            </tbody>
-        </table>
- </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="accordion" id="person_equipment_{{feature_detail.id}}">
+                    <div class="accordion-item">
+                        <h6 class="accordion-header" id="header_eq{{feature_detail.id}}">
+                            <button class="accordion-button collapsed table-sm" type="button" data-bs-toggle="collapse"
+                                                  style="--bs-accordion-btn-padding-y:0.25rem"
+                                                  data-bs-target="#body_eq{{feature_detail.id}}" aria-expanded="true"
+                                                  aria-controls="body_eq{{feature_detail.id}}">
+                                <strong>Снаряжение</strong>
+                            </button>
+                        </h6>
+                        <div id="body_eq{{feature_detail.id}}" class="accordion-collapse collapse"
+                             aria-labelledby="header_eq{{feature_detail.id}}" data-bs-parent="#person_equipment_{{feature_detail.id}}">
+                            <div class="accordion-body">
+                               <table class="table-info table-hover table-bordered table-sm">
+                                    <tbody>
+                                    {% for key_eq, value_eq in dict_equipment.items %}
+                                    <tr>
+                                        <td>{% get_label 'dict_equipment' key_eq %}</td>
+                                        <td align="right">
+                                            {% if feature_detail.equipment %}
+                                            {{ feature_detail.equipment|get_value_from_json:key_eq }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
 <hr>
 {% if user.username == 'gameadmin' %}
 
 <p align="left"> <a href="{% url 'poll:feature-update' feature_detail.pk %}">+ Изменить Свойство</a></p>
 <p align="left"><a href="{% url 'poll:feature-delete' feature_detail.pk %}">- Удалить Свойство</a></p>
+<p align="left"><a href="{% url 'poll:features-list' %}"> Вернуться к списку Свойств</a></p>
+</div>
 
 {% endif %}
+{% endblock content %}
 
 
 
-{% endblock %}
+

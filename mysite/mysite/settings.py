@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'ckeditor',
     'ckeditor_uploader',
+    'jsoneditor',
+    'django_json_widget',
     'bootstrap5',
     'allauth',
     'allauth.account',
@@ -77,6 +79,8 @@ SOCIALACCOUNT_PROVIDERS = {
                    }
           },
 }
+JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/8.6.4/jsoneditor.js'
+JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/8.6.4/jsoneditor.css'
 
 #  CRISPY_TEMPLATE_PACK = 'uni_form'
 #CRISPY_TEMPLATE_PACK = 'bootstrap5'
